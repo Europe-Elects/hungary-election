@@ -46,6 +46,18 @@ svg:active { cursor: grabbing; }
 }
 .district-label.dark { fill: #94A3B8; stroke: none; }
 
+/* Logo overlay */
+.map-logo {
+  position: absolute; top: 8px; left: 8px; z-index: 4;
+  opacity: 0.85; pointer-events: none;
+}
+.map-logo img { height: 28px; width: auto; }
+
+/* Footer */
+.footer {
+  margin-top: 8px; font-size: 11px; color: #94A3B8; text-align: center;
+}
+
 /* Zoom controls */
 .zoom-controls {
   position: absolute; bottom: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5;
@@ -111,6 +123,7 @@ svg:active { cursor: grabbing; }
   </div>
   <div id="map-container">
     <svg id="map"></svg>
+    <div class="map-logo"><img src="logo.png" alt="Europe Elects"></div>
     <div id="tooltip"></div>
     <div class="zoom-controls">
       <button class="zoom-btn" id="zoomIn" title="Zoom in">+</button>
@@ -121,16 +134,17 @@ svg:active { cursor: grabbing; }
   </div>
   <div class="seat-count" id="seatCount"></div>
   <div class="legend" id="legend"></div>
+  <div class="footer">Map created by Andrei Miclea and the EuropeElects team</div>
 </div>
 
 <script src="map-data.js"></script>
 <script>
 const PARTIES = {
-  'FIDESZ-KDNP': { color: '#F97316', name: 'FIDESZ-KDNP' },
-  'TISZA':       { color: '#1D4ED8', name: 'TISZA' },
-  'DK':          { color: '#7C3AED', name: 'DK' },
-  'Mi Hazánk':   { color: '#18181B', name: 'Mi Hazánk' },
-  'MKKP':        { color: '#A3E635', name: 'MKKP' },
+  'FIDESZ-KDNP': { color: '#000000', name: 'FIDESZ-KDNP (PfE)' },
+  'TISZA':       { color: '#3399FF', name: 'TISZA (EPP)' },
+  'DK':          { color: '#FF0000', name: 'DK (S&D)' },
+  'Mi Hazánk':   { color: '#70463A', name: 'Mi Hazánk (ESN)' },
+  'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
   'Egyéb':       { color: '#9CA3AF', name: 'Other' }
 };
 const NO_DATA_COLOR = '#E2E8F0';
