@@ -10,8 +10,10 @@ Usage:
   python3 scraper.py --loop                   # continuous polling (every 60s)
   python3 scraper.py --loop --interval 30     # custom interval
   python3 scraper.py --loop --push            # poll + auto git push to GitHub Pages
+  python3 scraper.py --csv hungary_NA_national_unicameral_constituencies_2026_04.csv
+  python3 scraper.py --csv-county hungary_NA_national_unicameral_counties_2026_04.csv
+  python3 scraper.py --csv hungary_NA_national_unicameral_constituencies_2026_04.csv --csv-county hungary_NA_national_unicameral_counties_2026_04.csv --push
   python3 scraper.py --test                   # inject test data
-  python3 scraper.py --test --push            # inject test data + push
   python3 scraper.py --clear --push           # reset to empty + push
 
 Before election day:
@@ -24,6 +26,7 @@ Before election day:
 import json
 import time
 import argparse
+import csv
 import os
 import sys
 import subprocess
@@ -188,6 +191,194 @@ def update_county(results, county_name, party_results):
         results['countyList'][county_name] = party_results
 
 
+def import_csv(csv_path):
+    """
+    Import constituency results from a CSV file.
+
+    Expected CSV format (tab-separated):
+      Code  Választókerületek  Székhely  Fidesz-KDNP (PfE)  Tisza (EPP)  Mi Hazánk (ESN)  DK (S&D)  MKKP (→Greens/EFA)  Other  Winner
+
+    Code format: MAZ*100 + EVK, e.g. 101 = Budapest 01, 1401 = Pest 01
+
+    Usage:
+      python3 scraper.py --csv constituencies.csv
+      python3 scraper.py --csv constituencies.csv --push
+    """
+    results = load_current_results()
+
+    # CSV column name → results.json party name mapping
+    CSV_PARTY_MAP = {
+        'Fidesz-KDNP (PfE)': 'FIDESZ-KDNP',
+        'Tisza (EPP)': 'TISZA',
+        'DK (S&D)': 'DK',
+        'Mi Hazánk (ESN)': 'Mi Hazánk',
+        'MKKP (→Greens/EFA)': 'MKKP',
+    }
+
+    # Detect delimiter (tab or comma)
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        sample = f.readline()
+        delimiter = '\t' if '\t' in sample else ','
+
+    count = 0
+    county_totals = {}  # county → {party: [pct, ...]} for averaging into county list
+
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        reader = csv.DictReader(f, delimiter=delimiter)
+
+        for row in reader:
+            code_str = row.get('Code', '').strip()
+            if not code_str or not code_str.isdigit():
+                continue
+
+            code = int(code_str)
+            maz = f"{code // 100:02d}"
+            evk = code % 100
+
+            if maz not in MAZ_TO_ID:
+                print(f"  [WARN] Unknown MAZ code {maz} from Code={code}, skipping")
+                continue
+
+            prefix = MAZ_TO_ID[maz]
+            district_id = f"{prefix}-{evk:02d}"
+            county = MAZ_TO_COUNTY[maz]
+
+            # Parse party percentages
+            party_results = {}
+            for csv_col, json_party in CSV_PARTY_MAP.items():
+                val_str = ''
+                # Try exact match first, then fuzzy
+                for key in row:
+                    if csv_col.lower() in key.lower():
+                        val_str = row[key].strip()
+                        break
+
+                # Parse: "45.2%", "45.2", or empty
+                val_str = val_str.replace('%', '').replace(',', '.').strip()
+                try:
+                    party_results[json_party] = float(val_str) if val_str else 0.0
+                except ValueError:
+                    party_results[json_party] = 0.0
+
+            update_constituency(results, district_id, party_results)
+            count += 1
+
+            # Accumulate for county averages
+            if county not in county_totals:
+                county_totals[county] = {p: [] for p in PARTIES}
+            for p in PARTIES:
+                if party_results.get(p, 0) > 0:
+                    county_totals[county][p].append(party_results[p])
+
+    # Update county list with averages from constituency data
+    for county, totals in county_totals.items():
+        county_avg = {}
+        for party, values in totals.items():
+            county_avg[party] = round(sum(values) / len(values), 1) if values else 0
+        update_county(results, county, county_avg)
+
+    save_results(results)
+    print(f"  [CSV] Imported {count} constituencies from {csv_path}")
+    print(f"  [CSV] Updated {len(county_totals)} county averages")
+
+
+def import_csv_county(csv_path):
+    """
+    Import national list results by county from a CSV file.
+
+    Expected CSV format (tab or comma separated):
+      County  Fidesz-KDNP (PfE)  Tisza (EPP)  Mi Hazánk (ESN)  DK (S&D)  MKKP (→Greens/EFA)  Other  Winner
+
+    County names should match: Budapest, Baranya, Bács-Kiskun, Békés, etc.
+
+    Usage:
+      python3 scraper.py --csv-county county-results.csv
+      python3 scraper.py --csv-county county-results.csv --push
+    """
+    results = load_current_results()
+
+    CSV_PARTY_MAP = {
+        'Fidesz-KDNP (PfE)': 'FIDESZ-KDNP',
+        'Tisza (EPP)': 'TISZA',
+        'DK (S&D)': 'DK',
+        'Mi Hazánk (ESN)': 'Mi Hazánk',
+        'MKKP (→Greens/EFA)': 'MKKP',
+    }
+
+    # Also allow matching by partial county name
+    COUNTY_ALIASES = {}
+    for county in COUNTIES:
+        COUNTY_ALIASES[county.lower()] = county
+        # Add short versions: "Borsod" → "Borsod-Abaúj-Zemplén"
+        COUNTY_ALIASES[county.split('-')[0].lower()] = county
+    # Manual aliases
+    COUNTY_ALIASES['csongrád'] = 'Csongrád-Csanád'
+    COUNTY_ALIASES['győr'] = 'Győr-Moson-Sopron'
+    COUNTY_ALIASES['komárom'] = 'Komárom-Esztergom'
+    COUNTY_ALIASES['szabolcs'] = 'Szabolcs-Szatmár-Bereg'
+    COUNTY_ALIASES['jász'] = 'Jász-Nagykun-Szolnok'
+
+    def resolve_county(name):
+        name = name.strip()
+        if name in results['countyList']:
+            return name
+        low = name.lower()
+        if low in COUNTY_ALIASES:
+            return COUNTY_ALIASES[low]
+        # Fuzzy: check if any county starts with the input
+        for county in COUNTIES:
+            if county.lower().startswith(low):
+                return county
+        return None
+
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        sample = f.readline()
+        delimiter = '\t' if '\t' in sample else ','
+
+    count = 0
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        reader = csv.DictReader(f, delimiter=delimiter)
+
+        # Find the county column (first column or one named County/Vármegye/Megye)
+        county_col = None
+        for col in reader.fieldnames:
+            if col.lower() in ('county', 'vármegye', 'megye', 'county name'):
+                county_col = col
+                break
+        if not county_col:
+            county_col = reader.fieldnames[0]
+
+        for row in reader:
+            county_raw = row.get(county_col, '').strip()
+            if not county_raw:
+                continue
+
+            county = resolve_county(county_raw)
+            if not county:
+                print(f"  [WARN] Unknown county '{county_raw}', skipping")
+                continue
+
+            party_results = {}
+            for csv_col, json_party in CSV_PARTY_MAP.items():
+                val_str = ''
+                for key in row:
+                    if csv_col.lower() in key.lower():
+                        val_str = row[key].strip()
+                        break
+
+                val_str = val_str.replace('%', '').replace(',', '.').strip()
+                try:
+                    party_results[json_party] = float(val_str) if val_str else 0.0
+                except ValueError:
+                    party_results[json_party] = 0.0
+
+            update_county(results, county, party_results)
+            count += 1
+
+    save_results(results)
+    print(f"  [CSV] Imported {count} county results from {csv_path}")
+
+
 def inject_test_data():
     """Inject realistic test data to verify the maps render correctly."""
     results = empty_results()
@@ -291,6 +482,8 @@ def main():
     parser.add_argument('--interval', type=int, default=60, help='Polling interval in seconds (default: 60)')
     parser.add_argument('--test', action='store_true', help='Inject test data')
     parser.add_argument('--clear', action='store_true', help='Reset to empty results')
+    parser.add_argument('--csv', type=str, metavar='FILE', help='Import constituency results from CSV file')
+    parser.add_argument('--csv-county', type=str, metavar='FILE', help='Import national list results by county from CSV file')
     parser.add_argument('--push', action='store_true', help='Git commit & push results.json after each update')
     args = parser.parse_args()
 
@@ -298,6 +491,15 @@ def main():
     print(f"Results file: {RESULTS_FILE}")
     if args.push:
         print("Auto-push: ON")
+
+    if args.csv or args.csv_county:
+        if args.csv:
+            import_csv(args.csv)
+        if args.csv_county:
+            import_csv_county(args.csv_county)
+        if args.push:
+            git_push()
+        return
 
     if args.test:
         inject_test_data()

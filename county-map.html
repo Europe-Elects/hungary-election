@@ -13,6 +13,16 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 
 .header { margin-bottom: 12px; }
 h1 { font-size: 20px; font-weight: 700; color: #0F172A; letter-spacing: -0.3px; }
+
+.map-logo {
+  position: absolute; top: 8px; left: 8px; z-index: 4;
+  opacity: 0.85; pointer-events: none;
+}
+.map-logo img { height: 28px; width: auto; }
+
+.footer {
+  margin-top: 8px; font-size: 11px; color: #94A3B8; text-align: center;
+}
 .subtitle { font-size: 13px; color: #64748B; margin-top: 2px; }
 .last-updated {
   display: inline-flex; align-items: center; gap: 6px;
@@ -55,7 +65,7 @@ svg { width: 100%; height: auto; display: block; }
 }
 #tooltip h3 { font-size: 14px; font-weight: 600; color: #0F172A; margin-bottom: 8px; }
 .bar-row { display: flex; align-items: center; margin-bottom: 4px; gap: 6px; }
-.bar-label { width: 88px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.bar-label { width: 130px; font-size: 11px; font-weight: 500; white-space: nowrap; }
 .bar-container { flex: 1; height: 12px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 3px; transition: width .3s ease; }
 .bar-pct { font-size: 11px; color: #64748B; width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
@@ -91,6 +101,7 @@ svg { width: 100%; height: auto; display: block; }
   </div>
   <div id="map-container">
     <svg id="map"></svg>
+    <div class="map-logo"><img src="logo.png" alt="Europe Elects"></div>
     <div id="tooltip"></div>
   </div>
   <div class="legend" id="legend"></div>
@@ -98,19 +109,20 @@ svg { width: 100%; height: auto; display: block; }
     <h2>National Summary</h2>
     <div id="nationalBars"></div>
   </div>
+  <div class="footer">Map created by Andrei Miclea and the EuropeElects team</div>
 </div>
 
 <script src="county-data.js"></script>
 <script>
 const PARTIES = {
-  'FIDESZ-KDNP': { color: '#F97316', name: 'FIDESZ-KDNP' },
-  'TISZA':       { color: '#1D4ED8', name: 'TISZA' },
-  'DK':          { color: '#7C3AED', name: 'DK' },
-  'Mi Hazánk':   { color: '#18181B', name: 'Mi Hazánk' },
-  'MKKP':        { color: '#A3E635', name: 'MKKP' },
+  'FIDESZ-KDNP': { color: '#000000', name: 'FIDESZ-KDNP (PfE)' },
+  'TISZA':       { color: '#3399FF', name: 'TISZA (EPP)' },
+  'DK':          { color: '#FF0000', name: 'DK (S&D)' },
+  'Mi Hazánk':   { color: '#70463A', name: 'Mi Hazánk (ESN)' },
+  'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
 };
 const NO_DATA_COLOR = '#E2E8F0';
-const DARK_FILLS = new Set(['#18181B', '#1D4ED8', '#7C3AED']);
+const DARK_FILLS = new Set(['#000000', '#70463A', '#009900']);
 
 const COUNTY_ABBR = {
   'Budapest': 'Budapest', 'Bács-Kiskun': 'Bács-Kiskun', 'Baranya': 'Baranya',
