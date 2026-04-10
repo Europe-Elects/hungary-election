@@ -364,25 +364,36 @@ function updateStatCards(points) {
   sigEl.classList.remove('small');
   sigEl.textContent = signBold(diff);
 
-  // Now that the delta is time-matched against a 2022 baseline at the
-  // same hour, we can interpret it throughout the day — no more
-  // "wait for 18:30" fallback.
-  sigCard.className = 'stat-card signal ' +
-    (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
+  // Sanity guard: on real election day 2026, time-matched deltas should
+  // live in roughly ±10 pp. If both group averages are WAY below that
+  // floor (e.g. both < -15 pp), we're either staring at synthetic
+  // rehearsal data or at an abnormal situation where the mobilisation
+  // narrative would scream "Fidesz mobilising strongly" based on a
+  // 2 pp noise difference between two -43 pp readings. Show a
+  // neutral "initialising" state instead.
+  const noisyData = stats.opp.avg < -15 && stats.fid.avg < -15;
 
-  let narrative;
-  if (diff > 2) {
-    narrative = 'Opposition mobilising strongly → bad for Fidesz';
-  } else if (diff > 0.5) {
-    narrative = 'Opposition mobilising slightly more';
-  } else if (diff < -2) {
-    narrative = 'Fidesz mobilising strongly → bad for opposition';
-  } else if (diff < -0.5) {
-    narrative = 'Fidesz mobilising slightly more';
+  if (noisyData) {
+    sigCard.className = 'stat-card signal neutral';
+    sigSub.textContent = 'Initialising — waiting for meaningful data';
   } else {
-    narrative = 'Balanced — no clear mobilisation edge';
+    sigCard.className = 'stat-card signal ' +
+      (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
+
+    let narrative;
+    if (diff > 2) {
+      narrative = 'Opposition mobilising strongly → bad for Fidesz';
+    } else if (diff > 0.5) {
+      narrative = 'Opposition mobilising slightly more';
+    } else if (diff < -2) {
+      narrative = 'Fidesz mobilising strongly → bad for opposition';
+    } else if (diff < -0.5) {
+      narrative = 'Fidesz mobilising slightly more';
+    } else {
+      narrative = 'Balanced — no clear mobilisation edge';
+    }
+    sigSub.textContent = narrative;
   }
-  sigSub.textContent = narrative;
 
   if (stats.bp.avg !== null) {
     bpNote.innerHTML = ` <strong>Budapest:</strong> ${signBold(stats.bp.avg)} across ${stats.bp.count}/${stats.bp.total} districts.`;

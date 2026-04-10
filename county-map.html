@@ -112,13 +112,6 @@ button.legend-item { line-height: 1.4; }
   font-size: 11px; color: #94A3B8; margin-top: 6px;
 }
 
-.national-summary {
-  margin-top: 12px; padding: 14px 16px;
-  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
-.national-summary h2 { font-size: 15px; font-weight: 600; color: #0F172A; margin-bottom: 10px; }
-
 @media (prefers-reduced-motion: reduce) {
   .county { transition: none; }
   .bar-fill { transition: none; }
@@ -139,10 +132,6 @@ button.legend-item { line-height: 1.4; }
   </div>
   <div class="legend" id="legend"></div>
   <div class="legend-hint" id="legendHint">Click a party to shade counties by that party's vote share</div>
-  <div class="national-summary" id="nationalSummary">
-    <h2>National Summary</h2>
-    <div id="nationalBars"></div>
-  </div>
   <div class="footer">Map created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
 </div>
 
@@ -329,29 +318,6 @@ function moveTooltip(e) {
 }
 function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
 
-function buildNationalSummary(countyData) {
-  const totals = {};
-  for (const p of Object.keys(PARTIES)) totals[p] = 0;
-  let count = 0;
-  for (const [, data] of Object.entries(countyData)) {
-    if (data && hasData(data)) {
-      count++;
-      for (const [party, pct] of Object.entries(data)) {
-        if (totals[party] !== undefined) totals[party] += pct;
-      }
-    }
-  }
-  const div = document.getElementById('nationalBars');
-  if (count === 0) { div.innerHTML = '<div class="no-data">No data yet</div>'; return; }
-  div.innerHTML = Object.entries(totals).map(([p, t]) => [p, t / count]).sort((a, b) => b[1] - a[1])
-    .map(([party, pct]) => {
-      const col = PARTIES[party]?.color || '#9CA3AF';
-      return `<div class="bar-row"><div class="bar-label" style="color:${col}">${party}</div>
-        <div class="bar-container"><div class="bar-fill" style="width:${Math.min(pct,100)}%;background:${col}"></div></div>
-        <div class="bar-pct">${pct.toFixed(1)}%</div></div>`;
-    }).join('');
-}
-
 function buildLegend() {
   const lg = document.getElementById('legend');
   lg.innerHTML = '';
@@ -406,14 +372,13 @@ function applyResults(data) {
   const hasAny = Object.values(countyData).some(d => hasData(d));
   el.classList.toggle('live', hasAny);
   buildMap(countyData);
-  buildNationalSummary(countyData);
 }
 
 async function loadResults() {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
     applyResults(data);
-  } catch(e) { buildMap({}); buildNationalSummary({}); }
+  } catch(e) { buildMap({}); }
 }
 
 setInterval(async () => {
