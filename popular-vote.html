@@ -293,10 +293,16 @@ function renderChart(voteData, minorityData, source) {
     // Value label above bar
     const val = document.createElementNS(ns, 'text');
     val.setAttribute('x', cx);
-    val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
+    if (isMain) {
+      val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
+    } else {
+      // Minority bars are all tiny — pin every label to a single Y so
+      // they align cleanly instead of jittering with each bar's height.
+      val.setAttribute('y', PAD_TOP + plotH - 6);
+      val.setAttribute('font-size', '8');
+    }
     val.setAttribute('class', 'bar-value');
-    if (!isMain) val.setAttribute('font-size', '9');
-    val.textContent = isMain ? pct.toFixed(2) + '%' : pct.toFixed(2) + '%';
+    val.textContent = pct.toFixed(2) + '%';
     svg.appendChild(val);
 
     // X-axis label
