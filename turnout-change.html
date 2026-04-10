@@ -182,6 +182,30 @@ svg#chart {
   .dot { transition: none; }
   @keyframes pulse { 0%, 100% { opacity: 1; } }
 }
+
+/* Phones: shrink the stat cards so the scatter gets usable vertical
+   space. Keeps 3 cards in a row (don't stack) but cuts each card
+   from ~115 px to ~60 px tall. */
+@media (max-width: 640px) {
+  .stats-row { gap: 6px; margin-bottom: 6px; }
+  .stat-card { padding: 6px 8px; border-left-width: 2px; }
+  .stat-label { font-size: 8px; letter-spacing: .01em; }
+  .stat-value { font-size: 15px; margin-top: 2px; line-height: 1.05; }
+  .stat-value.small { font-size: 12px; }
+  .stat-sub { font-size: 8px; margin-top: 2px; line-height: 1.2; }
+  .stat-confidence {
+    font-size: 8px; margin-top: 3px; padding: 1px 5px;
+  }
+  .stat-confidence::before { width: 4px; height: 4px; }
+}
+/* Extra-narrow phones (iPhone SE etc.): squeeze one more step */
+@media (max-width: 420px) {
+  .stat-label { font-size: 7px; }
+  .stat-value { font-size: 13px; }
+  .stat-value.small { font-size: 11px; }
+  .stat-sub { font-size: 7px; }
+  .stat-confidence { font-size: 7px; }
+}
 </style>
 </head>
 <body>
