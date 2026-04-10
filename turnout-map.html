@@ -27,6 +27,23 @@ h1 { font-size: 20px; font-weight: 700; color: #0F172A; letter-spacing: -0.3px; 
 .last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+/* Tabs */
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 8px;
+  background: #F1F5F9; padding: 4px; border-radius: 8px;
+  border: 1px solid #E2E8F0;
+}
+.tab {
+  flex: 1; padding: 8px 14px; border: none; background: transparent;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: #64748B;
+  border-radius: 6px; cursor: pointer; transition: background .15s, color .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tab:hover { color: #0F172A; }
+.tab.active { background: #fff; color: #0F172A; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.tab .count { font-weight: 500; color: #94A3B8; font-variant-numeric: tabular-nums; }
+.tab.active .count { color: #64748B; }
+
 /* Map */
 #map-container {
   position: relative; width: 100%; overflow: hidden;
@@ -140,8 +157,16 @@ svg:active { cursor: grabbing; }
 <div class="container">
   <div class="header">
     <h1>Turnout – Hungary 2026</h1>
-    <div class="subtitle">Live voter turnout by constituency (OEVK), updated every 2 hours</div>
+    <div class="subtitle" id="subtitle">Live voter turnout, updated every 2 hours</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Turnout layer">
+    <button class="tab active" id="tab-const" role="tab" aria-selected="true" data-layer="const">
+      Constituencies <span class="count">106</span>
+    </button>
+    <button class="tab" id="tab-county" role="tab" aria-selected="false" data-layer="county">
+      Counties <span class="count">20</span>
+    </button>
   </div>
   <div id="map-container">
     <svg id="map"></svg>
@@ -160,8 +185,26 @@ svg:active { cursor: grabbing; }
 </div>
 
 <script src="map-data.js"></script>
+<script src="county-data.js"></script>
 <script>
 const NO_DATA_COLOR = '#E2E8F0';
+
+// ── Layer state ──
+// 'const' = 106 constituencies (map-data.js / MAP_DATA / SVG_WIDTH / SVG_HEIGHT)
+// 'county' = 20 counties      (county-data.js / COUNTY_MAP_DATA / COUNTY_SVG_WIDTH / COUNTY_SVG_HEIGHT)
+let currentLayer = 'const';
+try {
+  const saved = localStorage.getItem('turnoutLayer');
+  if (saved === 'const' || saved === 'county') currentLayer = saved;
+} catch (e) {}
+
+function layerDims() {
+  return currentLayer === 'county'
+    ? { w: COUNTY_SVG_WIDTH, h: COUNTY_SVG_HEIGHT }
+    : { w: SVG_WIDTH, h: SVG_HEIGHT };
+}
+
+let lastTurnoutData = null;
 
 // Sequential colour scale: amber → dark brown
 // Anchored at fixed turnout %s so colour stays meaningful across the day
@@ -197,50 +240,85 @@ function turnoutColor(pct) {
 function buildMap(turnoutData) {
   const svg = document.getElementById('map');
   const ns = 'http://www.w3.org/2000/svg';
-  svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`);
+  const dims = layerDims();
+  svg.setAttribute('viewBox', `${zoomState.vbX} ${zoomState.vbY} ${zoomState.vbW} ${zoomState.vbH}`);
   svg.innerHTML = '';
 
-  const constituencies = (turnoutData && turnoutData.constituencies) || {};
+  if (currentLayer === 'county') {
+    const counties = (turnoutData && turnoutData.counties) || {};
+    COUNTY_MAP_DATA.forEach(c => {
+      const record = counties[c.id];
+      const pct = record ? record.pct : null;
+      const fillColor = turnoutColor(pct);
 
-  MAP_DATA.forEach(d => {
-    const record = constituencies[d.id];
-    const pct = record ? record.pct : null;
-    const fillColor = turnoutColor(pct);
+      const path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', c.d);
+      path.setAttribute('class', 'district');
+      path.setAttribute('data-id', c.id);
+      path.setAttribute('fill', fillColor);
+      path.setAttribute('stroke', fillColor);
+      path.addEventListener('mouseenter', (e) => showCountyTooltip(e, c, record));
+      path.addEventListener('mousemove', moveTooltip);
+      path.addEventListener('mouseleave', hideTooltip);
+      svg.appendChild(path);
+    });
+    // Border lines
+    COUNTY_MAP_DATA.forEach(c => {
+      const b = document.createElementNS(ns, 'path');
+      b.setAttribute('d', c.d);
+      b.setAttribute('class', 'border-line');
+      svg.appendChild(b);
+    });
+  } else {
+    const constituencies = (turnoutData && turnoutData.constituencies) || {};
+    MAP_DATA.forEach(d => {
+      const record = constituencies[d.id];
+      const pct = record ? record.pct : null;
+      const fillColor = turnoutColor(pct);
 
-    const path = document.createElementNS(ns, 'path');
-    path.setAttribute('d', d.d);
-    path.setAttribute('class', 'district');
-    path.setAttribute('data-id', d.id);
-    path.setAttribute('fill', fillColor);
-    path.setAttribute('stroke', fillColor);
-    path.addEventListener('mouseenter', (e) => showTooltip(e, d, record));
-    path.addEventListener('mousemove', moveTooltip);
-    path.addEventListener('mouseleave', hideTooltip);
-    svg.appendChild(path);
-  });
-
-  // Border lines (over the fill)
-  MAP_DATA.forEach(d => {
-    const b = document.createElementNS(ns, 'path');
-    b.setAttribute('d', d.d);
-    b.setAttribute('class', 'border-line');
-    svg.appendChild(b);
-  });
+      const path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', d.d);
+      path.setAttribute('class', 'district');
+      path.setAttribute('data-id', d.id);
+      path.setAttribute('fill', fillColor);
+      path.setAttribute('stroke', fillColor);
+      path.addEventListener('mouseenter', (e) => showConstTooltip(e, d, record));
+      path.addEventListener('mousemove', moveTooltip);
+      path.addEventListener('mouseleave', hideTooltip);
+      svg.appendChild(path);
+    });
+    // Border lines
+    MAP_DATA.forEach(d => {
+      const b = document.createElementNS(ns, 'path');
+      b.setAttribute('d', d.d);
+      b.setAttribute('class', 'border-line');
+      svg.appendChild(b);
+    });
+  }
 }
 
-function showTooltip(e, d, record) {
-  const tt = document.getElementById('tooltip');
-  let html = `<h3>${d.county} – #${d.n}</h3>`;
+function tooltipBody(record) {
   if (record && record.pct !== undefined) {
-    html += `<div class="reported">Reported at ${record.time}</div>`;
+    let html = `<div class="reported">Reported at ${record.time}</div>`;
     html += `<div class="turnout-row"><span class="turnout-label">Turnout</span><span class="turnout-value">${record.pct.toFixed(2)}%</span></div>`;
     if (record.megj !== undefined && record.vp !== undefined) {
       html += `<div class="voters">${record.megj.toLocaleString('en-GB')} of ${record.vp.toLocaleString('en-GB')} eligible voters</div>`;
     }
-  } else {
-    html += '<div class="no-data">No turnout data yet</div>';
+    return html;
   }
-  tt.innerHTML = html;
+  return '<div class="no-data">No turnout data yet</div>';
+}
+
+function showConstTooltip(e, d, record) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `<h3>${d.county} – #${d.n}</h3>` + tooltipBody(record);
+  tt.style.display = 'block';
+  moveTooltip(e);
+}
+
+function showCountyTooltip(e, c, record) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `<h3>${c.id}</h3>` + tooltipBody(record);
   tt.style.display = 'block';
   moveTooltip(e);
 }
@@ -288,16 +366,23 @@ function buildLegend() {
   `;
 }
 
+function applyTurnoutData(data) {
+  const el = document.getElementById('lastUpdated');
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  const turnout = data.turnout || {};
+  lastTurnoutData = turnout;
+  const layerHasData = currentLayer === 'county'
+    ? turnout.counties && Object.keys(turnout.counties).length > 0
+    : turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
+  el.classList.toggle('live', !!layerHasData);
+  buildMap(turnout);
+  updateNationalSummary(turnout);
+}
+
 async function loadResults() {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
-    const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    const turnout = data.turnout || {};
-    const hasData = turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
-    el.classList.toggle('live', hasData);
-    buildMap(turnout);
-    updateNationalSummary(turnout);
+    applyTurnoutData(data);
   } catch (e) {
     buildMap({});
     updateNationalSummary(null);
@@ -307,25 +392,64 @@ async function loadResults() {
 setInterval(async () => {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
-    const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    const turnout = data.turnout || {};
-    const hasData = turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
-    el.classList.toggle('live', hasData);
-    document.getElementById('map').innerHTML = '';
-    buildMap(turnout);
-    updateNationalSummary(turnout);
+    applyTurnoutData(data);
   } catch(e) {}
 }, 30000);
+
+// ── Tab switching ──
+function updateSubtitle() {
+  const sub = document.getElementById('subtitle');
+  sub.textContent = currentLayer === 'county'
+    ? 'Live voter turnout by county (20), updated every ~2 hours'
+    : 'Live voter turnout by constituency (OEVK, 106), updated every ~2 hours';
+}
+
+function setLayer(layer) {
+  if (layer !== 'const' && layer !== 'county') return;
+  if (layer === currentLayer) return;
+  currentLayer = layer;
+  try { localStorage.setItem('turnoutLayer', layer); } catch (e) {}
+
+  document.querySelectorAll('.tab').forEach(btn => {
+    const active = btn.dataset.layer === layer;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+
+  updateSubtitle();
+  resetZoom();               // resets viewBox to the new layer's dims
+  if (lastTurnoutData) buildMap(lastTurnoutData); else buildMap({});
+  // Refresh the live indicator for the new layer
+  if (lastTurnoutData) {
+    const el = document.getElementById('lastUpdated');
+    const layerHasData = layer === 'county'
+      ? lastTurnoutData.counties && Object.keys(lastTurnoutData.counties).length > 0
+      : lastTurnoutData.constituencies && Object.keys(lastTurnoutData.constituencies).length > 0;
+    el.classList.toggle('live', !!layerHasData);
+  }
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => setLayer(btn.dataset.layer));
+});
+
+// Initialise active tab UI from persisted state
+document.querySelectorAll('.tab').forEach(btn => {
+  const active = btn.dataset.layer === currentLayer;
+  btn.classList.toggle('active', active);
+  btn.setAttribute('aria-selected', active ? 'true' : 'false');
+});
+updateSubtitle();
 
 buildLegend();
 loadResults();
 
-// ── Zoom & Pan (identical to constituency-map.html) ──
+// ── Zoom & Pan (layer-aware — reads dims from current layer) ──
+const _initDims = layerDims();
 const zoomState = {
   scale: 1,
   vbX: 0, vbY: 0,
-  vbW: SVG_WIDTH, vbH: SVG_HEIGHT,
+  vbW: _initDims.w, vbH: _initDims.h,
   minScale: 1, maxScale: 8,
   isPanning: false,
   startX: 0, startY: 0,
@@ -340,8 +464,9 @@ function updateViewBox() {
 }
 
 function clampViewBox() {
-  const maxX = SVG_WIDTH - zoomState.vbW;
-  const maxY = SVG_HEIGHT - zoomState.vbH;
+  const dims = layerDims();
+  const maxX = dims.w - zoomState.vbW;
+  const maxY = dims.h - zoomState.vbH;
   zoomState.vbX = Math.max(0, Math.min(maxX, zoomState.vbX));
   zoomState.vbY = Math.max(0, Math.min(maxY, zoomState.vbY));
 }
@@ -349,8 +474,9 @@ function clampViewBox() {
 function zoomAt(cx, cy, factor) {
   const newScale = Math.max(zoomState.minScale, Math.min(zoomState.maxScale, zoomState.scale * factor));
   if (newScale === zoomState.scale) return;
-  const newW = SVG_WIDTH / newScale;
-  const newH = SVG_HEIGHT / newScale;
+  const dims = layerDims();
+  const newW = dims.w / newScale;
+  const newH = dims.h / newScale;
   const ratio = 1 - newW / zoomState.vbW;
   zoomState.vbX += (cx - zoomState.vbX) * ratio;
   zoomState.vbY += (cy - zoomState.vbY) * ratio;
@@ -362,11 +488,12 @@ function zoomAt(cx, cy, factor) {
 }
 
 function resetZoom() {
+  const dims = layerDims();
   zoomState.scale = 1;
   zoomState.vbX = 0;
   zoomState.vbY = 0;
-  zoomState.vbW = SVG_WIDTH;
-  zoomState.vbH = SVG_HEIGHT;
+  zoomState.vbW = dims.w;
+  zoomState.vbH = dims.h;
   updateViewBox();
 }
 

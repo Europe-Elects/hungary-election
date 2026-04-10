@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+launchd-scraper.log
+.DS_Store
+ELECTION_DAY_PLAN.md
