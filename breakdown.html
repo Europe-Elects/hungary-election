@@ -51,24 +51,38 @@ body {
 .legend-row .swatch { width: 11px; height: 11px; border-radius: 2px; }
 
 .donuts {
-  display: flex; gap: 12px; justify-content: space-around;
-  align-items: center; flex: 1 1 auto; min-height: 0;
-  flex-wrap: wrap;
+  display: flex; gap: 8px; justify-content: space-around;
+  align-items: flex-start; flex: 1 1 auto; min-height: 0;
 }
 .donut-cell {
   display: flex; flex-direction: column; align-items: center;
-  flex: 1 1 0; min-width: 180px;
+  flex: 1 1 0;
+  /* no min-width so 3 donuts always split the available space evenly,
+     even on a 375 px phone — avoids wrapping to two rows */
+  min-width: 0;
 }
-.donut-cell svg { width: 100%; max-width: 220px; height: auto; }
+.donut-cell svg {
+  width: 100%; max-width: 220px; height: auto; display: block;
+}
 .donut-label {
   font-size: 13px; font-weight: 700; color: #0F172A;
-  margin-top: 4px; text-align: center;
+  margin-top: 4px; text-align: center; line-height: 1.2;
+  overflow-wrap: break-word; max-width: 100%;
 }
 .donut-sub {
   font-size: 10px; color: #64748B; margin-top: 2px; text-align: center;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2; overflow-wrap: break-word; max-width: 100%;
 }
 .donut-sub.awaiting { color: #94A3B8; font-style: italic; }
+
+/* Narrow phones: tighter gap + slightly smaller labels */
+@media (max-width: 480px) {
+  .donuts { gap: 4px; }
+  .donut-label { font-size: 11px; }
+  .donut-sub { font-size: 9px; }
+  .legend-row { gap: 8px; font-size: 11px; }
+}
 
 .donut-slice {
   transition: opacity .15s;
@@ -112,11 +126,9 @@ body {
     <div class="legend-row" id="chartLegend"></div>
     <div class="donuts" id="donuts"></div>
     <div class="chart-footnote">
-      Each donut is the national list vote (party list only) for that
-      geography. <strong>Voters Abroad</strong> = mail ballots from dual-
-      citizens without a Hungarian residence; NVI counts them over the
-      <strong>5–6 days</strong> after election day, so that ring fills
-      in gradually through the following week.
+      <strong>Voters Abroad</strong> = mail ballots from dual-citizens
+      without a Hungarian residence; NVI counts them over the
+      <strong>5–6 days</strong> after election day.
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
