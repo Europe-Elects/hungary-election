@@ -271,22 +271,33 @@ function updateStatCards(points) {
   const diff = stats.opp.avg - stats.fid.avg;
   sigEl.classList.remove('small');
   sigEl.textContent = signBold(diff);
-  sigCard.className = 'stat-card signal ' +
-    (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
 
-  let narrative;
-  if (diff > 2) {
-    narrative = 'Opposition mobilising strongly → bad for Fidesz';
-  } else if (diff > 0.5) {
-    narrative = 'Opposition mobilising slightly more';
-  } else if (diff < -2) {
-    narrative = 'Fidesz mobilising strongly → bad for opposition';
-  } else if (diff < -0.5) {
-    narrative = 'Fidesz mobilising slightly more';
+  // If both averages are massively negative (both < -10 pp), we're still
+  // in a partial daytime snapshot — the mobilisation narrative isn't yet
+  // meaningful. Flag it instead of claiming a trend.
+  const partial = stats.opp.avg < -10 && stats.fid.avg < -10;
+
+  if (partial) {
+    sigCard.className = 'stat-card signal neutral';
+    sigSub.textContent = 'Partial daytime snapshot — wait for 18:30';
   } else {
-    narrative = 'Balanced — no clear mobilisation edge';
+    sigCard.className = 'stat-card signal ' +
+      (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
+
+    let narrative;
+    if (diff > 2) {
+      narrative = 'Opposition mobilising strongly → bad for Fidesz';
+    } else if (diff > 0.5) {
+      narrative = 'Opposition mobilising slightly more';
+    } else if (diff < -2) {
+      narrative = 'Fidesz mobilising strongly → bad for opposition';
+    } else if (diff < -0.5) {
+      narrative = 'Fidesz mobilising slightly more';
+    } else {
+      narrative = 'Balanced — no clear mobilisation edge';
+    }
+    sigSub.textContent = narrative;
   }
-  sigSub.textContent = narrative;
 
   if (stats.bp.avg !== null) {
     bpNote.innerHTML = ` <strong>Budapest:</strong> ${signBold(stats.bp.avg)} across ${stats.bp.count}/${stats.bp.total} districts.`;
