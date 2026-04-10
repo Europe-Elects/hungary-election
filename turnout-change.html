@@ -77,6 +77,22 @@ body {
 }
 .stat-sub.strong { color: #0F172A; font-weight: 600; }
 
+/* Confidence pill inside the mobilisation signal card */
+.stat-confidence {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: .02em;
+  margin-top: 6px;
+  padding: 2px 7px; border-radius: 10px;
+  text-transform: uppercase;
+}
+.stat-confidence.low  { background: #F1F5F9; color: #64748B; }
+.stat-confidence.mid  { background: #FEF3C7; color: #92400E; }
+.stat-confidence.high { background: #DCFCE7; color: #166534; }
+.stat-confidence::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; display: inline-block;
+}
+
 #chart-container {
   position: relative; width: 100%;
   background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
@@ -154,7 +170,7 @@ svg#chart {
 #tooltip .tt-hint { font-size: 10px; color: #94A3B8; margin-top: 4px; }
 
 .chart-footnote {
-  font-size: 11px; color: #64748B; margin-top: 4px; line-height: 1.4;
+  font-size: 10px; color: #64748B; margin-top: 4px; line-height: 1.45;
 }
 .chart-footnote strong { color: #334155; }
 
@@ -191,6 +207,9 @@ svg#chart {
       <div class="stat-label">Mobilisation signal</div>
       <div class="stat-value small" id="statSignalValue">awaiting 2026 data</div>
       <div class="stat-sub strong" id="statSignalText">&nbsp;</div>
+      <div class="stat-confidence low" id="statConfidence">
+        <span id="statConfidenceLabel">awaiting data</span>
+      </div>
     </div>
   </div>
   <div id="chart-container">
@@ -202,16 +221,9 @@ svg#chart {
     </div>
     <svg id="chart"></svg>
     <div class="chart-footnote" id="chartFootnote">
-      Each dot is a constituency. X = Fidesz-KDNP's 2022 vote share.
-      Y = <strong>2026 turnout − time-matched 2022 turnout</strong>
-      (pp). The 2022 baseline is scaled to the current 2026 snapshot
-      time using the 2022 national hourly curve (09:00 10.3%, 11:00
-      25.8%, 13:00 40%, 15:00 52.8%, 17:00 62.9%, 18:30 67.8%), so the
-      comparison is meaningful all day instead of only after polls
-      close. If turnout rises more in <strong>opposition-won 2022
-      districts</strong> than in Fidesz ones, the opposition is likely
-      mobilising harder — the signal above.
-      <span id="budapestNote"></span>
+      Each dot is a constituency. X = Fidesz-KDNP's 2022 share, Y =
+      2026 turnout − <strong>time-matched</strong> 2022 turnout. Rising
+      turnout in opposition-won districts = opposition mobilising.<span id="budapestNote"></span>
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · 2022 baseline from NVI XLSX</div>
@@ -331,6 +343,22 @@ function signBold(v) {
   return (v > 0 ? '+' : '') + v.toFixed(1) + ' pp';
 }
 
+// Confidence level of the mobilisation signal. Urban districts vote
+// earlier than rural ones, and we apply a single national hourly curve
+// uniformly to every district — so early-morning readings carry more
+// noise than late-afternoon ones. This function maps the latest
+// snapshot time to a coarse reliability bucket.
+function pickConfidence(latestTime) {
+  if (!latestTime) return { cls: 'low', text: 'awaiting data' };
+  const m = /^(\d{1,2}):(\d{2})$/.exec(latestTime);
+  if (!m) return { cls: 'low', text: 'awaiting data' };
+  const minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  if (minutes < 11 * 60) return { cls: 'low',  text: 'low confidence' };  // before 11:00
+  if (minutes < 15 * 60) return { cls: 'mid',  text: 'directional' };     // 11:00–15:00
+  if (minutes < 17 * 60) return { cls: 'mid',  text: 'firming up' };      // 15:00–17:00
+  return                        { cls: 'high', text: 'reliable' };        // 17:00+
+}
+
 function updateStatCards(points) {
   const stats = groupStats(points);
   const oppEl    = document.getElementById('statOppValue');
@@ -340,7 +368,16 @@ function updateStatCards(points) {
   const sigEl    = document.getElementById('statSignalValue');
   const sigSub   = document.getElementById('statSignalText');
   const sigCard  = document.getElementById('signalCard');
+  const confEl   = document.getElementById('statConfidence');
+  const confLbl  = document.getElementById('statConfidenceLabel');
   const bpNote   = document.getElementById('budapestNote');
+
+  // Latest snapshot time across all points with data
+  const withData = points.filter(p => p.delta !== null);
+  const latestTime = withData.map(p => p.reportTime).filter(Boolean).sort().pop() || null;
+  const conf = pickConfidence(latestTime);
+  confEl.className = 'stat-confidence ' + conf.cls;
+  confLbl.textContent = conf.text;
 
   if (!stats.hasData) {
     oppEl.textContent = '—';
