@@ -90,7 +90,7 @@ svg#chart {
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="chartLegend"></div>
-    <svg id="chart" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg id="chart"></svg>
     <div class="chart-footnote">
       Designated national minority lists can enter parliament with
       <strong>~0.27%</strong> of the popular vote. Other parties need
@@ -131,11 +131,9 @@ const MINORITY_LABELS = {
 };
 const MINORITY_COLOR = '#93BFE7';  // light blue matching the reference
 
-// Viewport — internal coordinate space. Aspect ratio chosen to closely
-// match the container (~900 × ~430 px after chrome) so "meet" scaling
-// leaves minimal whitespace and fonts stay crisp.
-const VB_W = 900;
-const VB_H = 430;
+// Internal coordinate space is computed at render time from the SVG's
+// actual bounding rect, so text renders at its intended pixel size and
+// the chart fills its container with no letterboxing.
 const PAD_LEFT = 48;
 const PAD_RIGHT = 24;
 const PAD_TOP = 28;
@@ -193,9 +191,15 @@ function niceMax(observedMax) {
 
 function renderChart(voteData, minorityData, source) {
   const svg = document.getElementById('chart');
-  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
   svg.innerHTML = '';
   const ns = 'http://www.w3.org/2000/svg';
+
+  // Size viewBox to match the container at render time. This avoids
+  // letterboxing and keeps label fonts at their intended pixel size.
+  const rect = svg.getBoundingClientRect();
+  const VB_W = Math.max(400, Math.round(rect.width));
+  const VB_H = Math.max(260, Math.round(rect.height));
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
 
   const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
   const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
@@ -367,6 +371,21 @@ setInterval(async () => {
     applyResults(data);
   } catch (e) {}
 }, 30000);
+
+// Re-render on resize so the dynamic viewBox tracks the container.
+let resizeTimer = null;
+let lastData = null;
+const origApplyResults = applyResults;
+applyResults = function (data) {
+  lastData = data;
+  origApplyResults(data);
+};
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (lastData) origApplyResults(lastData);
+  }, 150);
+});
 
 buildLegend();
 loadResults();
