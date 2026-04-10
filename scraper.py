@@ -612,6 +612,7 @@ def parse_results_xml(valtozo1_zip, master):
 
     # ── Process national grand-total party list (oszint=51, valtip=L) ──
     # This is the true nationwide popular vote for the party lists.
+    lists_data = master.get('lists', {})
     for sfid, info in sfid_data.items():
         if info['oszint'] != '51' or info['valtip'] != 'L':
             continue
@@ -620,16 +621,24 @@ def parse_results_xml(valtozo1_zip, master):
             continue
 
         national = {p: 0.0 for p in PARTIES}
+        minority = {}
         for vote in sfid_votes.get(sfid, []):
             tlid = vote['jlid']
             szav = vote['szav']
-            pct = round(szav / total_valid * 100, 2) if total_valid else 0
+            pct = round(szav / total_valid * 100, 3) if total_valid else 0
             if tlid in tlid_to_party:
                 party = tlid_to_party[tlid]
                 national[party] += pct
-            # Nationality lists fall through → "Other" (ignored per design)
+                continue
+            # Nationality lists — capture by list name so the frontend
+            # can render them on the popular vote chart.
+            list_info = lists_data.get(tlid, {})
+            if list_info.get('type') == 'N':
+                list_name = list_info.get('name', f'tlid:{tlid}')
+                minority[list_name] = round(minority.get(list_name, 0) + pct, 3)
 
         results['nationalVote'] = national
+        results['minorityVote'] = minority
         break  # oszint=51 valtip=L is a single grand-total entry
 
     # Get version info from verzio.xml inside the ZIP
@@ -812,6 +821,7 @@ def empty_results():
         "constituencies": {},
         "countyList": county_list,
         "nationalVote": {p: 0 for p in PARTIES},  # popular vote, party list (oszint=51)
+        "minorityVote": {},                         # nationality list vote: {nvi_name: pct}
         "turnout": {
             "national": None,             # {pct, megj, vp, time}
             "counties": {},               # county_name → {pct, megj, vp, time}

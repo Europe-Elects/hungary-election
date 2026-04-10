@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-10T10:44:10.527475",
+  "lastUpdated": "2026-04-10T16:36:17.176882",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.7,
@@ -991,6 +991,18 @@
       "Mi Hazánk": 4.0,
       "MKKP": 0.0
     }
+  },
+  "nationalVote": {
+    "FIDESZ-KDNP": 48.298,
+    "TISZA": 22.671,
+    "DK": 23.656,
+    "Mi Hazánk": 3.943,
+    "MKKP": 0.0
+  },
+  "minorityVote": {
+    "HORVÁT": 0.04,
+    "NÉMET": 0.578,
+    "ROMA": 0.814
   },
   "turnout": {
     "national": {
