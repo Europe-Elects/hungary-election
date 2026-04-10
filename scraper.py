@@ -585,6 +585,14 @@ def parse_results_xml(valtozo1_zip, master):
         results['constituencies'][district_id] = entry
 
     # ── Process county list results (oszint=4, valtip=L) ──
+    # Also accumulate raw absolute counts so we can derive
+    # Capital (Budapest only) vs Rest-of-country breakdowns for the
+    # nationalBreakdown donuts.
+    capital_valid = 0
+    capital_votes = {p: 0 for p in PARTIES}
+    rest_valid = 0
+    rest_votes = {p: 0 for p in PARTIES}
+
     for sfid, info in sfid_data.items():
         if info['oszint'] != '4':
             continue
@@ -606,9 +614,29 @@ def parse_results_xml(valtozo1_zip, master):
             if tlid in tlid_to_party:
                 party = tlid_to_party[tlid]
                 party_results[party] += pct
+                # Accumulate raw absolute counts into Capital vs Rest
+                if maz == '01':
+                    capital_votes[party] += szav
+                else:
+                    rest_votes[party] += szav
             # Nationality lists (HORVÁT, NÉMET, ROMA) → skip (go to "Other")
 
+        if maz == '01':
+            capital_valid += total_valid
+        else:
+            rest_valid += total_valid
+
         results['countyList'][county] = party_results
+
+    # Compute percentages for the Capital + Rest breakdowns from the
+    # raw absolute counts we accumulated above.
+    def _pcts_from_counts(valid, votes):
+        if not valid:
+            return None
+        return {p: round(v / valid * 100, 2) for p, v in votes.items()}
+
+    capital_pcts = _pcts_from_counts(capital_valid, capital_votes)
+    rest_pcts = _pcts_from_counts(rest_valid, rest_votes)
 
     # ── Process national grand-total party list (oszint=51, valtip=L) ──
     # This is the true nationwide popular vote for the party lists.
@@ -640,6 +668,34 @@ def parse_results_xml(valtozo1_zip, master):
         results['nationalVote'] = national
         results['minorityVote'] = minority
         break  # oszint=51 valtip=L is a single grand-total entry
+
+    # ── Process mail / abroad party list (oszint=53, valtip=L) ──
+    # Dual-citizen diaspora vote, counted separately over 5-6 days
+    # after election day. Expected to be empty on election night and
+    # fill in gradually through the week.
+    abroad_valid = 0
+    abroad_votes = {p: 0 for p in PARTIES}
+    for sfid, info in sfid_data.items():
+        if info['oszint'] != '53' or info['valtip'] != 'L':
+            continue
+        total_valid = info['valid_votes']
+        if not total_valid:
+            continue
+        abroad_valid += total_valid
+        for vote in sfid_votes.get(sfid, []):
+            tlid = vote['jlid']
+            szav = vote['szav']
+            if tlid in tlid_to_party:
+                party = tlid_to_party[tlid]
+                abroad_votes[party] += szav
+
+    abroad_pcts = _pcts_from_counts(abroad_valid, abroad_votes)
+
+    results['nationalBreakdown'] = {
+        'capital': capital_pcts,
+        'restOfCountry': rest_pcts,
+        'abroad': abroad_pcts,
+    }
 
     # Get version info from verzio.xml inside the ZIP
     if 'verzio.xml' in valtozo1_zip.namelist():
@@ -822,6 +878,11 @@ def empty_results():
         "countyList": county_list,
         "nationalVote": {p: 0 for p in PARTIES},  # popular vote, party list (oszint=51)
         "minorityVote": {},                         # nationality list vote: {nvi_name: pct}
+        "nationalBreakdown": {                      # 3-way split for donut chart
+            "capital":       None,                  # Budapest only (oszint=4 maz=01)
+            "restOfCountry": None,                  # all counties except Budapest
+            "abroad":        None,                  # mail votes (oszint=53 valtip=L)
+        },
         "turnout": {
             "national": None,             # {pct, megj, vp, time}
             "counties": {},               # county_name → {pct, megj, vp, time}
