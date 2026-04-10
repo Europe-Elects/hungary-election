@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-10T16:36:17.176882",
+  "lastUpdated": "2026-04-11T00:19:05.811160",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.7,
@@ -1003,6 +1003,29 @@
     "HORVÁT": 0.04,
     "NÉMET": 0.578,
     "ROMA": 0.814
+  },
+  "nationalBreakdown": {
+    "capital": {
+      "FIDESZ-KDNP": 48.87,
+      "TISZA": 22.95,
+      "DK": 23.95,
+      "Mi Hazánk": 4.01,
+      "MKKP": 0.0
+    },
+    "restOfCountry": {
+      "FIDESZ-KDNP": 48.18,
+      "TISZA": 22.61,
+      "DK": 23.6,
+      "Mi Hazánk": 3.93,
+      "MKKP": 0.0
+    },
+    "abroad": {
+      "FIDESZ-KDNP": 48.88,
+      "TISZA": 22.94,
+      "DK": 23.94,
+      "Mi Hazánk": 4.24,
+      "MKKP": 0.0
+    }
   },
   "turnout": {
     "national": {
