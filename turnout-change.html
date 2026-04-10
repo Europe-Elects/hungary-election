@@ -214,13 +214,13 @@ function renderChart() {
   function xScale(v) { return PAD_LEFT + ((v - xMin) / (xMax - xMin)) * plotW; }
   function yScale(v) { return PAD_TOP + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
 
-  // Adaptive gridline step: keep roughly 4-7 tick labels regardless of range
+  // Adaptive gridline step: keep roughly 5-7 tick labels regardless of range
   function pickStep(range) {
     if (range <= 12) return 5;
-    if (range <= 25) return 10;
-    if (range <= 50) return 20;
-    if (range <= 100) return 25;
-    return 50;
+    if (range <= 25) return 5;
+    if (range <= 50) return 10;
+    if (range <= 100) return 20;
+    return 25;
   }
   const yStep = pickStep(yRange * 2);
 
