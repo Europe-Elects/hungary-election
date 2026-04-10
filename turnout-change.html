@@ -214,8 +214,18 @@ function renderChart() {
   function xScale(v) { return PAD_LEFT + ((v - xMin) / (xMax - xMin)) * plotW; }
   function yScale(v) { return PAD_TOP + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
 
-  // Gridlines + axis ticks — Y every 5pp, X every 10pp
-  for (let y = yMin; y <= yMax; y += 5) {
+  // Adaptive gridline step: keep roughly 4-7 tick labels regardless of range
+  function pickStep(range) {
+    if (range <= 12) return 5;
+    if (range <= 25) return 10;
+    if (range <= 50) return 20;
+    if (range <= 100) return 25;
+    return 50;
+  }
+  const yStep = pickStep(yRange * 2);
+
+  // Gridlines + axis ticks
+  for (let y = yMin; y <= yMax; y += yStep) {
     const yy = yScale(y);
     const line = document.createElementNS(ns, 'line');
     line.setAttribute('x1', PAD_LEFT);
