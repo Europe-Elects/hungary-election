@@ -610,6 +610,28 @@ def parse_results_xml(valtozo1_zip, master):
 
         results['countyList'][county] = party_results
 
+    # ── Process national grand-total party list (oszint=51, valtip=L) ──
+    # This is the true nationwide popular vote for the party lists.
+    for sfid, info in sfid_data.items():
+        if info['oszint'] != '51' or info['valtip'] != 'L':
+            continue
+        total_valid = info['valid_votes']
+        if not total_valid:
+            continue
+
+        national = {p: 0.0 for p in PARTIES}
+        for vote in sfid_votes.get(sfid, []):
+            tlid = vote['jlid']
+            szav = vote['szav']
+            pct = round(szav / total_valid * 100, 2) if total_valid else 0
+            if tlid in tlid_to_party:
+                party = tlid_to_party[tlid]
+                national[party] += pct
+            # Nationality lists fall through → "Other" (ignored per design)
+
+        results['nationalVote'] = national
+        break  # oszint=51 valtip=L is a single grand-total entry
+
     # Get version info from verzio.xml inside the ZIP
     if 'verzio.xml' in valtozo1_zip.namelist():
         ver_data = valtozo1_zip.read('verzio.xml')
@@ -789,6 +811,7 @@ def empty_results():
         "lastUpdated": datetime.now().isoformat(),
         "constituencies": {},
         "countyList": county_list,
+        "nationalVote": {p: 0 for p in PARTIES},  # popular vote, party list (oszint=51)
         "turnout": {
             "national": None,             # {pct, megj, vp, time}
             "counties": {},               # county_name → {pct, megj, vp, time}
