@@ -43,6 +43,20 @@ body {
   background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0,0,0,.06);
   padding: 10px 14px;
+  transition: transform .12s, box-shadow .12s, border-color .12s;
+}
+.stat-card.selectable { cursor: pointer; }
+.stat-card.selectable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15,23,42,.10);
+  border-color: #CBD5E1;
+}
+.stat-card.selectable:focus-visible {
+  outline: 2px solid #2563EB; outline-offset: 2px;
+}
+.stat-card.selectable.active {
+  background: #EFF6FF; border-color: #2563EB;
+  box-shadow: 0 2px 8px rgba(37,99,235,.18);
 }
 .stat-card.opposition { border-left: 3px solid #3399FF; }
 .stat-card.fidesz     { border-left: 3px solid #000000; }
@@ -91,8 +105,53 @@ svg#chart {
 .ref-line { stroke: #94A3B8; stroke-width: 1; stroke-dasharray: 3 3; }
 .axis-label { font-size: 10px; fill: #64748B; font-variant-numeric: tabular-nums; }
 .axis-title { font-size: 11px; fill: #475569; font-weight: 600; }
-.dot { transition: opacity .15s; stroke: rgba(0,0,0,0.15); stroke-width: 0.5; }
-.dot:hover { opacity: 0.8; stroke-width: 1.5; }
+.dot {
+  transition: opacity .15s, r .12s, stroke-width .12s;
+  stroke: rgba(0,0,0,0.15); stroke-width: 0.5;
+  cursor: pointer;
+}
+.dot:hover, .dot.pinned {
+  stroke: #fff; stroke-width: 2;
+  filter: drop-shadow(0 2px 4px rgba(15,23,42,.4));
+}
+.dot.pinned { stroke: #2563EB; stroke-width: 2.5; }
+.dot.dimmed { opacity: 0.15; }
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 10px 14px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 20; min-width: 220px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s, transform .12s;
+}
+#tooltip.visible { opacity: 1; transform: translateY(0); }
+#tooltip.pinned { pointer-events: auto; border-color: #2563EB;
+  box-shadow: 0 8px 24px rgba(37,99,235,.2); }
+#tooltip h3 {
+  font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+#tooltip .tt-badge {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .02em;
+  padding: 2px 6px; border-radius: 3px; font-weight: 600;
+}
+#tooltip .tt-badge.fidesz { background: #111827; color: #fff; }
+#tooltip .tt-badge.opposition { background: #DBEAFE; color: #1E40AF; }
+#tooltip .tt-row {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: 11px; color: #475569; padding: 2px 0;
+}
+#tooltip .tt-row .label { color: #64748B; }
+#tooltip .tt-row .value { font-variant-numeric: tabular-nums; color: #0F172A; font-weight: 500; }
+#tooltip .tt-divider { border-top: 1px solid #F1F5F9; margin: 4px 0; }
+#tooltip .tt-delta-big {
+  font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+#tooltip .tt-delta-big.up   { color: #16A34A; }
+#tooltip .tt-delta-big.down { color: #DC2626; }
+#tooltip .tt-hint { font-size: 10px; color: #94A3B8; margin-top: 4px; }
 
 .chart-footnote {
   font-size: 11px; color: #64748B; margin-top: 4px; line-height: 1.4;
@@ -116,16 +175,18 @@ svg#chart {
     <div class="last-updated" id="lastUpdated">Loading baseline…</div>
   </div>
   <div class="stats-row" id="statsRow">
-    <div class="stat-card opposition">
+    <button type="button" class="stat-card opposition selectable" id="cardOpp"
+            aria-pressed="false" aria-label="Isolate opposition-won districts">
       <div class="stat-label">Opposition-won 2022</div>
       <div class="stat-value" id="statOppValue">—</div>
-      <div class="stat-sub" id="statOppSub">avg turnout change</div>
-    </div>
-    <div class="stat-card fidesz">
+      <div class="stat-sub" id="statOppSub">click to isolate · avg turnout change</div>
+    </button>
+    <button type="button" class="stat-card fidesz selectable" id="cardFid"
+            aria-pressed="false" aria-label="Isolate Fidesz-won districts">
       <div class="stat-label">Fidesz-won 2022</div>
       <div class="stat-value" id="statFidValue">—</div>
-      <div class="stat-sub" id="statFidSub">avg turnout change</div>
-    </div>
+      <div class="stat-sub" id="statFidSub">click to isolate · avg turnout change</div>
+    </button>
     <div class="stat-card signal neutral" id="signalCard">
       <div class="stat-label">Mobilisation signal</div>
       <div class="stat-value small" id="statSignalValue">awaiting 2026 data</div>
@@ -133,6 +194,7 @@ svg#chart {
     </div>
   </div>
   <div id="chart-container">
+    <div id="tooltip" role="tooltip"></div>
     <div class="chart-legend">
       <div class="item"><div class="swatch" style="background:#000000"></div>Fidesz-KDNP stronghold (2022)</div>
       <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition stronghold (2022)</div>
@@ -159,6 +221,8 @@ const PAD_BOTTOM = 42;
 
 let baseline = null;          // 2022_baseline.json once loaded
 let lastResults = null;       // last fetched results.json
+let filterGroup = null;       // 'opposition' | 'fidesz' | null
+let pinnedDotId = null;       // constituency id of a pinned dot
 
 // Interpolate a fill color from TISZA blue (low Fidesz) to black (high Fidesz)
 // across a reasonable 25-70% Fidesz range.
@@ -480,27 +544,120 @@ function renderChart() {
     const dot = document.createElementNS(ns, 'circle');
     dot.setAttribute('cx', cx);
     dot.setAttribute('cy', cy);
-    dot.setAttribute('r', 4.2);
+    const baseR = 4.2;
+    dot.setAttribute('r', pinnedDotId === p.id ? 6.5 : baseR);
     dot.setAttribute('fill', fill);
-    dot.setAttribute('class', 'dot');
+    dot.setAttribute('class', 'dot' + (pinnedDotId === p.id ? ' pinned' : '')
+      + (filterGroup && filterGroup !== p.winner ? ' dimmed' : ''));
+    dot.setAttribute('data-id', p.id);
+    dot.setAttribute('data-winner', p.winner);
     if (p.delta === null) dot.setAttribute('opacity', '0.25');
 
-    const title = document.createElementNS(ns, 'title');
-    if (p.delta !== null) {
-      title.textContent =
-        `${p.id}\n` +
-        `2022: turnout ${p.turnout2022.toFixed(1)}%, Fidesz ${p.fidesz2022.toFixed(1)}%, Opp ${p.opp2022.toFixed(1)}%\n` +
-        `2026: turnout ${p.turnout2026.toFixed(1)}% (${p.reportTime || 'latest'})\n` +
-        `Change: ${p.delta > 0 ? '+' : ''}${p.delta}pp`;
-    } else {
-      title.textContent =
-        `${p.id}\n` +
-        `2022: turnout ${p.turnout2022.toFixed(1)}%, Fidesz ${p.fidesz2022.toFixed(1)}%\n` +
-        `2026: awaiting data`;
-    }
-    dot.appendChild(title);
+    dot.addEventListener('mouseenter', (e) => {
+      dot.setAttribute('r', 6.5);
+      showDotTooltip(p, e);
+    });
+    dot.addEventListener('mousemove', (e) => {
+      if (pinnedDotId) return;
+      positionTooltip(e.clientX, e.clientY);
+    });
+    dot.addEventListener('mouseleave', () => {
+      if (pinnedDotId !== p.id) dot.setAttribute('r', baseR);
+      hideDotTooltip();
+    });
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePinDot(p, e);
+    });
+
     svg.appendChild(dot);
   }
+}
+
+function renderDotTooltipHtml(p) {
+  const winnerBadge = p.winner === 'fidesz'
+    ? '<span class="tt-badge fidesz">Fidesz 2022</span>'
+    : '<span class="tt-badge opposition">Opposition 2022</span>';
+  let html = `<h3>${p.id} ${winnerBadge}</h3>`;
+  html += `<div class="tt-row"><span class="label">2022 turnout</span><span class="value">${p.turnout2022.toFixed(1)}%</span></div>`;
+  html += `<div class="tt-row"><span class="label">2022 Fidesz-KDNP</span><span class="value">${p.fidesz2022.toFixed(1)}%</span></div>`;
+  html += `<div class="tt-row"><span class="label">2022 Opposition bloc</span><span class="value">${p.opp2022.toFixed(1)}%</span></div>`;
+  html += `<div class="tt-divider"></div>`;
+  if (p.delta !== null) {
+    html += `<div class="tt-row"><span class="label">2026 turnout${p.reportTime ? ' · ' + p.reportTime : ''}</span><span class="value">${p.turnout2026.toFixed(1)}%</span></div>`;
+    const cls = p.delta > 0 ? 'up' : p.delta < 0 ? 'down' : '';
+    const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
+    html += `<div class="tt-delta-big ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp vs 2022</div>`;
+  } else {
+    html += `<div class="tt-row"><span class="label">2026 turnout</span><span class="value">awaiting data</span></div>`;
+  }
+  html += `<div class="tt-hint">${pinnedDotId === p.id ? 'click dot or outside to unpin' : 'click to pin · hover others to compare'}</div>`;
+  return html;
+}
+
+function positionTooltip(clientX, clientY) {
+  const tt = document.getElementById('tooltip');
+  const container = document.getElementById('chart-container');
+  const rect = container.getBoundingClientRect();
+  let left = clientX - rect.left + 12;
+  let top  = clientY - rect.top + 12;
+  const ttRect = tt.getBoundingClientRect();
+  if (left + ttRect.width > rect.width - 6) left = clientX - rect.left - ttRect.width - 12;
+  if (top + ttRect.height > rect.height - 6) top = clientY - rect.top - ttRect.height - 12;
+  if (left < 6) left = 6;
+  if (top < 6) top = 6;
+  tt.style.left = left + 'px';
+  tt.style.top  = top + 'px';
+}
+
+function showDotTooltip(p, event) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = renderDotTooltipHtml(p);
+  tt.classList.add('visible');
+  tt.classList.toggle('pinned', pinnedDotId === p.id);
+  positionTooltip(event.clientX, event.clientY);
+}
+
+function hideDotTooltip() {
+  if (pinnedDotId) return;
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+function togglePinDot(p, event) {
+  if (pinnedDotId === p.id) {
+    pinnedDotId = null;
+    document.querySelectorAll('.dot.pinned').forEach(d => {
+      d.classList.remove('pinned');
+      d.setAttribute('r', 4.2);
+    });
+    document.getElementById('tooltip').classList.remove('pinned');
+    hideDotTooltip();
+    return;
+  }
+  pinnedDotId = p.id;
+  document.querySelectorAll('.dot.pinned').forEach(d => {
+    d.classList.remove('pinned');
+    d.setAttribute('r', 4.2);
+  });
+  const target = document.querySelector(`.dot[data-id="${CSS.escape(p.id)}"]`);
+  if (target) {
+    target.classList.add('pinned');
+    target.setAttribute('r', 6.5);
+  }
+  showDotTooltip(p, event);
+}
+
+// Stat-card click handlers: isolate one group (dim the other)
+function setFilterGroup(group) {
+  filterGroup = (filterGroup === group) ? null : group;
+  document.querySelectorAll('.dot').forEach(d => {
+    const w = d.getAttribute('data-winner');
+    d.classList.toggle('dimmed', filterGroup !== null && w !== filterGroup);
+  });
+  document.getElementById('cardOpp').classList.toggle('active', filterGroup === 'opposition');
+  document.getElementById('cardOpp').setAttribute('aria-pressed', filterGroup === 'opposition' ? 'true' : 'false');
+  document.getElementById('cardFid').classList.toggle('active', filterGroup === 'fidesz');
+  document.getElementById('cardFid').setAttribute('aria-pressed', filterGroup === 'fidesz' ? 'true' : 'false');
 }
 
 function applyUpdate() {
@@ -521,6 +678,24 @@ async function init() {
   await loadBaseline();
   await loadResults();
   applyUpdate();
+
+  // Wire up stat-card click handlers
+  document.getElementById('cardOpp').addEventListener('click', () => setFilterGroup('opposition'));
+  document.getElementById('cardFid').addEventListener('click', () => setFilterGroup('fidesz'));
+
+  // Click outside a dot/tooltip unpins
+  document.addEventListener('click', (e) => {
+    if (pinnedDotId && !e.target.closest('.dot') && !e.target.closest('#tooltip')
+        && !e.target.closest('.stat-card')) {
+      pinnedDotId = null;
+      document.querySelectorAll('.dot.pinned').forEach(d => {
+        d.classList.remove('pinned');
+        d.setAttribute('r', 4.2);
+      });
+      const tt = document.getElementById('tooltip');
+      tt.classList.remove('visible', 'pinned');
+    }
+  });
 
   setInterval(async () => {
     await loadResults();

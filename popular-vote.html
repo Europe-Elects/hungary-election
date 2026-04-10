@@ -65,7 +65,46 @@ svg#chart {
 .bar-label {
   font-size: 11px; fill: #475569; text-anchor: middle; font-weight: 500;
 }
-.bar-rect { transition: height .4s ease, y .4s ease; }
+.bar-rect {
+  transition: height .4s ease, y .4s ease, filter .15s, stroke-width .15s;
+  cursor: pointer;
+  stroke: transparent; stroke-width: 0;
+}
+.bar-rect:hover, .bar-rect.pinned {
+  filter: brightness(1.08) drop-shadow(0 2px 6px rgba(0,0,0,.2));
+  stroke: #0F172A; stroke-width: 1.5;
+}
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 10px 14px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 20; min-width: 200px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s, transform .12s;
+}
+#tooltip.visible { opacity: 1; transform: translateY(0); }
+#tooltip.pinned { pointer-events: auto; border-color: #94A3B8; box-shadow: 0 8px 24px rgba(15,23,42,.22); }
+#tooltip h3 {
+  font-size: 13px; font-weight: 700; color: #0F172A;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+#tooltip .tt-swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+#tooltip .tt-big {
+  font-size: 22px; font-weight: 800; color: #0F172A;
+  font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+#tooltip .tt-vs2022 {
+  font-size: 11px; color: #475569; margin-top: 4px;
+  border-top: 1px solid #F1F5F9; padding-top: 6px;
+}
+#tooltip .tt-delta {
+  font-weight: 700; font-variant-numeric: tabular-nums;
+}
+#tooltip .tt-delta.up   { color: #16A34A; }
+#tooltip .tt-delta.down { color: #DC2626; }
+#tooltip .tt-note { font-size: 10px; color: #94A3B8; font-style: italic; }
+#tooltip .tt-hint { font-size: 10px; color: #94A3B8; margin-top: 4px; }
 
 .chart-footnote {
   font-size: 11px; color: #64748B; margin-top: 6px; line-height: 1.4;
@@ -91,9 +130,11 @@ svg#chart {
   <div id="chart-container">
     <div class="chart-legend" id="chartLegend"></div>
     <svg id="chart"></svg>
+    <div id="tooltip" role="tooltip"></div>
     <div class="chart-footnote">
       A party needs <strong>5%</strong> of the list vote to win seats on
       the national list (1% for alliances of two, 10% for three or more).
+      <span style="color:#94A3B8">· hover a bar for details, click to pin</span>
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
@@ -116,11 +157,110 @@ const PAD_RIGHT = 24;
 const PAD_TOP = 32;
 const PAD_BOTTOM = 40;
 
+// 2022 party list percentages loaded from 2022_baseline.json.
+// Used to compute "vs 2022" deltas in the hover tooltip.
+let baseline2022 = null;
+
+// Which 2026 parties can be compared directly to 2022. DK was part of
+// the United Opposition bloc in 2022 and TISZA didn't exist, so those
+// get an explanatory note instead of a numeric delta.
+const VS_2022_KEY = {
+  'FIDESZ-KDNP': 'fideszPct',
+  'Mi Hazánk':   'miHazankPct',
+  'MKKP':        'mkkpPct',
+};
+const VS_2022_NOTE = {
+  'DK':    'Ran inside the United Opposition bloc in 2022 (34.4%) — no direct comparison.',
+  'TISZA': 'TISZA party did not exist in 2022.',
+};
+
+// Tooltip state — if pinned, hover events don't swap the content
+let tooltipPinned = null;  // party key that's currently pinned, or null
+
 function buildLegend() {
   const el = document.getElementById('chartLegend');
   el.innerHTML = Object.entries(PARTIES).map(([, p]) =>
     `<div class="item"><div class="swatch" style="background:${p.color}"></div>${p.name}</div>`
   ).join('');
+}
+
+async function loadBaseline2022() {
+  try {
+    const r = await fetch('2022_baseline.json');
+    baseline2022 = await r.json();
+  } catch (e) {
+    baseline2022 = null;
+  }
+}
+
+function renderTooltipFor(party, pct) {
+  const p = PARTIES[party];
+  if (!p) return '';
+  let html = `<h3><span class="tt-swatch" style="background:${p.color}"></span>${p.name}</h3>`;
+  html += `<div class="tt-big">${pct.toFixed(2)}%</div>`;
+  html += `<div class="tt-vs2022">`;
+  const key2022 = VS_2022_KEY[party];
+  const nv2022 = baseline2022 && baseline2022.nationalVote2022;
+  if (key2022 && nv2022 && typeof nv2022[key2022] === 'number') {
+    const p2022 = nv2022[key2022];
+    const delta = +(pct - p2022).toFixed(2);
+    const cls = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
+    const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '–';
+    html += `vs 2022: ${p2022.toFixed(2)}% ` +
+            `<span class="tt-delta ${cls}">${arrow} ${delta > 0 ? '+' : ''}${delta} pp</span>`;
+  } else if (VS_2022_NOTE[party]) {
+    html += `<span class="tt-note">${VS_2022_NOTE[party]}</span>`;
+  } else {
+    html += `<span class="tt-note">No 2022 comparison available.</span>`;
+  }
+  html += `</div>`;
+  html += `<div class="tt-hint">${tooltipPinned === party ? 'click again to unpin' : 'click to pin'}</div>`;
+  return html;
+}
+
+function positionTooltip(clientX, clientY) {
+  const tt = document.getElementById('tooltip');
+  const container = document.getElementById('chart-container');
+  const rect = container.getBoundingClientRect();
+  let left = clientX - rect.left + 12;
+  let top  = clientY - rect.top + 12;
+  // Keep inside the container
+  const ttRect = tt.getBoundingClientRect();
+  if (left + ttRect.width > rect.width - 6) left = clientX - rect.left - ttRect.width - 12;
+  if (top + ttRect.height > rect.height - 6) top = clientY - rect.top - ttRect.height - 12;
+  if (left < 6) left = 6;
+  if (top < 6) top = 6;
+  tt.style.left = left + 'px';
+  tt.style.top  = top + 'px';
+}
+
+function showTooltip(party, pct, event) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = renderTooltipFor(party, pct);
+  tt.classList.add('visible');
+  if (tooltipPinned) tt.classList.add('pinned'); else tt.classList.remove('pinned');
+  positionTooltip(event.clientX, event.clientY);
+}
+
+function hideTooltip() {
+  if (tooltipPinned) return;  // pinned tooltips stay until explicitly unpinned
+  const tt = document.getElementById('tooltip');
+  tt.classList.remove('visible');
+}
+
+function togglePin(party, pct, event) {
+  if (tooltipPinned === party) {
+    tooltipPinned = null;
+    document.getElementById('tooltip').classList.remove('pinned');
+    document.querySelectorAll('.bar-rect.pinned').forEach(el => el.classList.remove('pinned'));
+    hideTooltip();
+    return;
+  }
+  tooltipPinned = party;
+  document.querySelectorAll('.bar-rect.pinned').forEach(el => el.classList.remove('pinned'));
+  const target = document.querySelector(`[data-party="${CSS.escape(party)}"]`);
+  if (target) target.classList.add('pinned');
+  showTooltip(party, pct, event);
 }
 
 // Fallback: if scraper hasn't written nationalVote yet, compute a simple
@@ -229,18 +369,26 @@ function renderChart(voteData, source) {
     const y = PAD_TOP + plotH - barH;
     const color = PARTIES[party].color;
 
-    // Bar rectangle with native <title> tooltip on hover
+    // Bar rectangle with custom hover/click interaction
     const rect = document.createElementNS(ns, 'rect');
     rect.setAttribute('x', cx - barWidth / 2);
     rect.setAttribute('y', y);
     rect.setAttribute('width', barWidth);
     rect.setAttribute('height', barH);
     rect.setAttribute('fill', color);
-    rect.setAttribute('class', 'bar-rect');
+    rect.setAttribute('class', 'bar-rect' + (tooltipPinned === party ? ' pinned' : ''));
     rect.setAttribute('rx', '2');
-    const t = document.createElementNS(ns, 'title');
-    t.textContent = `${PARTIES[party].name}: ${pct.toFixed(2)}%`;
-    rect.appendChild(t);
+    rect.setAttribute('data-party', party);
+    rect.setAttribute('tabindex', '0');
+    rect.setAttribute('role', 'button');
+    rect.setAttribute('aria-label', `${PARTIES[party].name}: ${pct.toFixed(2)}%`);
+    rect.addEventListener('mouseenter', (e) => showTooltip(party, pct, e));
+    rect.addEventListener('mousemove', (e) => { if (!tooltipPinned) positionTooltip(e.clientX, e.clientY); });
+    rect.addEventListener('mouseleave', hideTooltip);
+    rect.addEventListener('click', (e) => { e.stopPropagation(); togglePin(party, pct, e); });
+    rect.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePin(party, pct, e); }
+    });
     svg.appendChild(rect);
 
     // Value label above bar
@@ -314,7 +462,16 @@ window.addEventListener('resize', () => {
 });
 
 buildLegend();
-loadResults();
+loadBaseline2022().then(loadResults);
+
+// Clicking outside the chart area unpins the tooltip
+document.addEventListener('click', (e) => {
+  if (tooltipPinned && !e.target.closest('.bar-rect') && !e.target.closest('#tooltip')) {
+    tooltipPinned = null;
+    document.querySelectorAll('.bar-rect.pinned').forEach(el => el.classList.remove('pinned'));
+    document.getElementById('tooltip').classList.remove('visible', 'pinned');
+  }
+});
 </script>
 </body>
 </html>

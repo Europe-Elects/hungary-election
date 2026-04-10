@@ -249,6 +249,57 @@ def parse_county_list(path):
     return out
 
 
+def parse_national_list(path):
+    """Parse Országos_listás_eredmény.xlsx sheet 1 for the final 2022
+    nationwide party list percentages.
+
+    Relevant columns: PÁRT_LISTA (name), PÁRT_LISTA_SZAVAZAT (votes),
+    ÉRVÉNYES (total valid). ÉRVÉNYES is on the single F-type row.
+    """
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    ws = wb.active
+
+    header = None
+    for row in ws.iter_rows(max_row=1, values_only=True):
+        header = list(row)
+        break
+    idx = {name: i for i, name in enumerate(header)}
+
+    def col(row, name):
+        i = idx.get(name)
+        return row[i] if i is not None and i < len(row) else None
+
+    ervenyes = 0
+    votes = {'fidesz': 0, 'opp': 0, 'mihazank': 0, 'mkkp': 0}
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        erv = col(row, 'ÉRVÉNYES')
+        if erv and not ervenyes:
+            try:
+                ervenyes = int(erv)
+            except (TypeError, ValueError):
+                pass
+        list_name = col(row, 'PÁRT_LISTA')
+        list_votes = col(row, 'PÁRT_LISTA_SZAVAZAT')
+        if list_name and list_votes:
+            bucket = classify_2022_party(list_name)
+            if bucket in votes:
+                try:
+                    votes[bucket] += int(list_votes)
+                except (TypeError, ValueError):
+                    pass
+    wb.close()
+
+    if not ervenyes:
+        return {}
+    return {
+        'ervenyes': ervenyes,
+        'fideszPct':    round(votes['fidesz']   / ervenyes * 100, 2),
+        'oppBlocPct':   round(votes['opp']      / ervenyes * 100, 2),
+        'miHazankPct':  round(votes['mihazank'] / ervenyes * 100, 2),
+        'mkkpPct':      round(votes['mkkp']     / ervenyes * 100, 2),
+    }
+
+
 def main():
     const_path = _find_xlsx(['egy', 'erjkv']) or _find_xlsx(['egy', 'sz', 'erjkv'])
     if not const_path or 'szk' in const_path.lower():
@@ -263,6 +314,13 @@ def main():
         low = f.lower()
         if 'ter' in low and 'erjkv' in low:
             county_path = f
+            break
+
+    national_path = None
+    for f in glob.glob('2022_parlamenti/*.xlsx'):
+        low = f.lower()
+        if 'orsz' in low and 'list' in low and 'eredm' in low:
+            national_path = f
             break
 
     if not const_path:
@@ -280,10 +338,17 @@ def main():
     counties = parse_county_list(county_path)
     print(f'  parsed {len(counties)} counties')
 
+    national = {}
+    if national_path:
+        print(f'Reading {national_path}')
+        national = parse_national_list(national_path)
+        print(f'  national list: {national}')
+
     out = {
         'generatedFrom': 'NVI 2022 parliamentary XLSX protocol files',
         'constituencies': constituencies,
         'counties': counties,
+        'nationalVote2022': national,
     }
 
     with open('2022_baseline.json', 'w', encoding='utf-8') as f:

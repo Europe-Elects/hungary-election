@@ -991,5 +991,12 @@
       "valasztopolgar": 220471
     }
   },
-  "generatedFrom": "NVI 2022 parliamentary XLSX protocol files"
+  "generatedFrom": "NVI 2022 parliamentary XLSX protocol files",
+  "nationalVote2022": {
+    "ervenyes": 5654860,
+    "fideszPct": 54.13,
+    "miHazankPct": 5.88,
+    "mkkpPct": 3.27,
+    "oppBlocPct": 34.44
+  }
 }
