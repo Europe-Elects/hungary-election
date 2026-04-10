@@ -92,10 +92,8 @@ svg#chart {
     <div class="chart-legend" id="chartLegend"></div>
     <svg id="chart"></svg>
     <div class="chart-footnote">
-      Designated national minority lists can enter parliament with
-      <strong>~0.27%</strong> of the popular vote. Other parties need
-      <strong>5%</strong> (list vote) or a plurality of votes in a
-      constituency (constituency vote).
+      A party needs <strong>5%</strong> of the list vote to win seats on
+      the national list (1% for alliances of two, 10% for three or more).
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
@@ -110,38 +108,13 @@ const PARTIES = {
   'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
 };
 
-// Ordered list of Hungary's 13 recognised minorities, keyed by the NVI
-// tnev as it appears in tlista.xml for the production torzs. Order
-// follows the nemz numeric code (1..13) which is the Hungarian law
-// ordering. Always render all 13 slots — when a minority doesn't
-// field a list in a given cycle (most recently Serbian, nemz=10), that
-// slot renders as a muted placeholder so the row stays visually
-// consistent across elections.
-const MINORITY_SLOTS = [
-  { nvi: 'Bolgár Országos Önkormányzat', label: 'BOÖ (BG)' },      // 1 Bulgarian
-  { nvi: 'MGOÖ',                          label: 'MGOÖ (GR)' },    // 2 Greek
-  { nvi: 'OHÖ',                           label: 'OHÖ (HR)' },     // 3 Croatian
-  { nvi: 'OLÖ',                           label: 'OLÖ (PL)' },     // 4 Polish
-  { nvi: 'MNOÖ',                          label: 'MNOÖ (D)' },     // 5 German
-  { nvi: 'OÖÖ',                           label: 'OÖÖ (AM)' },     // 6 Armenian
-  { nvi: 'Magyarországi Romák Országos',  label: 'ROMA (Romani)' },// 7 Roma
-  { nvi: 'MROÖ',                          label: 'MROÖ (RO)' },    // 8 Romanian
-  { nvi: 'ORÖ',                           label: 'ORÖ (Rusyns)' }, // 9 Rusyn
-  { nvi: '__not_fielded_sr__',            label: 'OSZÖ (SR)' },    // 10 Serbian (placeholder)
-  { nvi: 'OSZÖ',                          label: 'OSZÖ (SK)' },    // 11 Slovak
-  { nvi: 'Országos Szlovén',              label: 'OSZLÖ (SLO)' },  // 12 Slovenian
-  { nvi: 'Országos Ukrán',                label: 'UOO (UA)' },     // 13 Ukrainian
-];
-const MINORITY_COLOR = '#5A7BA6';           // steel blue, 4.36:1 on white
-const MINORITY_PLACEHOLDER_COLOR = '#CBD5E1'; // muted slate for not-fielded slot
-
 // Internal coordinate space is computed at render time from the SVG's
 // actual bounding rect, so text renders at its intended pixel size and
 // the chart fills its container with no letterboxing.
 const PAD_LEFT = 48;
 const PAD_RIGHT = 24;
-const PAD_TOP = 28;
-const PAD_BOTTOM = 118;  // room for rotated minority labels
+const PAD_TOP = 32;
+const PAD_BOTTOM = 40;
 
 function buildLegend() {
   const el = document.getElementById('chartLegend');
@@ -173,36 +146,11 @@ function computeFromCounties(countyList) {
 
 function pickNationalVote(data) {
   const nv = data.nationalVote || {};
-  const mv = data.minorityVote || {};
   const hasReal = Object.values(nv).some(v => v > 0);
-  if (hasReal) return { data: nv, minority: mv, source: 'national' };
+  if (hasReal) return { data: nv, source: 'national' };
   const fallback = computeFromCounties(data.countyList);
-  if (fallback) return { data: fallback, minority: {}, source: 'fallback' };
-  return { data: null, minority: {}, source: 'none' };
-}
-
-// Resolve which minority slots to render.
-// Production mode: any slot matches → render all 13 canonical slots
-// (the missing one shows as an "n/a" placeholder).
-// Rehearsal / unknown mode: render whatever tnevs actually exist in
-// minorityVote (labels fall through to the raw NVI name).
-function resolveMinorityEntries(minorityData) {
-  const md = minorityData || {};
-  const productionMode = MINORITY_SLOTS.some(s => md[s.nvi] !== undefined);
-  if (productionMode) {
-    return MINORITY_SLOTS.map(s => ({
-      label: s.label,
-      pct: typeof md[s.nvi] === 'number' ? md[s.nvi] : 0,
-      isPlaceholder: typeof md[s.nvi] !== 'number',
-    }));
-  }
-  // Rehearsal fall-through
-  const lookup = new Map(MINORITY_SLOTS.map(s => [s.nvi, s.label]));
-  return Object.entries(md).map(([name, pct]) => ({
-    label: lookup.get(name) || name,
-    pct,
-    isPlaceholder: false,
-  }));
+  if (fallback) return { data: fallback, source: 'fallback' };
+  return { data: null, source: 'none' };
 }
 
 function niceMax(observedMax) {
@@ -213,16 +161,17 @@ function niceMax(observedMax) {
   return Math.ceil(observedMax / 20) * 20;
 }
 
-function renderChart(voteData, minorityData, source) {
+function renderChart(voteData, source) {
   const svg = document.getElementById('chart');
   svg.innerHTML = '';
   const ns = 'http://www.w3.org/2000/svg';
 
-  // Size viewBox to match the container at render time. This avoids
-  // letterboxing and keeps label fonts at their intended pixel size.
+  // Size viewBox to match the container at render time so text renders
+  // at its intended pixel size and the chart fills its container with
+  // no letterboxing.
   const rect = svg.getBoundingClientRect();
   const VB_W = Math.max(400, Math.round(rect.width));
-  const VB_H = Math.max(260, Math.round(rect.height));
+  const VB_H = Math.max(220, Math.round(rect.height));
   svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
 
   const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
@@ -233,27 +182,19 @@ function renderChart(voteData, minorityData, source) {
     t.setAttribute('x', VB_W / 2);
     t.setAttribute('y', VB_H / 2);
     t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('fill', '#94A3B8');
+    t.setAttribute('fill', '#64748B');
     t.setAttribute('font-size', '14');
-    t.textContent = 'Awaiting data — polls still open or no list results yet';
+    t.textContent = 'Awaiting results — polls still open';
     svg.appendChild(t);
     return;
   }
 
-  // Sort main parties by pct descending for a natural "leaderboard"
-  const mainEntries = Object.entries(voteData)
+  // Sort by pct descending for a natural "leaderboard" ordering
+  const entries = Object.entries(voteData)
     .filter(([p]) => PARTIES[p])
     .sort((a, b) => b[1] - a[1]);
 
-  // Minority entries come back in canonical nemz order when in
-  // production mode, or in raw order from the scraper otherwise.
-  const minorityEntries = resolveMinorityEntries(minorityData);
-
-  const observedMax = Math.max(
-    0,
-    ...mainEntries.map(([, v]) => v),
-    ...minorityEntries.map(e => e.pct)
-  );
+  const observedMax = Math.max(0, ...entries.map(([, v]) => v));
   const yMax = niceMax(observedMax);
 
   // Y-axis gridlines at every 20%
@@ -276,129 +217,48 @@ function renderChart(voteData, minorityData, source) {
     svg.appendChild(lbl);
   }
 
-  // Slot layout: main parties get wider slots than minorities so the
-  // FIDESZ-KDNP / TISZA / DK / Mi Hazánk / MKKP bars remain chunky.
-  const nMain = mainEntries.length;
-  const nMin = minorityEntries.length;
-  const gap = nMin > 0 ? 22 : 0;   // visual gap between main and minority groups
+  // Chunky equal-width slots for the 5 main parties, capped at 120px
+  const nBars = entries.length;
+  const slotWidth = plotW / nBars;
+  const barWidth = Math.min(120, slotWidth * 0.55);
+  const minBarH = 1.5;
 
-  // Try a fixed layout first; scale down if it wouldn't fit
-  let mainSlot = 64, minoritySlot = 40;
-  let totalWidth = nMain * mainSlot + nMin * minoritySlot + gap;
-  if (totalWidth > plotW) {
-    const scale = plotW / totalWidth;
-    mainSlot *= scale;
-    minoritySlot *= scale;
-    totalWidth = plotW;
-  }
-  const mainBarWidth = Math.min(54, mainSlot * 0.78);
-  const minorityBarWidth = Math.min(26, minoritySlot * 0.68);
-  const minBarH = 1.5;  // tiny bars still need a visible sliver
-
-  // Centre the whole row within the plot
-  let cursor = PAD_LEFT + (plotW - totalWidth) / 2;
-
-  function drawBar(opts) {
-    const { pct, cx, color, barW, isMain, labelText, minorityIdx, isPlaceholder, tooltip } = opts;
+  entries.forEach(([party, pct], i) => {
+    const cx = PAD_LEFT + slotWidth * i + slotWidth / 2;
     const barH = Math.max(minBarH, plotH * (pct / yMax));
     const y = PAD_TOP + plotH - barH;
+    const color = PARTIES[party].color;
 
+    // Bar rectangle with native <title> tooltip on hover
     const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', cx - barW / 2);
+    rect.setAttribute('x', cx - barWidth / 2);
     rect.setAttribute('y', y);
-    rect.setAttribute('width', barW);
+    rect.setAttribute('width', barWidth);
     rect.setAttribute('height', barH);
     rect.setAttribute('fill', color);
     rect.setAttribute('class', 'bar-rect');
     rect.setAttribute('rx', '2');
-    if (isPlaceholder) rect.setAttribute('opacity', '0.55');
-
-    // Native browser tooltip on hover — accessible and no custom UI
-    if (tooltip) {
-      const t = document.createElementNS(ns, 'title');
-      t.textContent = tooltip;
-      rect.appendChild(t);
-    }
+    const t = document.createElementNS(ns, 'title');
+    t.textContent = `${PARTIES[party].name}: ${pct.toFixed(2)}%`;
+    rect.appendChild(t);
     svg.appendChild(rect);
 
     // Value label above bar
     const val = document.createElementNS(ns, 'text');
     val.setAttribute('x', cx);
-    if (isMain) {
-      val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
-    } else {
-      // Stagger minority labels between two Y rows (even low, odd high)
-      // so adjacent values don't collide even with 13+ bars in a row.
-      const lowY = PAD_TOP + plotH - 6;
-      const highY = PAD_TOP + plotH - 18;
-      val.setAttribute('y', minorityIdx % 2 === 0 ? lowY : highY);
-      val.setAttribute('font-size', '8');
-    }
+    val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
     val.setAttribute('class', 'bar-value');
-    if (isPlaceholder) {
-      val.setAttribute('fill', '#94A3B8');
-      val.textContent = 'n/a';
-    } else {
-      val.textContent = pct.toFixed(2) + '%';
-    }
+    val.textContent = pct.toFixed(2) + '%';
     svg.appendChild(val);
 
-    // X-axis label
+    // Party label below bar
     const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', cx);
+    lbl.setAttribute('y', PAD_TOP + plotH + 18);
     lbl.setAttribute('class', 'bar-label');
-    if (isMain) {
-      lbl.setAttribute('x', cx);
-      lbl.setAttribute('y', PAD_TOP + plotH + 16);
-      lbl.textContent = labelText;
-    } else {
-      // Rotate -55° around the label anchor for density
-      const ly = PAD_TOP + plotH + 10;
-      lbl.setAttribute('x', cx);
-      lbl.setAttribute('y', ly);
-      lbl.setAttribute('text-anchor', 'end');
-      lbl.setAttribute('transform', `rotate(-55 ${cx} ${ly})`);
-      lbl.setAttribute('font-size', '10');
-      if (isPlaceholder) lbl.setAttribute('fill', '#94A3B8');
-      lbl.textContent = labelText;
-    }
+    lbl.textContent = party;
     svg.appendChild(lbl);
-  }
-
-  mainEntries.forEach(([party, pct]) => {
-    const cx = cursor + mainSlot / 2;
-    drawBar({
-      pct, cx,
-      color: PARTIES[party].color,
-      barW: mainBarWidth,
-      isMain: true,
-      labelText: party,
-      minorityIdx: -1,
-      isPlaceholder: false,
-      tooltip: `${PARTIES[party].name}: ${pct.toFixed(2)}%`,
-    });
-    cursor += mainSlot;
   });
-
-  if (nMin > 0) {
-    cursor += gap;
-    minorityEntries.forEach((e, i) => {
-      const cx = cursor + minoritySlot / 2;
-      drawBar({
-        pct: e.pct,
-        cx,
-        color: e.isPlaceholder ? MINORITY_PLACEHOLDER_COLOR : MINORITY_COLOR,
-        barW: minorityBarWidth,
-        isMain: false,
-        labelText: e.label,
-        minorityIdx: i,
-        isPlaceholder: e.isPlaceholder,
-        tooltip: e.isPlaceholder
-          ? `${e.label}: no list fielded this cycle`
-          : `${e.label}: ${e.pct.toFixed(2)}%`,
-      });
-      cursor += minoritySlot;
-    });
-  }
 
   // Tiny "estimated from counties" note inside the chart if using fallback
   if (source === 'fallback') {
@@ -417,9 +277,9 @@ function renderChart(voteData, minorityData, source) {
 function applyResults(data) {
   const el = document.getElementById('lastUpdated');
   el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-  const { data: voteData, minority, source } = pickNationalVote(data);
+  const { data: voteData, source } = pickNationalVote(data);
   el.classList.toggle('live', !!voteData);
-  renderChart(voteData, minority, source);
+  renderChart(voteData, source);
 }
 
 async function loadResults() {
@@ -427,7 +287,7 @@ async function loadResults() {
     const data = await (await fetch('results.json?' + Date.now())).json();
     applyResults(data);
   } catch (e) {
-    renderChart(null, {}, 'none');
+    renderChart(null, 'none');
   }
 }
 
