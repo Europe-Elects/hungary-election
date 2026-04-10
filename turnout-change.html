@@ -203,10 +203,14 @@ svg#chart {
     <svg id="chart"></svg>
     <div class="chart-footnote" id="chartFootnote">
       Each dot is a constituency. X = Fidesz-KDNP's 2022 vote share.
-      Y = 2026 turnout − 2022 turnout (pp). If turnout rises more in
-      <strong>opposition-won 2022 districts</strong> than in Fidesz
-      ones (especially Budapest), the opposition is likely mobilising
-      harder — the central signal above.
+      Y = <strong>2026 turnout − time-matched 2022 turnout</strong>
+      (pp). The 2022 baseline is scaled to the current 2026 snapshot
+      time using the 2022 national hourly curve (09:00 10.3%, 11:00
+      25.8%, 13:00 40%, 15:00 52.8%, 17:00 62.9%, 18:30 67.8%), so the
+      comparison is meaningful all day instead of only after polls
+      close. If turnout rises more in <strong>opposition-won 2022
+      districts</strong> than in Fidesz ones, the opposition is likely
+      mobilising harder — the signal above.
       <span id="budapestNote"></span>
     </div>
   </div>
@@ -253,6 +257,29 @@ async function loadResults() {
   }
 }
 
+// Given a snapshot time like "11:00", return the per-constituency
+// 2022 baseline ADJUSTED to that point in the day.
+//
+// Approach: use the national hourly curve as a ratio of the national
+// final, then multiply by that constituency's 2022 final. This assumes
+// all constituencies share roughly the same intraday curve shape —
+// which isn't exactly true (Budapest tends to vote earlier than rural
+// areas) but is accurate enough at ~±2 pp to make the delta meaningful.
+//
+// If the snapshot time isn't in the curve (e.g. some weird off-cycle
+// snapshot) or the baseline has no hourly data, fall back to the raw
+// 2022 final.
+function adjust2022ForTime(constFinal2022, reportTime) {
+  if (!baseline || !baseline.hourlyNational2022) return constFinal2022;
+  if (!reportTime) return constFinal2022;
+  const hourly = baseline.hourlyNational2022[reportTime];
+  const natFinal = baseline.nationalFinal2022;
+  if (typeof hourly !== 'number' || typeof natFinal !== 'number' || natFinal === 0) {
+    return constFinal2022;
+  }
+  return constFinal2022 * (hourly / natFinal);
+}
+
 function buildPoints() {
   if (!baseline || !lastResults) return [];
   const turnout2026 = (lastResults.turnout && lastResults.turnout.constituencies) || {};
@@ -260,17 +287,22 @@ function buildPoints() {
   for (const [id, base2022] of Object.entries(baseline.constituencies || {})) {
     const r2026 = turnout2026[id];
     const t2026 = r2026 && typeof r2026.pct === 'number' ? r2026.pct : null;
-    const t2022 = base2022.turnoutPct;
-    const delta = t2026 !== null ? +(t2026 - t2022).toFixed(2) : null;
+    const t2022final = base2022.turnoutPct;
+    const reportTime = r2026 && r2026.time;
+    // Time-matched 2022 baseline, so a 2026 11:00 snapshot compares to
+    // 2022's estimated level at 11:00 instead of 2022's final total.
+    const t2022adjusted = adjust2022ForTime(t2022final, reportTime);
+    const delta = t2026 !== null ? +(t2026 - t2022adjusted).toFixed(2) : null;
     points.push({
       id,
       fidesz2022: base2022.fideszPct,
       opp2022: base2022.oppPct,
-      turnout2022: t2022,
+      turnout2022: t2022final,
+      turnout2022Adjusted: +t2022adjusted.toFixed(2),
       turnout2026: t2026,
       delta,
-      reportTime: r2026 && r2026.time,
-      winner: base2022.winner,  // "fidesz" or "opposition"
+      reportTime,
+      winner: base2022.winner,
       isBudapest: id.startsWith('BP-'),
     });
   }
@@ -332,32 +364,25 @@ function updateStatCards(points) {
   sigEl.classList.remove('small');
   sigEl.textContent = signBold(diff);
 
-  // If both averages are massively negative (both < -10 pp), we're still
-  // in a partial daytime snapshot — the mobilisation narrative isn't yet
-  // meaningful. Flag it instead of claiming a trend.
-  const partial = stats.opp.avg < -10 && stats.fid.avg < -10;
+  // Now that the delta is time-matched against a 2022 baseline at the
+  // same hour, we can interpret it throughout the day — no more
+  // "wait for 18:30" fallback.
+  sigCard.className = 'stat-card signal ' +
+    (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
 
-  if (partial) {
-    sigCard.className = 'stat-card signal neutral';
-    sigSub.textContent = 'Partial daytime snapshot — wait for 18:30';
+  let narrative;
+  if (diff > 2) {
+    narrative = 'Opposition mobilising strongly → bad for Fidesz';
+  } else if (diff > 0.5) {
+    narrative = 'Opposition mobilising slightly more';
+  } else if (diff < -2) {
+    narrative = 'Fidesz mobilising strongly → bad for opposition';
+  } else if (diff < -0.5) {
+    narrative = 'Fidesz mobilising slightly more';
   } else {
-    sigCard.className = 'stat-card signal ' +
-      (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
-
-    let narrative;
-    if (diff > 2) {
-      narrative = 'Opposition mobilising strongly → bad for Fidesz';
-    } else if (diff > 0.5) {
-      narrative = 'Opposition mobilising slightly more';
-    } else if (diff < -2) {
-      narrative = 'Fidesz mobilising strongly → bad for opposition';
-    } else if (diff < -0.5) {
-      narrative = 'Fidesz mobilising slightly more';
-    } else {
-      narrative = 'Balanced — no clear mobilisation edge';
-    }
-    sigSub.textContent = narrative;
+    narrative = 'Balanced — no clear mobilisation edge';
   }
+  sigSub.textContent = narrative;
 
   if (stats.bp.avg !== null) {
     bpNote.innerHTML = ` <strong>Budapest:</strong> ${signBold(stats.bp.avg)} across ${stats.bp.count}/${stats.bp.total} districts.`;
@@ -563,16 +588,22 @@ function renderDotTooltipHtml(p) {
   const winnerBadge = p.winner === 'fidesz'
     ? '<span class="tt-badge fidesz">Fidesz 2022</span>'
     : '<span class="tt-badge opposition">Opposition 2022</span>';
+  const t = p.reportTime;
+  const timeAdjusted = t && p.turnout2022Adjusted !== p.turnout2022;
   let html = `<h3>${p.id} ${winnerBadge}</h3>`;
-  html += `<div class="tt-row"><span class="label">2022 turnout</span><span class="value">${p.turnout2022.toFixed(1)}%</span></div>`;
+  html += `<div class="tt-row"><span class="label">2022 final turnout</span><span class="value">${p.turnout2022.toFixed(1)}%</span></div>`;
+  if (timeAdjusted) {
+    html += `<div class="tt-row"><span class="label">2022 at ${t} (est.)</span><span class="value">${p.turnout2022Adjusted.toFixed(1)}%</span></div>`;
+  }
   html += `<div class="tt-row"><span class="label">2022 Fidesz-KDNP</span><span class="value">${p.fidesz2022.toFixed(1)}%</span></div>`;
   html += `<div class="tt-row"><span class="label">2022 Opposition bloc</span><span class="value">${p.opp2022.toFixed(1)}%</span></div>`;
   html += `<div class="tt-divider"></div>`;
   if (p.delta !== null) {
-    html += `<div class="tt-row"><span class="label">2026 turnout${p.reportTime ? ' · ' + p.reportTime : ''}</span><span class="value">${p.turnout2026.toFixed(1)}%</span></div>`;
+    html += `<div class="tt-row"><span class="label">2026 turnout${t ? ' · ' + t : ''}</span><span class="value">${p.turnout2026.toFixed(1)}%</span></div>`;
     const cls = p.delta > 0 ? 'up' : p.delta < 0 ? 'down' : '';
     const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
-    html += `<div class="tt-delta-big ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp vs 2022</div>`;
+    const vsLabel = timeAdjusted ? `vs 2022 at ${t}` : 'vs 2022';
+    html += `<div class="tt-delta-big ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp ${vsLabel}</div>`;
   } else {
     html += `<div class="tt-row"><span class="label">2026 turnout</span><span class="value">awaiting data</span></div>`;
   }

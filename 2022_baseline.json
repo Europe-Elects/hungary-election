@@ -992,6 +992,15 @@
     }
   },
   "generatedFrom": "NVI 2022 parliamentary XLSX protocol files",
+  "hourlyNational2022": {
+    "09:00": 10.3,
+    "11:00": 25.8,
+    "13:00": 40.0,
+    "15:00": 52.8,
+    "17:00": 62.9,
+    "18:30": 67.8
+  },
+  "nationalFinal2022": 69.59,
   "nationalVote2022": {
     "ervenyes": 5654860,
     "fideszPct": 54.13,

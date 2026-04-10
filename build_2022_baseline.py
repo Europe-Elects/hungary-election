@@ -62,6 +62,31 @@ MAZ_TO_ID = {
     '19': 'VE', '20': 'ZA',
 }
 
+# Hungarian 2022 parliamentary election — national at-the-polls turnout
+# at each intraday snapshot time. These come from valasztas.hu's live
+# feed, preserved by Europe Elects' 2022 coverage on X/Twitter.
+# All values are WITHOUT mail-in ballots (in-person voting only).
+#
+# Used to compute a time-adjusted 2022 baseline per constituency:
+#   2022-at-time-T (constituency) ≈ 2022-final (constituency)
+#                                    × (HOURLY_2022[T] / NATIONAL_FINAL_2022)
+#
+# This assumes constituencies share roughly the same intraday curve
+# shape as the national average — not exact but good enough to make
+# 2026 vs 2022 comparisons meaningful mid-day instead of only at 18:30.
+HOURLY_NATIONAL_2022 = {
+    '09:00': 10.3,   # Europe Elects, source: valasztas.hu
+    '11:00': 25.8,
+    '13:00': 40.0,
+    '15:00': 52.8,
+    '17:00': 62.9,
+    '18:30': 67.8,   # final "at-the-polls" number before mail counting
+}
+# Final including mail-in ballots; from Országos_listás_eredmény.xlsx
+# (5,717,182 megjelentek / 8,215,304 eligible).
+NATIONAL_FINAL_2022 = 69.59
+
+
 # Party-name matching for 2022. The XLSX uses the long registered
 # party names; we classify each votes row as either Fidesz-KDNP, the
 # United Opposition bloc, Mi Hazánk, MKKP, or "other".
@@ -349,6 +374,8 @@ def main():
         'constituencies': constituencies,
         'counties': counties,
         'nationalVote2022': national,
+        'hourlyNational2022': HOURLY_NATIONAL_2022,
+        'nationalFinal2022': NATIONAL_FINAL_2022,
     }
 
     with open('2022_baseline.json', 'w', encoding='utf-8') as f:
