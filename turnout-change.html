@@ -196,8 +196,8 @@ svg#chart {
   <div id="chart-container">
     <div id="tooltip" role="tooltip"></div>
     <div class="chart-legend">
-      <div class="item"><div class="swatch" style="background:#000000"></div>Fidesz-KDNP stronghold (2022)</div>
-      <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition stronghold (2022)</div>
+      <div class="item"><div class="swatch" style="background:#111111"></div>Fidesz won 2022 (87 districts)</div>
+      <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition won 2022 (19 districts)</div>
       <div class="note" id="modeNote">Waiting for first turnout snapshot</div>
     </div>
     <svg id="chart"></svg>
@@ -224,16 +224,12 @@ let lastResults = null;       // last fetched results.json
 let filterGroup = null;       // 'opposition' | 'fidesz' | null
 let pinnedDotId = null;       // constituency id of a pinned dot
 
-// Interpolate a fill color from TISZA blue (low Fidesz) to black (high Fidesz)
-// across a reasonable 25-70% Fidesz range.
-function strongholdColor(fideszPct) {
-  const lo = 25, hi = 70;
-  const t = Math.max(0, Math.min(1, (fideszPct - lo) / (hi - lo)));
-  // Interpolate rgb(51,153,255) → rgb(0,0,0)
-  const r = Math.round(51 + (0 - 51) * t);
-  const g = Math.round(153 + (0 - 153) * t);
-  const b = Math.round(255 + (0 - 255) * t);
-  return `rgb(${r},${g},${b})`;
+// Binary dot colour: who actually won the constituency in 2022.
+// This is far more legible than a continuous gradient at 106 points.
+const COLOR_OPPOSITION = '#3399FF';  // TISZA blue, matches county/constituency map
+const COLOR_FIDESZ     = '#111111';  // near-black, matches Fidesz brand
+function dotColor(winner) {
+  return winner === 'fidesz' ? COLOR_FIDESZ : COLOR_OPPOSITION;
 }
 
 async function loadBaseline() {
@@ -407,29 +403,47 @@ function renderChart() {
   // Axes ranges
   // X: Fidesz 2022 share — 20% to 80% covers all 106 constituencies with margin
   const xMin = 20, xMax = 80;
-  // Y: delta turnout — symmetric around 0, adaptive to observed
-  let yRange = 10;
+  // Y: tight fit around the observed deltas + padding. During rehearsal
+  // all dots cluster near -40 pp so we must NOT force a symmetric range
+  // around 0 — that leaves 90% of the chart empty.
+  let yMin = -10, yMax = 10;
   if (withDelta.length) {
-    const absMax = Math.max(...withDelta.map(p => Math.abs(p.delta)));
-    yRange = Math.max(10, niceRoundMax(absMax, 5));
+    const deltas = withDelta.map(p => p.delta);
+    const observedMin = Math.min(...deltas);
+    const observedMax = Math.max(...deltas);
+    // Add 2pp padding on each side, snap to a 5pp grid
+    yMin = Math.floor((observedMin - 2) / 5) * 5;
+    yMax = Math.ceil((observedMax + 2) / 5) * 5;
+    // Keep the zero line in view whenever the observed range crosses it
+    // or gets close to it (within 10pp) — that's the "have we crossed
+    // the 2022 baseline" question
+    if (observedMin > -10) yMin = Math.min(yMin, -5);
+    if (observedMax <  10) yMax = Math.max(yMax, 5);
+    // Floor: the chart always spans at least 15 pp so it doesn't look
+    // squished when everything's within a tiny range
+    if (yMax - yMin < 15) {
+      const mid = (yMin + yMax) / 2;
+      yMin = Math.floor((mid - 7.5) / 5) * 5;
+      yMax = Math.ceil((mid + 7.5) / 5) * 5;
+    }
   }
-  const yMin = -yRange, yMax = yRange;
+  const yRange = yMax - yMin;
 
   function xScale(v) { return PAD_LEFT + ((v - xMin) / (xMax - xMin)) * plotW; }
   function yScale(v) { return PAD_TOP + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
 
-  // Adaptive gridline step: keep roughly 5-7 tick labels regardless of range
+  // Adaptive gridline step: keep roughly 4-6 tick labels regardless of range
   function pickStep(range) {
-    if (range <= 12) return 5;
+    if (range <= 12) return 2;
     if (range <= 25) return 5;
     if (range <= 50) return 10;
-    if (range <= 100) return 20;
-    return 25;
+    return 20;
   }
-  const yStep = pickStep(yRange * 2);
+  const yStep = pickStep(yRange);
 
-  // Gridlines + axis ticks
-  for (let y = yMin; y <= yMax; y += yStep) {
+  // Gridlines + axis ticks (align to yStep)
+  const yStart = Math.ceil(yMin / yStep) * yStep;
+  for (let y = yStart; y <= yMax; y += yStep) {
     const yy = yScale(y);
     const line = document.createElementNS(ns, 'line');
     line.setAttribute('x1', PAD_LEFT);
@@ -498,35 +512,6 @@ function renderChart() {
   yTitle.textContent = 'Turnout change vs 2022 (pp)';
   svg.appendChild(yTitle);
 
-  // Group-average horizontal lines, so the "opposition vs Fidesz mean"
-  // comparison is visible on the plot itself, not just the stat cards.
-  const stats = groupStats(points);
-  function drawGroupAvgLine(avg, color, label) {
-    if (avg === null) return;
-    const yy = yScale(Math.max(yMin, Math.min(yMax, avg)));
-    const line = document.createElementNS(ns, 'line');
-    line.setAttribute('x1', PAD_LEFT);
-    line.setAttribute('x2', PAD_LEFT + plotW);
-    line.setAttribute('y1', yy);
-    line.setAttribute('y2', yy);
-    line.setAttribute('stroke', color);
-    line.setAttribute('stroke-width', 1.5);
-    line.setAttribute('stroke-dasharray', '6 4');
-    line.setAttribute('opacity', '0.7');
-    svg.appendChild(line);
-    const t = document.createElementNS(ns, 'text');
-    t.setAttribute('x', PAD_LEFT + plotW - 6);
-    t.setAttribute('y', yy - 3);
-    t.setAttribute('text-anchor', 'end');
-    t.setAttribute('font-size', '10');
-    t.setAttribute('font-weight', '600');
-    t.setAttribute('fill', color);
-    t.textContent = `${label} avg ${signBold(avg)}`;
-    svg.appendChild(t);
-  }
-  drawGroupAvgLine(stats.opp.avg, '#1D4ED8', 'Opp');
-  drawGroupAvgLine(stats.fid.avg, '#1F2937', 'Fidesz');
-
   // Dots — show all points. Ones without 2026 data are rendered at y=0
   // with low opacity so the stronghold distribution is still visible.
   const sorted = [...points].sort((a, b) => {
@@ -539,13 +524,13 @@ function renderChart() {
     const cx = xScale(Math.max(xMin, Math.min(xMax, p.fidesz2022)));
     const cy = p.delta !== null
       ? yScale(Math.max(yMin, Math.min(yMax, p.delta)))
-      : yScale(0);
-    const fill = strongholdColor(p.fidesz2022);
+      : yScale((yMin + yMax) / 2);  // park "no data" dots in the middle
+    const fill = dotColor(p.winner);
     const dot = document.createElementNS(ns, 'circle');
     dot.setAttribute('cx', cx);
     dot.setAttribute('cy', cy);
-    const baseR = 4.2;
-    dot.setAttribute('r', pinnedDotId === p.id ? 6.5 : baseR);
+    const baseR = 5.2;
+    dot.setAttribute('r', pinnedDotId === p.id ? 7.5 : baseR);
     dot.setAttribute('fill', fill);
     dot.setAttribute('class', 'dot' + (pinnedDotId === p.id ? ' pinned' : '')
       + (filterGroup && filterGroup !== p.winner ? ' dimmed' : ''));
@@ -554,7 +539,7 @@ function renderChart() {
     if (p.delta === null) dot.setAttribute('opacity', '0.25');
 
     dot.addEventListener('mouseenter', (e) => {
-      dot.setAttribute('r', 6.5);
+      dot.setAttribute('r', 7.5);
       showDotTooltip(p, e);
     });
     dot.addEventListener('mousemove', (e) => {
@@ -628,7 +613,7 @@ function togglePinDot(p, event) {
     pinnedDotId = null;
     document.querySelectorAll('.dot.pinned').forEach(d => {
       d.classList.remove('pinned');
-      d.setAttribute('r', 4.2);
+      d.setAttribute('r', 5.2);
     });
     document.getElementById('tooltip').classList.remove('pinned');
     hideDotTooltip();
@@ -637,12 +622,12 @@ function togglePinDot(p, event) {
   pinnedDotId = p.id;
   document.querySelectorAll('.dot.pinned').forEach(d => {
     d.classList.remove('pinned');
-    d.setAttribute('r', 4.2);
+    d.setAttribute('r', 5.2);
   });
   const target = document.querySelector(`.dot[data-id="${CSS.escape(p.id)}"]`);
   if (target) {
     target.classList.add('pinned');
-    target.setAttribute('r', 6.5);
+    target.setAttribute('r', 7.5);
   }
   showDotTooltip(p, event);
 }
@@ -690,7 +675,7 @@ async function init() {
       pinnedDotId = null;
       document.querySelectorAll('.dot.pinned').forEach(d => {
         d.classList.remove('pinned');
-        d.setAttribute('r', 4.2);
+        d.setAttribute('r', 5.2);
       });
       const tt = document.getElementById('tooltip');
       tt.classList.remove('visible', 'pinned');
