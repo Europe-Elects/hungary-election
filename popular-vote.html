@@ -53,6 +53,7 @@ body {
 svg#chart {
   width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
   display: block;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 .grid-line { stroke: #E2E8F0; stroke-width: 1; }
 .grid-line.axis { stroke: #CBD5E1; }
@@ -89,7 +90,7 @@ svg#chart {
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="chartLegend"></div>
-    <svg id="chart" preserveAspectRatio="none"></svg>
+    <svg id="chart" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="chart-footnote">
       Designated national minority lists can enter parliament with
       <strong>~0.27%</strong> of the popular vote. Other parties need
@@ -130,14 +131,15 @@ const MINORITY_LABELS = {
 };
 const MINORITY_COLOR = '#93BFE7';  // light blue matching the reference
 
-// Viewport — internal coordinate space. preserveAspectRatio="none" lets
-// the SVG stretch to the container, so we size labels in px-like units.
-const VB_W = 720;
-const VB_H = 460;
-const PAD_LEFT = 46;
-const PAD_RIGHT = 20;
-const PAD_TOP = 30;
-const PAD_BOTTOM = 150;  // room for rotated minority labels
+// Viewport — internal coordinate space. Aspect ratio chosen to closely
+// match the container (~900 × ~430 px after chrome) so "meet" scaling
+// leaves minimal whitespace and fonts stay crisp.
+const VB_W = 900;
+const VB_H = 430;
+const PAD_LEFT = 48;
+const PAD_RIGHT = 24;
+const PAD_TOP = 28;
+const PAD_BOTTOM = 118;  // room for rotated minority labels
 
 function buildLegend() {
   const el = document.getElementById('chartLegend');
@@ -252,10 +254,10 @@ function renderChart(voteData, minorityData, source) {
   // FIDESZ-KDNP / TISZA / DK / Mi Hazánk / MKKP bars remain chunky.
   const nMain = mainEntries.length;
   const nMin = minorityEntries.length;
-  const gap = nMin > 0 ? 16 : 0;   // visual gap between main and minority groups
+  const gap = nMin > 0 ? 22 : 0;   // visual gap between main and minority groups
 
   // Try a fixed layout first; scale down if it wouldn't fit
-  let mainSlot = 56, minoritySlot = 30;
+  let mainSlot = 64, minoritySlot = 40;
   let totalWidth = nMain * mainSlot + nMin * minoritySlot + gap;
   if (totalWidth > plotW) {
     const scale = plotW / totalWidth;
@@ -263,8 +265,8 @@ function renderChart(voteData, minorityData, source) {
     minoritySlot *= scale;
     totalWidth = plotW;
   }
-  const mainBarWidth = Math.min(48, mainSlot * 0.78);
-  const minorityBarWidth = Math.min(22, minoritySlot * 0.66);
+  const mainBarWidth = Math.min(54, mainSlot * 0.78);
+  const minorityBarWidth = Math.min(26, minoritySlot * 0.68);
   const minBarH = 1.5;  // tiny bars still need a visible sliver
 
   // Centre the whole row within the plot
