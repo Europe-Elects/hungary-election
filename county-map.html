@@ -81,11 +81,26 @@ svg { width: 100%; height: 100%; display: block; }
 .no-data { color: #94A3B8; font-style: italic; }
 
 .legend {
-  display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
   font-size: 12px; color: #475569;
 }
-.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-item {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 8px; border-radius: 6px; border: 1px solid transparent;
+  transition: background .15s, border-color .15s, box-shadow .15s;
+  user-select: none;
+}
+.legend-item.clickable { cursor: pointer; }
+.legend-item.clickable:hover { background: #F1F5F9; border-color: #E2E8F0; }
+.legend-item.active {
+  background: #fff; border-color: #94A3B8;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  font-weight: 600; color: #0F172A;
+}
 .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+.legend-hint {
+  font-size: 11px; color: #94A3B8; margin-top: 6px;
+}
 
 .national-summary {
   margin-top: 12px; padding: 14px 16px;
@@ -104,7 +119,6 @@ svg { width: 100%; height: 100%; display: block; }
 <body>
 <div class="container">
   <div class="header">
-    <h1>National List Results by County – Hungary 2026</h1>
     <div class="subtitle">Party list vote share across 20 counties</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
   </div>
@@ -114,6 +128,7 @@ svg { width: 100%; height: 100%; display: block; }
     <div id="tooltip"></div>
   </div>
   <div class="legend" id="legend"></div>
+  <div class="legend-hint" id="legendHint">Click a party to shade counties by that party's vote share</div>
   <div class="national-summary" id="nationalSummary">
     <h2>National Summary</h2>
     <div id="nationalBars"></div>
@@ -131,7 +146,52 @@ const PARTIES = {
   'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
 };
 const NO_DATA_COLOR = '#E2E8F0';
-const DARK_FILLS = new Set(['#000000', '#70463A', '#009900']);
+
+// View state: 'winner' or a party key from PARTIES
+let currentView = 'winner';
+// Cached county data so legend clicks can re-render without re-fetching
+let lastCountyData = {};
+
+function hexToRgb(hex) {
+  const h = hex.replace('#', '');
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+  };
+}
+function parseRgb(str) {
+  if (!str) return null;
+  if (str.startsWith('#')) return hexToRgb(str);
+  const m = str.match(/\d+/g);
+  return m ? { r: +m[0], g: +m[1], b: +m[2] } : null;
+}
+function isLightFill(fill) {
+  const c = parseRgb(fill);
+  if (!c) return true;
+  // Perceived luminance
+  const lum = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
+  return lum > 0.62;
+}
+function partyShade(pct, maxPct, baseHex) {
+  if (pct === null || pct === undefined || pct <= 0) return NO_DATA_COLOR;
+  const t = Math.max(0, Math.min(1, pct / Math.max(maxPct, 0.01)));
+  const base = hexToRgb(baseHex);
+  // White → base color interpolation
+  const r = Math.round(255 + (base.r - 255) * t);
+  const g = Math.round(255 + (base.g - 255) * t);
+  const b = Math.round(255 + (base.b - 255) * t);
+  return `rgb(${r},${g},${b})`;
+}
+function partyMaxPct(countyData, party) {
+  let mx = 0;
+  for (const d of Object.values(countyData || {})) {
+    if (d && typeof d[party] === 'number' && d[party] > mx) mx = d[party];
+  }
+  // 10% floor so tiny parties still produce a visible gradient;
+  // 10% headroom so the darkest county isn't pinned to max.
+  return Math.max(10, mx * 1.1);
+}
 
 const COUNTY_ABBR = {
   'Budapest': 'Budapest', 'Bács-Kiskun': 'Bács-Kiskun', 'Baranya': 'Baranya',
@@ -159,10 +219,22 @@ function buildMap(countyData) {
   svg.setAttribute('viewBox', `0 0 ${COUNTY_SVG_WIDTH} ${COUNTY_SVG_HEIGHT}`);
   svg.innerHTML = '';
 
+  // In party mode, compute a single max once for the whole map
+  const partyMode = currentView !== 'winner';
+  const maxForParty = partyMode ? partyMaxPct(countyData, currentView) : 0;
+  const partyBaseColor = partyMode ? PARTIES[currentView].color : null;
+
+  // Pass 1: fill polygons
   COUNTY_MAP_DATA.forEach(c => {
     const data = countyData[c.id];
-    const winner = getWinner(data);
-    const fillColor = winner ? PARTIES[winner.party].color : NO_DATA_COLOR;
+    let fillColor;
+    if (partyMode) {
+      const pct = (data && typeof data[currentView] === 'number') ? data[currentView] : null;
+      fillColor = partyShade(pct, maxForParty, partyBaseColor);
+    } else {
+      const winner = getWinner(data);
+      fillColor = winner ? PARTIES[winner.party].color : NO_DATA_COLOR;
+    }
 
     const path = document.createElementNS(ns, 'path');
     path.setAttribute('d', c.d);
@@ -174,11 +246,20 @@ function buildMap(countyData) {
     svg.appendChild(path);
   });
 
+  // Pass 2: county name + primary number label
   COUNTY_MAP_DATA.forEach(c => {
     const data = countyData[c.id];
-    const winner = getWinner(data);
-    const fillColor = winner ? PARTIES[winner.party].color : NO_DATA_COLOR;
-    const isLight = !DARK_FILLS.has(fillColor);
+    let fillColor, primaryValue;
+    if (partyMode) {
+      const pct = (data && typeof data[currentView] === 'number') ? data[currentView] : null;
+      fillColor = partyShade(pct, maxForParty, partyBaseColor);
+      primaryValue = (pct !== null && pct > 0) ? pct : null;
+    } else {
+      const winner = getWinner(data);
+      fillColor = winner ? PARTIES[winner.party].color : NO_DATA_COLOR;
+      primaryValue = winner ? winner.pct : null;
+    }
+    const isLight = isLightFill(fillColor);
     const abbr = COUNTY_ABBR[c.id] || c.id;
     const lines = abbr.split('\n');
     const isBudapest = c.id === 'Budapest';
@@ -187,20 +268,20 @@ function buildMap(countyData) {
     lines.forEach((line, i) => {
       const t = document.createElementNS(ns, 'text');
       t.setAttribute('x', c.cx);
-      t.setAttribute('y', c.cy - (lines.length - 1) * (fs * 0.6) + i * (fs * 1.2) + (winner ? -4 : 0));
+      t.setAttribute('y', c.cy - (lines.length - 1) * (fs * 0.6) + i * (fs * 1.2) + (primaryValue !== null ? -4 : 0));
       t.setAttribute('class', 'county-label' + (isLight ? '' : ' light'));
       if (isBudapest) t.setAttribute('style', 'font-size:7px');
       t.textContent = line;
       svg.appendChild(t);
     });
 
-    if (winner) {
+    if (primaryValue !== null) {
       const p = document.createElementNS(ns, 'text');
       p.setAttribute('x', c.cx);
       p.setAttribute('y', c.cy + lines.length * (fs * 0.6) + 4);
       p.setAttribute('class', 'county-pct' + (isLight ? '' : ' light'));
       if (isBudapest) p.setAttribute('style', 'font-size:6px');
-      p.textContent = winner.pct.toFixed(1) + '%';
+      p.textContent = primaryValue.toFixed(1) + '%';
       svg.appendChild(p);
     }
   });
@@ -212,8 +293,10 @@ function showTooltip(e, county, data) {
   if (data && hasData(data)) {
     Object.entries(data).sort((a, b) => b[1] - a[1]).forEach(([party, pct]) => {
       const col = PARTIES[party] ? PARTIES[party].color : '#9CA3AF';
-      html += `<div class="bar-row">
-        <div class="bar-label" style="color:${col}">${party}</div>
+      const isActive = currentView === party;
+      const rowStyle = isActive ? 'font-weight:700;' : '';
+      html += `<div class="bar-row" style="${rowStyle}">
+        <div class="bar-label" style="color:${col}">${party}${isActive ? ' ●' : ''}</div>
         <div class="bar-container"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div>
         <div class="bar-pct">${pct.toFixed(1)}%</div>
       </div>`;
@@ -261,38 +344,69 @@ function buildNationalSummary(countyData) {
 
 function buildLegend() {
   const lg = document.getElementById('legend');
-  for (const [, p] of Object.entries(PARTIES)) {
-    lg.innerHTML += `<div class="legend-item"><div class="legend-swatch" style="background:${p.color}"></div>${p.name}</div>`;
+  lg.innerHTML = '';
+  for (const [key, p] of Object.entries(PARTIES)) {
+    const item = document.createElement('div');
+    item.className = 'legend-item clickable' + (currentView === key ? ' active' : '');
+    item.dataset.party = key;
+    item.innerHTML = `<div class="legend-swatch" style="background:${p.color}"></div>${p.name}`;
+    item.addEventListener('click', () => {
+      currentView = (currentView === key) ? 'winner' : key;
+      updateLegendActiveState();
+      updateLegendHint();
+      buildMap(lastCountyData);
+    });
+    lg.appendChild(item);
   }
-  lg.innerHTML += `<div class="legend-item"><div class="legend-swatch" style="background:${NO_DATA_COLOR}"></div>No data</div>`;
+  const noData = document.createElement('div');
+  noData.className = 'legend-item';
+  noData.innerHTML = `<div class="legend-swatch" style="background:${NO_DATA_COLOR}"></div>No data`;
+  lg.appendChild(noData);
+}
+
+function updateLegendActiveState() {
+  document.querySelectorAll('.legend-item.clickable').forEach(el => {
+    el.classList.toggle('active', el.dataset.party === currentView);
+  });
+}
+
+function updateLegendHint() {
+  const hint = document.getElementById('legendHint');
+  if (currentView === 'winner') {
+    hint.textContent = "Click a party to shade counties by that party's vote share";
+  } else {
+    const p = PARTIES[currentView];
+    hint.textContent = `Showing ${p.name} vote share by county — click again to return to winner view`;
+  }
+}
+
+function applyResults(data) {
+  const el = document.getElementById('lastUpdated');
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  const countyData = data.countyList || {};
+  lastCountyData = countyData;
+  const hasAny = Object.values(countyData).some(d => hasData(d));
+  el.classList.toggle('live', hasAny);
+  buildMap(countyData);
+  buildNationalSummary(countyData);
 }
 
 async function loadResults() {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
-    const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    const hasAny = Object.values(data.countyList || {}).some(d => hasData(d));
-    el.classList.toggle('live', hasAny);
-    buildMap(data.countyList || {});
-    buildNationalSummary(data.countyList || {});
+    applyResults(data);
   } catch(e) { buildMap({}); buildNationalSummary({}); }
 }
 
 setInterval(async () => {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
-    const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    const hasAny = Object.values(data.countyList || {}).some(d => hasData(d));
-    el.classList.toggle('live', hasAny);
-    document.getElementById('map').innerHTML = '';
-    buildMap(data.countyList || {});
-    buildNationalSummary(data.countyList || {});
+    applyResults(data);
   } catch(e) {}
 }, 30000);
 
 buildLegend();
+updateLegendHint();
 loadResults();
 </script>
 </body>
