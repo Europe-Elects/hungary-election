@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Popular Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #1E293B;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.container {
+  max-width: 960px; margin: 0 auto; padding: 16px 16px 16px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+
+.header { margin-bottom: 12px; }
+.subtitle { font-size: 13px; color: #64748B; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #94A3B8; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.last-updated::before {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: #94A3B8;
+}
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#chart-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  flex: 1 1 auto; min-height: 0;
+  padding: 12px 14px;
+  display: flex; flex-direction: column;
+}
+
+.chart-legend {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 12px; font-weight: 600; color: #334155;
+  margin-bottom: 8px;
+}
+.chart-legend .item { display: flex; align-items: center; gap: 6px; }
+.chart-legend .swatch { width: 11px; height: 11px; border-radius: 2px; }
+
+svg#chart {
+  width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
+  display: block;
+}
+.grid-line { stroke: #E2E8F0; stroke-width: 1; }
+.grid-line.axis { stroke: #CBD5E1; }
+.y-tick-label { font-size: 10px; fill: #94A3B8; font-variant-numeric: tabular-nums; }
+.bar-value {
+  font-size: 12px; font-weight: 700; fill: #0F172A;
+  font-variant-numeric: tabular-nums; text-anchor: middle;
+}
+.bar-label {
+  font-size: 11px; fill: #475569; text-anchor: middle; font-weight: 500;
+}
+.bar-rect { transition: height .4s ease, y .4s ease; }
+
+.chart-footnote {
+  font-size: 11px; color: #64748B; margin-top: 6px; line-height: 1.4;
+}
+.chart-footnote strong { color: #334155; }
+
+.footer {
+  margin-top: 8px; font-size: 11px; color: #94A3B8; text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-rect { transition: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">Popular vote — national party list (grand total)</div>
+    <div class="last-updated" id="lastUpdated">Last updated: –</div>
+  </div>
+  <div id="chart-container">
+    <div class="chart-legend" id="chartLegend"></div>
+    <svg id="chart" preserveAspectRatio="none"></svg>
+    <div class="chart-footnote">
+      Party needs <strong>5%</strong> of the list vote to enter parliament
+      (1% for alliances of two, 10% for three or more). Nationality list
+      votes are excluded from this chart.
+    </div>
+  </div>
+  <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
+</div>
+
+<script>
+const PARTIES = {
+  'FIDESZ-KDNP': { color: '#000000', name: 'FIDESZ-KDNP (PfE)' },
+  'TISZA':       { color: '#3399FF', name: 'TISZA (EPP)' },
+  'DK':          { color: '#FF0000', name: 'DK (S&D)' },
+  'Mi Hazánk':   { color: '#70463A', name: 'Mi Hazánk (ESN)' },
+  'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
+};
+
+// Viewport — internal coordinate space. preserveAspectRatio="none" lets
+// the SVG stretch to the container, so we size labels in px-like units.
+const VB_W = 700;
+const VB_H = 360;
+const PAD_LEFT = 46;
+const PAD_RIGHT = 20;
+const PAD_TOP = 30;
+const PAD_BOTTOM = 56;
+
+function buildLegend() {
+  const el = document.getElementById('chartLegend');
+  el.innerHTML = Object.entries(PARTIES).map(([, p]) =>
+    `<div class="item"><div class="swatch" style="background:${p.color}"></div>${p.name}</div>`
+  ).join('');
+}
+
+// Fallback: if scraper hasn't written nationalVote yet, compute a simple
+// unweighted average from the 20 counties. Accurate enough for rehearsal;
+// the scraper will override this with oszint=51 on election day.
+function computeFromCounties(countyList) {
+  if (!countyList) return null;
+  const totals = {};
+  for (const p of Object.keys(PARTIES)) totals[p] = 0;
+  let count = 0;
+  for (const data of Object.values(countyList)) {
+    if (data && Object.values(data).some(v => v > 0)) {
+      count++;
+      for (const [party, pct] of Object.entries(data)) {
+        if (totals[party] !== undefined) totals[party] += pct;
+      }
+    }
+  }
+  if (!count) return null;
+  for (const p of Object.keys(totals)) totals[p] = totals[p] / count;
+  return totals;
+}
+
+function pickNationalVote(data) {
+  const nv = data.nationalVote || {};
+  const hasReal = Object.values(nv).some(v => v > 0);
+  if (hasReal) return { data: nv, source: 'national' };
+  const fallback = computeFromCounties(data.countyList);
+  if (fallback) return { data: fallback, source: 'fallback' };
+  return { data: null, source: 'none' };
+}
+
+function niceMax(observedMax) {
+  // Fixed floor of 60% (matches typical Hungarian vote share ceiling).
+  // If any party exceeds that, bump to next 20% increment.
+  const floor = 60;
+  if (observedMax <= floor) return floor;
+  return Math.ceil(observedMax / 20) * 20;
+}
+
+function renderChart(voteData, source) {
+  const svg = document.getElementById('chart');
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
+  const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
+
+  if (!voteData) {
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', VB_W / 2);
+    t.setAttribute('y', VB_H / 2);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', '#94A3B8');
+    t.setAttribute('font-size', '14');
+    t.textContent = 'Awaiting data — polls still open or no list results yet';
+    svg.appendChild(t);
+    return;
+  }
+
+  // Sort parties by pct descending for a natural "leaderboard" look
+  const entries = Object.entries(voteData)
+    .filter(([p]) => PARTIES[p])
+    .sort((a, b) => b[1] - a[1]);
+
+  const observedMax = Math.max(0, ...entries.map(([, v]) => v));
+  const yMax = niceMax(observedMax);
+
+  // Y-axis gridlines at every 20%
+  for (let pct = 0; pct <= yMax; pct += 20) {
+    const y = PAD_TOP + plotH * (1 - pct / yMax);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', PAD_LEFT);
+    line.setAttribute('x2', VB_W - PAD_RIGHT);
+    line.setAttribute('y1', y);
+    line.setAttribute('y2', y);
+    line.setAttribute('class', pct === 0 ? 'grid-line axis' : 'grid-line');
+    svg.appendChild(line);
+
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', PAD_LEFT - 8);
+    lbl.setAttribute('y', y + 3);
+    lbl.setAttribute('class', 'y-tick-label');
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.textContent = pct + '%';
+    svg.appendChild(lbl);
+  }
+
+  // Bars
+  const nBars = entries.length;
+  const barWidth = Math.min(80, plotW / nBars * 0.55);
+  const slotWidth = plotW / nBars;
+
+  entries.forEach(([party, pct], i) => {
+    const cx = PAD_LEFT + slotWidth * i + slotWidth / 2;
+    const barH = plotH * (pct / yMax);
+    const y = PAD_TOP + plotH - barH;
+    const color = PARTIES[party].color;
+
+    // Bar rectangle
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', cx - barWidth / 2);
+    rect.setAttribute('y', y);
+    rect.setAttribute('width', barWidth);
+    rect.setAttribute('height', barH);
+    rect.setAttribute('fill', color);
+    rect.setAttribute('class', 'bar-rect');
+    rect.setAttribute('rx', '2');
+    svg.appendChild(rect);
+
+    // Value label above bar
+    const val = document.createElementNS(ns, 'text');
+    val.setAttribute('x', cx);
+    val.setAttribute('y', Math.max(PAD_TOP - 8, y - 8));
+    val.setAttribute('class', 'bar-value');
+    val.textContent = pct.toFixed(2) + '%';
+    svg.appendChild(val);
+
+    // Party label below bar
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', cx);
+    lbl.setAttribute('y', PAD_TOP + plotH + 18);
+    lbl.setAttribute('class', 'bar-label');
+    // Short label — drop the (PfE) etc. parenthetical for axis density
+    lbl.textContent = party;
+    svg.appendChild(lbl);
+  });
+
+  // Tiny "estimated from counties" note inside the chart if using fallback
+  if (source === 'fallback') {
+    const note = document.createElementNS(ns, 'text');
+    note.setAttribute('x', VB_W - PAD_RIGHT);
+    note.setAttribute('y', PAD_TOP + 12);
+    note.setAttribute('text-anchor', 'end');
+    note.setAttribute('fill', '#94A3B8');
+    note.setAttribute('font-size', '10');
+    note.setAttribute('font-style', 'italic');
+    note.textContent = 'estimated from county averages';
+    svg.appendChild(note);
+  }
+}
+
+function applyResults(data) {
+  const el = document.getElementById('lastUpdated');
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  const { data: voteData, source } = pickNationalVote(data);
+  el.classList.toggle('live', !!voteData);
+  renderChart(voteData, source);
+}
+
+async function loadResults() {
+  try {
+    const data = await (await fetch('results.json?' + Date.now())).json();
+    applyResults(data);
+  } catch (e) {
+    renderChart(null, 'none');
+  }
+}
+
+setInterval(async () => {
+  try {
+    const data = await (await fetch('results.json?' + Date.now())).json();
+    applyResults(data);
+  } catch (e) {}
+}, 30000);
+
+buildLegend();
+loadResults();
+</script>
+</body>
+</html>
