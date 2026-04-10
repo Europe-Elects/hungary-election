@@ -23,12 +23,12 @@ body {
 .subtitle { font-size: 13px; color: #64748B; }
 .last-updated {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; color: #94A3B8; margin-top: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
   padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
 }
 .last-updated::before {
   content: ''; display: inline-block; width: 6px; height: 6px;
-  border-radius: 50%; background: #94A3B8;
+  border-radius: 50%; background: #64748B;
 }
 .last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -73,7 +73,7 @@ svg#chart {
 .chart-footnote strong { color: #334155; }
 
 .footer {
-  margin-top: 8px; font-size: 11px; color: #94A3B8; text-align: center;
+  margin-top: 8px; font-size: 11px; color: #64748B; text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -110,26 +110,30 @@ const PARTIES = {
   'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
 };
 
-// Display labels for nationality / minority lists. Key = NVI list name
-// (tnev) as written by the scraper into results.json.minorityVote.
-// Hungary has 13 recognised minorities; one typically doesn't field a
-// list each cycle. Anything not in this table falls back to the raw
-// NVI name so newly appearing minorities still show up.
-const MINORITY_LABELS = {
-  'Bolgár Országos Önkormányzat': 'BOÖ (BG)',
-  'MGOÖ':                          'MGOÖ (GR)',
-  'MNOÖ':                          'MNOÖ (D)',
-  'MROÖ':                          'MROÖ (RO)',
-  'OHÖ':                           'OHÖ (HR)',
-  'OLÖ':                           'OLÖ (PL)',
-  'OÖÖ':                           'OÖÖ (AM)',
-  'ORÖ':                           'ORÖ (Rusyns)',
-  'OSZÖ':                          'OSZÖ (SK)',
-  'Országos Szlovén':              'OSZLÖ (SLO)',
-  'Magyarországi Romák Országos':  'ROMA (Romani)',
-  'Országos Ukrán':                'UOO (UA)',
-};
-const MINORITY_COLOR = '#93BFE7';  // light blue matching the reference
+// Ordered list of Hungary's 13 recognised minorities, keyed by the NVI
+// tnev as it appears in tlista.xml for the production torzs. Order
+// follows the nemz numeric code (1..13) which is the Hungarian law
+// ordering. Always render all 13 slots — when a minority doesn't
+// field a list in a given cycle (most recently Serbian, nemz=10), that
+// slot renders as a muted placeholder so the row stays visually
+// consistent across elections.
+const MINORITY_SLOTS = [
+  { nvi: 'Bolgár Országos Önkormányzat', label: 'BOÖ (BG)' },      // 1 Bulgarian
+  { nvi: 'MGOÖ',                          label: 'MGOÖ (GR)' },    // 2 Greek
+  { nvi: 'OHÖ',                           label: 'OHÖ (HR)' },     // 3 Croatian
+  { nvi: 'OLÖ',                           label: 'OLÖ (PL)' },     // 4 Polish
+  { nvi: 'MNOÖ',                          label: 'MNOÖ (D)' },     // 5 German
+  { nvi: 'OÖÖ',                           label: 'OÖÖ (AM)' },     // 6 Armenian
+  { nvi: 'Magyarországi Romák Országos',  label: 'ROMA (Romani)' },// 7 Roma
+  { nvi: 'MROÖ',                          label: 'MROÖ (RO)' },    // 8 Romanian
+  { nvi: 'ORÖ',                           label: 'ORÖ (Rusyns)' }, // 9 Rusyn
+  { nvi: '__not_fielded_sr__',            label: 'OSZÖ (SR)' },    // 10 Serbian (placeholder)
+  { nvi: 'OSZÖ',                          label: 'OSZÖ (SK)' },    // 11 Slovak
+  { nvi: 'Országos Szlovén',              label: 'OSZLÖ (SLO)' },  // 12 Slovenian
+  { nvi: 'Országos Ukrán',                label: 'UOO (UA)' },     // 13 Ukrainian
+];
+const MINORITY_COLOR = '#5A7BA6';           // steel blue, 4.36:1 on white
+const MINORITY_PLACEHOLDER_COLOR = '#CBD5E1'; // muted slate for not-fielded slot
 
 // Internal coordinate space is computed at render time from the SVG's
 // actual bounding rect, so text renders at its intended pixel size and
@@ -177,8 +181,28 @@ function pickNationalVote(data) {
   return { data: null, minority: {}, source: 'none' };
 }
 
-function minorityLabel(nviName) {
-  return MINORITY_LABELS[nviName] || nviName;
+// Resolve which minority slots to render.
+// Production mode: any slot matches → render all 13 canonical slots
+// (the missing one shows as an "n/a" placeholder).
+// Rehearsal / unknown mode: render whatever tnevs actually exist in
+// minorityVote (labels fall through to the raw NVI name).
+function resolveMinorityEntries(minorityData) {
+  const md = minorityData || {};
+  const productionMode = MINORITY_SLOTS.some(s => md[s.nvi] !== undefined);
+  if (productionMode) {
+    return MINORITY_SLOTS.map(s => ({
+      label: s.label,
+      pct: typeof md[s.nvi] === 'number' ? md[s.nvi] : 0,
+      isPlaceholder: typeof md[s.nvi] !== 'number',
+    }));
+  }
+  // Rehearsal fall-through
+  const lookup = new Map(MINORITY_SLOTS.map(s => [s.nvi, s.label]));
+  return Object.entries(md).map(([name, pct]) => ({
+    label: lookup.get(name) || name,
+    pct,
+    isPlaceholder: false,
+  }));
 }
 
 function niceMax(observedMax) {
@@ -221,16 +245,14 @@ function renderChart(voteData, minorityData, source) {
     .filter(([p]) => PARTIES[p])
     .sort((a, b) => b[1] - a[1]);
 
-  // Minority entries come from results.json.minorityVote — keep input
-  // order stable by sorting alphabetically on the display label.
-  const minorityEntries = Object.entries(minorityData || {})
-    .map(([name, pct]) => [name, pct, minorityLabel(name)])
-    .sort((a, b) => a[2].localeCompare(b[2]));
+  // Minority entries come back in canonical nemz order when in
+  // production mode, or in raw order from the scraper otherwise.
+  const minorityEntries = resolveMinorityEntries(minorityData);
 
   const observedMax = Math.max(
     0,
     ...mainEntries.map(([, v]) => v),
-    ...minorityEntries.map(([, v]) => v)
+    ...minorityEntries.map(e => e.pct)
   );
   const yMax = niceMax(observedMax);
 
@@ -276,7 +298,8 @@ function renderChart(voteData, minorityData, source) {
   // Centre the whole row within the plot
   let cursor = PAD_LEFT + (plotW - totalWidth) / 2;
 
-  function drawBar(pct, cx, color, barW, isMain, labelText, minorityIdx) {
+  function drawBar(opts) {
+    const { pct, cx, color, barW, isMain, labelText, minorityIdx, isPlaceholder, tooltip } = opts;
     const barH = Math.max(minBarH, plotH * (pct / yMax));
     const y = PAD_TOP + plotH - barH;
 
@@ -288,6 +311,14 @@ function renderChart(voteData, minorityData, source) {
     rect.setAttribute('fill', color);
     rect.setAttribute('class', 'bar-rect');
     rect.setAttribute('rx', '2');
+    if (isPlaceholder) rect.setAttribute('opacity', '0.55');
+
+    // Native browser tooltip on hover — accessible and no custom UI
+    if (tooltip) {
+      const t = document.createElementNS(ns, 'title');
+      t.textContent = tooltip;
+      rect.appendChild(t);
+    }
     svg.appendChild(rect);
 
     // Value label above bar
@@ -296,16 +327,20 @@ function renderChart(voteData, minorityData, source) {
     if (isMain) {
       val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
     } else {
-      // Minority bars are all tiny — stagger labels between two Y rows
-      // (even indices low, odd indices high) so adjacent values don't
-      // collide horizontally even with 12+ bars in a narrow group.
+      // Stagger minority labels between two Y rows (even low, odd high)
+      // so adjacent values don't collide even with 13+ bars in a row.
       const lowY = PAD_TOP + plotH - 6;
       const highY = PAD_TOP + plotH - 18;
       val.setAttribute('y', minorityIdx % 2 === 0 ? lowY : highY);
       val.setAttribute('font-size', '8');
     }
     val.setAttribute('class', 'bar-value');
-    val.textContent = pct.toFixed(2) + '%';
+    if (isPlaceholder) {
+      val.setAttribute('fill', '#94A3B8');
+      val.textContent = 'n/a';
+    } else {
+      val.textContent = pct.toFixed(2) + '%';
+    }
     svg.appendChild(val);
 
     // X-axis label
@@ -323,6 +358,7 @@ function renderChart(voteData, minorityData, source) {
       lbl.setAttribute('text-anchor', 'end');
       lbl.setAttribute('transform', `rotate(-55 ${cx} ${ly})`);
       lbl.setAttribute('font-size', '10');
+      if (isPlaceholder) lbl.setAttribute('fill', '#94A3B8');
       lbl.textContent = labelText;
     }
     svg.appendChild(lbl);
@@ -330,15 +366,36 @@ function renderChart(voteData, minorityData, source) {
 
   mainEntries.forEach(([party, pct]) => {
     const cx = cursor + mainSlot / 2;
-    drawBar(pct, cx, PARTIES[party].color, mainBarWidth, true, party, -1);
+    drawBar({
+      pct, cx,
+      color: PARTIES[party].color,
+      barW: mainBarWidth,
+      isMain: true,
+      labelText: party,
+      minorityIdx: -1,
+      isPlaceholder: false,
+      tooltip: `${PARTIES[party].name}: ${pct.toFixed(2)}%`,
+    });
     cursor += mainSlot;
   });
 
   if (nMin > 0) {
     cursor += gap;
-    minorityEntries.forEach(([, pct, label], i) => {
+    minorityEntries.forEach((e, i) => {
       const cx = cursor + minoritySlot / 2;
-      drawBar(pct, cx, MINORITY_COLOR, minorityBarWidth, false, label, i);
+      drawBar({
+        pct: e.pct,
+        cx,
+        color: e.isPlaceholder ? MINORITY_PLACEHOLDER_COLOR : MINORITY_COLOR,
+        barW: minorityBarWidth,
+        isMain: false,
+        labelText: e.label,
+        minorityIdx: i,
+        isPlaceholder: e.isPlaceholder,
+        tooltip: e.isPlaceholder
+          ? `${e.label}: no list fielded this cycle`
+          : `${e.label}: ${e.pct.toFixed(2)}%`,
+      });
       cursor += minoritySlot;
     });
   }
