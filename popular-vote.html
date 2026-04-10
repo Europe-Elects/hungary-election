@@ -186,7 +186,7 @@ function buildLegend() {
 
 async function loadBaseline2022() {
   try {
-    const r = await fetch('2022_baseline.json');
+    const r = await fetch('2022_baseline.json?v=' + Date.now());
     baseline2022 = await r.json();
   } catch (e) {
     baseline2022 = null;

@@ -238,7 +238,7 @@ function strongholdColor(fideszPct) {
 
 async function loadBaseline() {
   try {
-    const res = await fetch('2022_baseline.json');
+    const res = await fetch('2022_baseline.json?v=' + Date.now());
     baseline = await res.json();
     return true;
   } catch (e) {
