@@ -102,7 +102,7 @@ JLCS_TO_PARTY = {
 PARTY_KEYWORDS = {
     'FIDESZ-KDNP': ['fidesz', 'kdnp'],
     'TISZA': ['tisza'],
-    'DK': ['demokratikus koalíció', 'dk '],
+    'DK': ['demokratikus koalíció', 'dk'],
     'Mi Hazánk': ['mi hazánk', 'hazánk'],
     'MKKP': ['mkkp', 'kétfarkú'],
 }
