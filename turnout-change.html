@@ -33,6 +33,36 @@ body {
 .last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.stat-card {
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  padding: 10px 14px;
+}
+.stat-card.opposition { border-left: 3px solid #3399FF; }
+.stat-card.fidesz     { border-left: 3px solid #000000; }
+.stat-card.signal     { border-left: 3px solid #22C55E; background: #F0FDF4; }
+.stat-card.signal.negative { border-left-color: #EF4444; background: #FEF2F2; }
+.stat-card.signal.neutral  { border-left-color: #94A3B8; background: #F8FAFC; }
+.stat-label {
+  font-size: 11px; font-weight: 600; color: #475569;
+  text-transform: uppercase; letter-spacing: .02em;
+}
+.stat-value {
+  font-size: 24px; font-weight: 700; color: #0F172A;
+  font-variant-numeric: tabular-nums; line-height: 1.1; margin-top: 4px;
+}
+.stat-value.small { font-size: 20px; }
+.stat-sub {
+  font-size: 11px; color: #64748B; margin-top: 3px;
+}
+.stat-sub.strong { color: #0F172A; font-weight: 600; }
+
 #chart-container {
   position: relative; width: 100%;
   background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
@@ -82,8 +112,25 @@ svg#chart {
 <body>
 <div class="container">
   <div class="header">
-    <div class="subtitle">Turnout change vs 2022, by constituency · 106 single-member districts</div>
+    <div class="subtitle">Is the opposition mobilising? Turnout change vs 2022 by 2022 winner</div>
     <div class="last-updated" id="lastUpdated">Loading baseline…</div>
+  </div>
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card opposition">
+      <div class="stat-label">Opposition-won 2022</div>
+      <div class="stat-value" id="statOppValue">—</div>
+      <div class="stat-sub" id="statOppSub">avg turnout change</div>
+    </div>
+    <div class="stat-card fidesz">
+      <div class="stat-label">Fidesz-won 2022</div>
+      <div class="stat-value" id="statFidValue">—</div>
+      <div class="stat-sub" id="statFidSub">avg turnout change</div>
+    </div>
+    <div class="stat-card signal neutral" id="signalCard">
+      <div class="stat-label">Mobilisation signal</div>
+      <div class="stat-value small" id="statSignalValue">awaiting 2026 data</div>
+      <div class="stat-sub strong" id="statSignalText">&nbsp;</div>
+    </div>
   </div>
   <div id="chart-container">
     <div class="chart-legend">
@@ -92,14 +139,13 @@ svg#chart {
       <div class="note" id="modeNote">Waiting for first turnout snapshot</div>
     </div>
     <svg id="chart"></svg>
-    <div class="chart-footnote">
-      Each dot is a constituency. X = Fidesz-KDNP's share of the
-      2022 constituency vote (stronghold strength). Y = <strong>2026
-      turnout − 2022 turnout</strong>, in percentage points. Points
-      above the dashed line have higher turnout than in 2022; below,
-      lower. 2022 final turnout was measured after polls closed —
-      comparisons are only meaningful near or after the <strong>18:30
-      2026 snapshot</strong>.
+    <div class="chart-footnote" id="chartFootnote">
+      Each dot is a constituency. X = Fidesz-KDNP's 2022 vote share.
+      Y = 2026 turnout − 2022 turnout (pp). If turnout rises more in
+      <strong>opposition-won 2022 districts</strong> than in Fidesz
+      ones (especially Budapest), the opposition is likely mobilising
+      harder — the central signal above.
+      <span id="budapestNote"></span>
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · 2022 baseline from NVI XLSX</div>
@@ -164,9 +210,89 @@ function buildPoints() {
       turnout2026: t2026,
       delta,
       reportTime: r2026 && r2026.time,
+      winner: base2022.winner,  // "fidesz" or "opposition"
+      isBudapest: id.startsWith('BP-'),
     });
   }
   return points;
+}
+
+function groupStats(points) {
+  const withDelta = points.filter(p => p.delta !== null);
+  const opp = withDelta.filter(p => p.winner === 'opposition');
+  const fid = withDelta.filter(p => p.winner === 'fidesz');
+  const bp  = withDelta.filter(p => p.isBudapest);
+  function avg(arr) {
+    if (!arr.length) return null;
+    const s = arr.reduce((a, p) => a + p.delta, 0);
+    return s / arr.length;
+  }
+  return {
+    opp:   { count: opp.length, total: points.filter(p => p.winner === 'opposition').length, avg: avg(opp) },
+    fid:   { count: fid.length, total: points.filter(p => p.winner === 'fidesz').length,     avg: avg(fid) },
+    bp:    { count: bp.length,  total: points.filter(p => p.isBudapest).length,               avg: avg(bp) },
+    hasData: withDelta.length > 0,
+  };
+}
+
+function signBold(v) {
+  return (v > 0 ? '+' : '') + v.toFixed(1) + ' pp';
+}
+
+function updateStatCards(points) {
+  const stats = groupStats(points);
+  const oppEl    = document.getElementById('statOppValue');
+  const oppSub   = document.getElementById('statOppSub');
+  const fidEl    = document.getElementById('statFidValue');
+  const fidSub   = document.getElementById('statFidSub');
+  const sigEl    = document.getElementById('statSignalValue');
+  const sigSub   = document.getElementById('statSignalText');
+  const sigCard  = document.getElementById('signalCard');
+  const bpNote   = document.getElementById('budapestNote');
+
+  if (!stats.hasData) {
+    oppEl.textContent = '—';
+    fidEl.textContent = '—';
+    sigEl.textContent = 'awaiting 2026 data';
+    sigEl.classList.add('small');
+    sigSub.innerHTML = '&nbsp;';
+    sigCard.className = 'stat-card signal neutral';
+    oppSub.textContent = `${stats.opp.total} opposition districts · avg turnout change`;
+    fidSub.textContent = `${stats.fid.total} Fidesz districts · avg turnout change`;
+    bpNote.textContent = '';
+    return;
+  }
+
+  oppEl.textContent = signBold(stats.opp.avg);
+  oppSub.textContent = `${stats.opp.count}/${stats.opp.total} districts with data`;
+  fidEl.textContent = signBold(stats.fid.avg);
+  fidSub.textContent = `${stats.fid.count}/${stats.fid.total} districts with data`;
+
+  const diff = stats.opp.avg - stats.fid.avg;
+  sigEl.classList.remove('small');
+  sigEl.textContent = signBold(diff);
+  sigCard.className = 'stat-card signal ' +
+    (diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral');
+
+  let narrative;
+  if (diff > 2) {
+    narrative = 'Opposition mobilising strongly → bad for Fidesz';
+  } else if (diff > 0.5) {
+    narrative = 'Opposition mobilising slightly more';
+  } else if (diff < -2) {
+    narrative = 'Fidesz mobilising strongly → bad for opposition';
+  } else if (diff < -0.5) {
+    narrative = 'Fidesz mobilising slightly more';
+  } else {
+    narrative = 'Balanced — no clear mobilisation edge';
+  }
+  sigSub.textContent = narrative;
+
+  if (stats.bp.avg !== null) {
+    bpNote.innerHTML = ` <strong>Budapest:</strong> ${signBold(stats.bp.avg)} across ${stats.bp.count}/${stats.bp.total} districts.`;
+  } else {
+    bpNote.textContent = '';
+  }
 }
 
 function niceRoundMax(v, step) {
@@ -188,6 +314,9 @@ function renderChart() {
 
   const points = buildPoints();
   const withDelta = points.filter(p => p.delta !== null);
+
+  // Update the top stat cards
+  updateStatCards(points);
 
   // Mode note reflects whether 2026 turnout data has arrived
   const mode = document.getElementById('modeNote');
@@ -293,6 +422,35 @@ function renderChart() {
   yTitle.setAttribute('class', 'axis-title');
   yTitle.textContent = 'Turnout change vs 2022 (pp)';
   svg.appendChild(yTitle);
+
+  // Group-average horizontal lines, so the "opposition vs Fidesz mean"
+  // comparison is visible on the plot itself, not just the stat cards.
+  const stats = groupStats(points);
+  function drawGroupAvgLine(avg, color, label) {
+    if (avg === null) return;
+    const yy = yScale(Math.max(yMin, Math.min(yMax, avg)));
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', PAD_LEFT);
+    line.setAttribute('x2', PAD_LEFT + plotW);
+    line.setAttribute('y1', yy);
+    line.setAttribute('y2', yy);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', 1.5);
+    line.setAttribute('stroke-dasharray', '6 4');
+    line.setAttribute('opacity', '0.7');
+    svg.appendChild(line);
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', PAD_LEFT + plotW - 6);
+    t.setAttribute('y', yy - 3);
+    t.setAttribute('text-anchor', 'end');
+    t.setAttribute('font-size', '10');
+    t.setAttribute('font-weight', '600');
+    t.setAttribute('fill', color);
+    t.textContent = `${label} avg ${signBold(avg)}`;
+    svg.appendChild(t);
+  }
+  drawGroupAvgLine(stats.opp.avg, '#1D4ED8', 'Opp');
+  drawGroupAvgLine(stats.fid.avg, '#1F2937', 'Fidesz');
 
   // Dots — show all points. Ones without 2026 data are rendered at y=0
   // with low opacity so the stronghold distribution is still visible.
