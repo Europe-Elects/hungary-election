@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Turnout Change vs 2022</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #1E293B;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.container {
+  max-width: 960px; margin: 0 auto; padding: 16px 16px 16px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+
+.header { margin-bottom: 12px; }
+.subtitle { font-size: 13px; color: #64748B; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.last-updated::before {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: #64748B;
+}
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#chart-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  flex: 1 1 auto; min-height: 0;
+  padding: 12px 14px 8px;
+  display: flex; flex-direction: column;
+}
+
+.chart-legend {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 12px; color: #334155;
+  margin-bottom: 6px; align-items: center;
+}
+.chart-legend .item { display: flex; align-items: center; gap: 6px; }
+.chart-legend .swatch { width: 11px; height: 11px; border-radius: 50%; }
+.chart-legend .note { font-size: 11px; color: #64748B; }
+
+svg#chart {
+  width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
+  display: block;
+  font-family: inherit;
+}
+.axis-line { stroke: #CBD5E1; stroke-width: 1; }
+.grid-line { stroke: #F1F5F9; stroke-width: 1; }
+.ref-line { stroke: #94A3B8; stroke-width: 1; stroke-dasharray: 3 3; }
+.axis-label { font-size: 10px; fill: #64748B; font-variant-numeric: tabular-nums; }
+.axis-title { font-size: 11px; fill: #475569; font-weight: 600; }
+.dot { transition: opacity .15s; stroke: rgba(0,0,0,0.15); stroke-width: 0.5; }
+.dot:hover { opacity: 0.8; stroke-width: 1.5; }
+
+.chart-footnote {
+  font-size: 11px; color: #64748B; margin-top: 4px; line-height: 1.4;
+}
+.chart-footnote strong { color: #334155; }
+
+.footer {
+  margin-top: 8px; font-size: 11px; color: #64748B; text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot { transition: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">Turnout change vs 2022, by constituency · 106 single-member districts</div>
+    <div class="last-updated" id="lastUpdated">Loading baseline…</div>
+  </div>
+  <div id="chart-container">
+    <div class="chart-legend">
+      <div class="item"><div class="swatch" style="background:#000000"></div>Fidesz-KDNP stronghold (2022)</div>
+      <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition stronghold (2022)</div>
+      <div class="note" id="modeNote">Waiting for first turnout snapshot</div>
+    </div>
+    <svg id="chart"></svg>
+    <div class="chart-footnote">
+      Each dot is a constituency. X = Fidesz-KDNP's share of the
+      2022 constituency vote (stronghold strength). Y = <strong>2026
+      turnout − 2022 turnout</strong>, in percentage points. Points
+      above the dashed line have higher turnout than in 2022; below,
+      lower. 2022 final turnout was measured after polls closed —
+      comparisons are only meaningful near or after the <strong>18:30
+      2026 snapshot</strong>.
+    </div>
+  </div>
+  <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · 2022 baseline from NVI XLSX</div>
+</div>
+
+<script>
+const PAD_LEFT = 50;
+const PAD_RIGHT = 18;
+const PAD_TOP = 26;
+const PAD_BOTTOM = 42;
+
+let baseline = null;          // 2022_baseline.json once loaded
+let lastResults = null;       // last fetched results.json
+
+// Interpolate a fill color from TISZA blue (low Fidesz) to black (high Fidesz)
+// across a reasonable 25-70% Fidesz range.
+function strongholdColor(fideszPct) {
+  const lo = 25, hi = 70;
+  const t = Math.max(0, Math.min(1, (fideszPct - lo) / (hi - lo)));
+  // Interpolate rgb(51,153,255) → rgb(0,0,0)
+  const r = Math.round(51 + (0 - 51) * t);
+  const g = Math.round(153 + (0 - 153) * t);
+  const b = Math.round(255 + (0 - 255) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+async function loadBaseline() {
+  try {
+    const res = await fetch('2022_baseline.json');
+    baseline = await res.json();
+    return true;
+  } catch (e) {
+    console.error('Failed to load baseline', e);
+    return false;
+  }
+}
+
+async function loadResults() {
+  try {
+    const res = await fetch('results.json?' + Date.now());
+    lastResults = await res.json();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function buildPoints() {
+  if (!baseline || !lastResults) return [];
+  const turnout2026 = (lastResults.turnout && lastResults.turnout.constituencies) || {};
+  const points = [];
+  for (const [id, base2022] of Object.entries(baseline.constituencies || {})) {
+    const r2026 = turnout2026[id];
+    const t2026 = r2026 && typeof r2026.pct === 'number' ? r2026.pct : null;
+    const t2022 = base2022.turnoutPct;
+    const delta = t2026 !== null ? +(t2026 - t2022).toFixed(2) : null;
+    points.push({
+      id,
+      fidesz2022: base2022.fideszPct,
+      opp2022: base2022.oppPct,
+      turnout2022: t2022,
+      turnout2026: t2026,
+      delta,
+      reportTime: r2026 && r2026.time,
+    });
+  }
+  return points;
+}
+
+function niceRoundMax(v, step) {
+  return Math.ceil(v / step) * step;
+}
+
+function renderChart() {
+  const svg = document.getElementById('chart');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const rect = svg.getBoundingClientRect();
+  const VB_W = Math.max(400, Math.round(rect.width));
+  const VB_H = Math.max(220, Math.round(rect.height));
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+
+  const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
+  const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
+
+  const points = buildPoints();
+  const withDelta = points.filter(p => p.delta !== null);
+
+  // Mode note reflects whether 2026 turnout data has arrived
+  const mode = document.getElementById('modeNote');
+  if (points.length === 0) {
+    mode.textContent = 'Loading 2022 baseline…';
+  } else if (withDelta.length === 0) {
+    mode.textContent = `${points.length} constituencies from 2022 · awaiting 2026 turnout snapshot`;
+  } else {
+    const latest = withDelta.map(p => p.reportTime).filter(Boolean).sort().pop() || '—';
+    mode.textContent = `${withDelta.length}/${points.length} with 2026 data · latest snapshot ${latest}`;
+  }
+
+  // Axes ranges
+  // X: Fidesz 2022 share — 20% to 80% covers all 106 constituencies with margin
+  const xMin = 20, xMax = 80;
+  // Y: delta turnout — symmetric around 0, adaptive to observed
+  let yRange = 10;
+  if (withDelta.length) {
+    const absMax = Math.max(...withDelta.map(p => Math.abs(p.delta)));
+    yRange = Math.max(10, niceRoundMax(absMax, 5));
+  }
+  const yMin = -yRange, yMax = yRange;
+
+  function xScale(v) { return PAD_LEFT + ((v - xMin) / (xMax - xMin)) * plotW; }
+  function yScale(v) { return PAD_TOP + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
+
+  // Gridlines + axis ticks — Y every 5pp, X every 10pp
+  for (let y = yMin; y <= yMax; y += 5) {
+    const yy = yScale(y);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', PAD_LEFT);
+    line.setAttribute('x2', PAD_LEFT + plotW);
+    line.setAttribute('y1', yy);
+    line.setAttribute('y2', yy);
+    line.setAttribute('class', y === 0 ? 'ref-line' : 'grid-line');
+    svg.appendChild(line);
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', PAD_LEFT - 6);
+    lbl.setAttribute('y', yy + 3);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('class', 'axis-label');
+    lbl.textContent = (y > 0 ? '+' : '') + y + 'pp';
+    svg.appendChild(lbl);
+  }
+  for (let x = xMin; x <= xMax; x += 10) {
+    const xx = xScale(x);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', xx);
+    line.setAttribute('x2', xx);
+    line.setAttribute('y1', PAD_TOP);
+    line.setAttribute('y2', PAD_TOP + plotH);
+    line.setAttribute('class', x === 50 ? 'ref-line' : 'grid-line');
+    svg.appendChild(line);
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', xx);
+    lbl.setAttribute('y', PAD_TOP + plotH + 14);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('class', 'axis-label');
+    lbl.textContent = x + '%';
+    svg.appendChild(lbl);
+  }
+
+  // Axis frame
+  const axisBottom = document.createElementNS(ns, 'line');
+  axisBottom.setAttribute('x1', PAD_LEFT);
+  axisBottom.setAttribute('x2', PAD_LEFT + plotW);
+  axisBottom.setAttribute('y1', PAD_TOP + plotH);
+  axisBottom.setAttribute('y2', PAD_TOP + plotH);
+  axisBottom.setAttribute('class', 'axis-line');
+  svg.appendChild(axisBottom);
+  const axisLeft = document.createElementNS(ns, 'line');
+  axisLeft.setAttribute('x1', PAD_LEFT);
+  axisLeft.setAttribute('x2', PAD_LEFT);
+  axisLeft.setAttribute('y1', PAD_TOP);
+  axisLeft.setAttribute('y2', PAD_TOP + plotH);
+  axisLeft.setAttribute('class', 'axis-line');
+  svg.appendChild(axisLeft);
+
+  // Axis titles
+  const xTitle = document.createElementNS(ns, 'text');
+  xTitle.setAttribute('x', PAD_LEFT + plotW / 2);
+  xTitle.setAttribute('y', VB_H - 8);
+  xTitle.setAttribute('text-anchor', 'middle');
+  xTitle.setAttribute('class', 'axis-title');
+  xTitle.textContent = 'Fidesz-KDNP 2022 vote share (%)';
+  svg.appendChild(xTitle);
+
+  const yTitle = document.createElementNS(ns, 'text');
+  yTitle.setAttribute('transform', `rotate(-90 14 ${PAD_TOP + plotH / 2})`);
+  yTitle.setAttribute('x', 14);
+  yTitle.setAttribute('y', PAD_TOP + plotH / 2);
+  yTitle.setAttribute('text-anchor', 'middle');
+  yTitle.setAttribute('class', 'axis-title');
+  yTitle.textContent = 'Turnout change vs 2022 (pp)';
+  svg.appendChild(yTitle);
+
+  // Dots — show all points. Ones without 2026 data are rendered at y=0
+  // with low opacity so the stronghold distribution is still visible.
+  const sorted = [...points].sort((a, b) => {
+    // Points with data on top so they're easier to hover
+    if ((a.delta === null) !== (b.delta === null)) return a.delta === null ? -1 : 1;
+    return 0;
+  });
+
+  for (const p of sorted) {
+    const cx = xScale(Math.max(xMin, Math.min(xMax, p.fidesz2022)));
+    const cy = p.delta !== null
+      ? yScale(Math.max(yMin, Math.min(yMax, p.delta)))
+      : yScale(0);
+    const fill = strongholdColor(p.fidesz2022);
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', cx);
+    dot.setAttribute('cy', cy);
+    dot.setAttribute('r', 4.2);
+    dot.setAttribute('fill', fill);
+    dot.setAttribute('class', 'dot');
+    if (p.delta === null) dot.setAttribute('opacity', '0.25');
+
+    const title = document.createElementNS(ns, 'title');
+    if (p.delta !== null) {
+      title.textContent =
+        `${p.id}\n` +
+        `2022: turnout ${p.turnout2022.toFixed(1)}%, Fidesz ${p.fidesz2022.toFixed(1)}%, Opp ${p.opp2022.toFixed(1)}%\n` +
+        `2026: turnout ${p.turnout2026.toFixed(1)}% (${p.reportTime || 'latest'})\n` +
+        `Change: ${p.delta > 0 ? '+' : ''}${p.delta}pp`;
+    } else {
+      title.textContent =
+        `${p.id}\n` +
+        `2022: turnout ${p.turnout2022.toFixed(1)}%, Fidesz ${p.fidesz2022.toFixed(1)}%\n` +
+        `2026: awaiting data`;
+    }
+    dot.appendChild(title);
+    svg.appendChild(dot);
+  }
+}
+
+function applyUpdate() {
+  const el = document.getElementById('lastUpdated');
+  if (lastResults) {
+    el.textContent = 'Last updated: ' + new Date(lastResults.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+    const hasData = lastResults.turnout && lastResults.turnout.constituencies
+      && Object.values(lastResults.turnout.constituencies).some(r => r && r.pct > 0);
+    el.classList.toggle('live', !!hasData);
+  } else {
+    el.textContent = 'Waiting for turnout data…';
+    el.classList.remove('live');
+  }
+  renderChart();
+}
+
+async function init() {
+  await loadBaseline();
+  await loadResults();
+  applyUpdate();
+
+  setInterval(async () => {
+    await loadResults();
+    applyUpdate();
+  }, 30000);
+
+  // Re-render on window resize (debounced)
+  let t = null;
+  window.addEventListener('resize', () => {
+    if (t) clearTimeout(t);
+    t = setTimeout(renderChart, 150);
+  });
+}
+
+init();
+</script>
+</body>
+</html>

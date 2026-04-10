@@ -1,0 +1,995 @@
+{
+  "constituencies": {
+    "BA-01": {
+      "fideszPct": 41.78,
+      "megjelentek": 52327,
+      "oppPct": 44.01,
+      "turnoutPct": 70.27,
+      "valasztopolgar": 74465,
+      "winner": "opposition"
+    },
+    "BA-02": {
+      "fideszPct": 44.41,
+      "megjelentek": 52392,
+      "oppPct": 41.17,
+      "turnoutPct": 68.31,
+      "valasztopolgar": 76693,
+      "winner": "fidesz"
+    },
+    "BA-03": {
+      "fideszPct": 60.44,
+      "megjelentek": 47422,
+      "oppPct": 29.94,
+      "turnoutPct": 66.97,
+      "valasztopolgar": 70815,
+      "winner": "fidesz"
+    },
+    "BA-04": {
+      "fideszPct": 61.08,
+      "megjelentek": 48961,
+      "oppPct": 28.74,
+      "turnoutPct": 64.6,
+      "valasztopolgar": 75794,
+      "winner": "fidesz"
+    },
+    "BE-01": {
+      "fideszPct": 48.27,
+      "megjelentek": 48255,
+      "oppPct": 40.05,
+      "turnoutPct": 70.42,
+      "valasztopolgar": 68522,
+      "winner": "fidesz"
+    },
+    "BE-02": {
+      "fideszPct": 57.71,
+      "megjelentek": 45224,
+      "oppPct": 29.37,
+      "turnoutPct": 65.38,
+      "valasztopolgar": 69176,
+      "winner": "fidesz"
+    },
+    "BE-03": {
+      "fideszPct": 55.76,
+      "megjelentek": 44757,
+      "oppPct": 33.93,
+      "turnoutPct": 66.13,
+      "valasztopolgar": 67685,
+      "winner": "fidesz"
+    },
+    "BE-04": {
+      "fideszPct": 49.82,
+      "megjelentek": 45750,
+      "oppPct": 39.67,
+      "turnoutPct": 63.95,
+      "valasztopolgar": 71541,
+      "winner": "fidesz"
+    },
+    "BK-01": {
+      "fideszPct": 59.02,
+      "megjelentek": 47068,
+      "oppPct": 28.98,
+      "turnoutPct": 68.11,
+      "valasztopolgar": 69101,
+      "winner": "fidesz"
+    },
+    "BK-02": {
+      "fideszPct": 53.0,
+      "megjelentek": 50963,
+      "oppPct": 34.28,
+      "turnoutPct": 70.85,
+      "valasztopolgar": 71933,
+      "winner": "fidesz"
+    },
+    "BK-03": {
+      "fideszPct": 59.7,
+      "megjelentek": 45135,
+      "oppPct": 30.23,
+      "turnoutPct": 69.18,
+      "valasztopolgar": 65242,
+      "winner": "fidesz"
+    },
+    "BK-04": {
+      "fideszPct": 62.97,
+      "megjelentek": 48039,
+      "oppPct": 24.75,
+      "turnoutPct": 67.08,
+      "valasztopolgar": 71615,
+      "winner": "fidesz"
+    },
+    "BK-05": {
+      "fideszPct": 60.16,
+      "megjelentek": 43458,
+      "oppPct": 28.53,
+      "turnoutPct": 63.66,
+      "valasztopolgar": 68267,
+      "winner": "fidesz"
+    },
+    "BK-06": {
+      "fideszPct": 57.26,
+      "megjelentek": 42458,
+      "oppPct": 32.71,
+      "turnoutPct": 65.71,
+      "valasztopolgar": 64619,
+      "winner": "fidesz"
+    },
+    "BO-01": {
+      "fideszPct": 46.5,
+      "megjelentek": 50030,
+      "oppPct": 41.37,
+      "turnoutPct": 68.93,
+      "valasztopolgar": 72579,
+      "winner": "fidesz"
+    },
+    "BO-02": {
+      "fideszPct": 43.85,
+      "megjelentek": 47536,
+      "oppPct": 42.8,
+      "turnoutPct": 66.67,
+      "valasztopolgar": 71302,
+      "winner": "fidesz"
+    },
+    "BO-03": {
+      "fideszPct": 58.93,
+      "megjelentek": 40970,
+      "oppPct": 27.08,
+      "turnoutPct": 58.06,
+      "valasztopolgar": 70559,
+      "winner": "fidesz"
+    },
+    "BO-04": {
+      "fideszPct": 54.39,
+      "megjelentek": 46060,
+      "oppPct": 34.55,
+      "turnoutPct": 62.06,
+      "valasztopolgar": 74214,
+      "winner": "fidesz"
+    },
+    "BO-05": {
+      "fideszPct": 60.6,
+      "megjelentek": 45998,
+      "oppPct": 29.99,
+      "turnoutPct": 62.72,
+      "valasztopolgar": 73338,
+      "winner": "fidesz"
+    },
+    "BO-06": {
+      "fideszPct": 59.0,
+      "megjelentek": 51084,
+      "oppPct": 36.94,
+      "turnoutPct": 67.19,
+      "valasztopolgar": 76032,
+      "winner": "fidesz"
+    },
+    "BO-07": {
+      "fideszPct": 60.42,
+      "megjelentek": 50420,
+      "oppPct": 26.96,
+      "turnoutPct": 66.77,
+      "valasztopolgar": 75515,
+      "winner": "fidesz"
+    },
+    "BP-01": {
+      "fideszPct": 42.6,
+      "megjelentek": 45391,
+      "oppPct": 48.47,
+      "turnoutPct": 75.96,
+      "valasztopolgar": 59754,
+      "winner": "opposition"
+    },
+    "BP-02": {
+      "fideszPct": 40.73,
+      "megjelentek": 54198,
+      "oppPct": 51.94,
+      "turnoutPct": 81.09,
+      "valasztopolgar": 66833,
+      "winner": "opposition"
+    },
+    "BP-03": {
+      "fideszPct": 41.82,
+      "megjelentek": 52830,
+      "oppPct": 48.42,
+      "turnoutPct": 82.06,
+      "valasztopolgar": 64378,
+      "winner": "opposition"
+    },
+    "BP-04": {
+      "fideszPct": 40.6,
+      "megjelentek": 58354,
+      "oppPct": 51.89,
+      "turnoutPct": 81.95,
+      "valasztopolgar": 71208,
+      "winner": "opposition"
+    },
+    "BP-05": {
+      "fideszPct": 37.79,
+      "megjelentek": 40486,
+      "oppPct": 51.39,
+      "turnoutPct": 68.72,
+      "valasztopolgar": 58914,
+      "winner": "opposition"
+    },
+    "BP-06": {
+      "fideszPct": 41.78,
+      "megjelentek": 44953,
+      "oppPct": 48.31,
+      "turnoutPct": 65.67,
+      "valasztopolgar": 68448,
+      "winner": "opposition"
+    },
+    "BP-07": {
+      "fideszPct": 30.39,
+      "megjelentek": 58820,
+      "oppPct": 60.53,
+      "turnoutPct": 74.24,
+      "valasztopolgar": 79234,
+      "winner": "opposition"
+    },
+    "BP-08": {
+      "fideszPct": 36.54,
+      "megjelentek": 56351,
+      "oppPct": 54.09,
+      "turnoutPct": 75.35,
+      "valasztopolgar": 74785,
+      "winner": "opposition"
+    },
+    "BP-09": {
+      "fideszPct": 42.55,
+      "megjelentek": 50657,
+      "oppPct": 45.97,
+      "turnoutPct": 70.25,
+      "valasztopolgar": 72110,
+      "winner": "opposition"
+    },
+    "BP-10": {
+      "fideszPct": 41.12,
+      "megjelentek": 53916,
+      "oppPct": 48.82,
+      "turnoutPct": 77.28,
+      "valasztopolgar": 69771,
+      "winner": "opposition"
+    },
+    "BP-11": {
+      "fideszPct": 39.08,
+      "megjelentek": 56036,
+      "oppPct": 50.82,
+      "turnoutPct": 75.2,
+      "valasztopolgar": 74515,
+      "winner": "opposition"
+    },
+    "BP-12": {
+      "fideszPct": 42.39,
+      "megjelentek": 52422,
+      "oppPct": 45.11,
+      "turnoutPct": 72.96,
+      "valasztopolgar": 71850,
+      "winner": "opposition"
+    },
+    "BP-13": {
+      "fideszPct": 44.61,
+      "megjelentek": 55884,
+      "oppPct": 45.46,
+      "turnoutPct": 81.0,
+      "valasztopolgar": 68991,
+      "winner": "opposition"
+    },
+    "BP-14": {
+      "fideszPct": 44.66,
+      "megjelentek": 56808,
+      "oppPct": 43.98,
+      "turnoutPct": 76.47,
+      "valasztopolgar": 74285,
+      "winner": "fidesz"
+    },
+    "BP-15": {
+      "fideszPct": 43.26,
+      "megjelentek": 58810,
+      "oppPct": 44.6,
+      "turnoutPct": 75.25,
+      "valasztopolgar": 78158,
+      "winner": "opposition"
+    },
+    "BP-16": {
+      "fideszPct": 42.34,
+      "megjelentek": 49913,
+      "oppPct": 46.35,
+      "turnoutPct": 71.73,
+      "valasztopolgar": 69584,
+      "winner": "opposition"
+    },
+    "BP-17": {
+      "fideszPct": 41.69,
+      "megjelentek": 53612,
+      "oppPct": 46.49,
+      "turnoutPct": 72.0,
+      "valasztopolgar": 74456,
+      "winner": "opposition"
+    },
+    "BP-18": {
+      "fideszPct": 42.03,
+      "megjelentek": 60456,
+      "oppPct": 48.47,
+      "turnoutPct": 78.4,
+      "valasztopolgar": 77117,
+      "winner": "opposition"
+    },
+    "CS-01": {
+      "fideszPct": 36.37,
+      "megjelentek": 56077,
+      "oppPct": 49.51,
+      "turnoutPct": 69.64,
+      "valasztopolgar": 80527,
+      "winner": "opposition"
+    },
+    "CS-02": {
+      "fideszPct": 45.29,
+      "megjelentek": 61622,
+      "oppPct": 40.23,
+      "turnoutPct": 71.19,
+      "valasztopolgar": 86558,
+      "winner": "fidesz"
+    },
+    "CS-03": {
+      "fideszPct": 54.74,
+      "megjelentek": 54742,
+      "oppPct": 31.36,
+      "turnoutPct": 68.28,
+      "valasztopolgar": 80170,
+      "winner": "fidesz"
+    },
+    "CS-04": {
+      "fideszPct": 51.77,
+      "megjelentek": 56338,
+      "oppPct": 40.2,
+      "turnoutPct": 72.77,
+      "valasztopolgar": 77415,
+      "winner": "fidesz"
+    },
+    "FE-01": {
+      "fideszPct": 47.43,
+      "megjelentek": 45879,
+      "oppPct": 41.81,
+      "turnoutPct": 76.44,
+      "valasztopolgar": 60023,
+      "winner": "fidesz"
+    },
+    "FE-02": {
+      "fideszPct": 56.01,
+      "megjelentek": 51245,
+      "oppPct": 30.04,
+      "turnoutPct": 73.02,
+      "valasztopolgar": 70183,
+      "winner": "fidesz"
+    },
+    "FE-03": {
+      "fideszPct": 57.34,
+      "megjelentek": 57441,
+      "oppPct": 31.9,
+      "turnoutPct": 74.86,
+      "valasztopolgar": 76732,
+      "winner": "fidesz"
+    },
+    "FE-04": {
+      "fideszPct": 46.17,
+      "megjelentek": 45117,
+      "oppPct": 43.81,
+      "turnoutPct": 68.47,
+      "valasztopolgar": 65896,
+      "winner": "fidesz"
+    },
+    "FE-05": {
+      "fideszPct": 64.55,
+      "megjelentek": 43292,
+      "oppPct": 24.39,
+      "turnoutPct": 64.41,
+      "valasztopolgar": 67210,
+      "winner": "fidesz"
+    },
+    "GY-01": {
+      "fideszPct": 50.44,
+      "megjelentek": 48434,
+      "oppPct": 38.29,
+      "turnoutPct": 72.75,
+      "valasztopolgar": 66579,
+      "winner": "fidesz"
+    },
+    "GY-02": {
+      "fideszPct": 60.13,
+      "megjelentek": 53299,
+      "oppPct": 31.37,
+      "turnoutPct": 72.96,
+      "valasztopolgar": 73057,
+      "winner": "fidesz"
+    },
+    "GY-03": {
+      "fideszPct": 71.22,
+      "megjelentek": 49916,
+      "oppPct": 21.48,
+      "turnoutPct": 74.82,
+      "valasztopolgar": 66713,
+      "winner": "fidesz"
+    },
+    "GY-04": {
+      "fideszPct": 57.35,
+      "megjelentek": 57263,
+      "oppPct": 33.26,
+      "turnoutPct": 75.88,
+      "valasztopolgar": 75464,
+      "winner": "fidesz"
+    },
+    "GY-05": {
+      "fideszPct": 59.23,
+      "megjelentek": 55698,
+      "oppPct": 30.47,
+      "turnoutPct": 72.21,
+      "valasztopolgar": 77129,
+      "winner": "fidesz"
+    },
+    "HB-01": {
+      "fideszPct": 48.95,
+      "megjelentek": 48311,
+      "oppPct": 39.75,
+      "turnoutPct": 72.87,
+      "valasztopolgar": 66301,
+      "winner": "fidesz"
+    },
+    "HB-02": {
+      "fideszPct": 55.61,
+      "megjelentek": 49583,
+      "oppPct": 40.12,
+      "turnoutPct": 68.68,
+      "valasztopolgar": 72198,
+      "winner": "fidesz"
+    },
+    "HB-03": {
+      "fideszPct": 63.51,
+      "megjelentek": 50035,
+      "oppPct": 27.68,
+      "turnoutPct": 63.87,
+      "valasztopolgar": 78335,
+      "winner": "fidesz"
+    },
+    "HB-04": {
+      "fideszPct": 61.66,
+      "megjelentek": 42001,
+      "oppPct": 23.01,
+      "turnoutPct": 61.81,
+      "valasztopolgar": 67955,
+      "winner": "fidesz"
+    },
+    "HB-05": {
+      "fideszPct": 60.61,
+      "megjelentek": 45119,
+      "oppPct": 30.39,
+      "turnoutPct": 64.82,
+      "valasztopolgar": 69610,
+      "winner": "fidesz"
+    },
+    "HB-06": {
+      "fideszPct": 58.19,
+      "megjelentek": 45369,
+      "oppPct": 31.1,
+      "turnoutPct": 65.15,
+      "valasztopolgar": 69635,
+      "winner": "fidesz"
+    },
+    "HE-01": {
+      "fideszPct": 52.19,
+      "megjelentek": 57616,
+      "oppPct": 36.5,
+      "turnoutPct": 70.93,
+      "valasztopolgar": 81233,
+      "winner": "fidesz"
+    },
+    "HE-02": {
+      "fideszPct": 54.91,
+      "megjelentek": 53270,
+      "oppPct": 36.41,
+      "turnoutPct": 69.32,
+      "valasztopolgar": 76849,
+      "winner": "fidesz"
+    },
+    "HE-03": {
+      "fideszPct": 59.06,
+      "megjelentek": 53094,
+      "oppPct": 29.56,
+      "turnoutPct": 66.65,
+      "valasztopolgar": 79655,
+      "winner": "fidesz"
+    },
+    "JN-01": {
+      "fideszPct": 46.91,
+      "megjelentek": 54064,
+      "oppPct": 39.2,
+      "turnoutPct": 69.83,
+      "valasztopolgar": 77426,
+      "winner": "fidesz"
+    },
+    "JN-02": {
+      "fideszPct": 59.81,
+      "megjelentek": 47749,
+      "oppPct": 33.74,
+      "turnoutPct": 67.39,
+      "valasztopolgar": 70852,
+      "winner": "fidesz"
+    },
+    "JN-03": {
+      "fideszPct": 64.14,
+      "megjelentek": 47417,
+      "oppPct": 29.18,
+      "turnoutPct": 63.13,
+      "valasztopolgar": 75111,
+      "winner": "fidesz"
+    },
+    "JN-04": {
+      "fideszPct": 51.5,
+      "megjelentek": 46625,
+      "oppPct": 37.1,
+      "turnoutPct": 63.24,
+      "valasztopolgar": 73724,
+      "winner": "fidesz"
+    },
+    "KE-01": {
+      "fideszPct": 48.18,
+      "megjelentek": 55037,
+      "oppPct": 41.16,
+      "turnoutPct": 70.01,
+      "valasztopolgar": 78608,
+      "winner": "fidesz"
+    },
+    "KE-02": {
+      "fideszPct": 49.96,
+      "megjelentek": 56364,
+      "oppPct": 38.8,
+      "turnoutPct": 68.93,
+      "valasztopolgar": 81769,
+      "winner": "fidesz"
+    },
+    "KE-03": {
+      "fideszPct": 55.1,
+      "megjelentek": 56822,
+      "oppPct": 33.11,
+      "turnoutPct": 69.09,
+      "valasztopolgar": 82238,
+      "winner": "fidesz"
+    },
+    "NO-01": {
+      "fideszPct": 53.85,
+      "megjelentek": 49173,
+      "oppPct": 36.15,
+      "turnoutPct": 65.34,
+      "valasztopolgar": 75257,
+      "winner": "fidesz"
+    },
+    "NO-02": {
+      "fideszPct": 60.08,
+      "megjelentek": 53849,
+      "oppPct": 23.95,
+      "turnoutPct": 68.41,
+      "valasztopolgar": 78717,
+      "winner": "fidesz"
+    },
+    "PE-01": {
+      "fideszPct": 45.38,
+      "megjelentek": 65894,
+      "oppPct": 43.05,
+      "turnoutPct": 75.69,
+      "valasztopolgar": 87054,
+      "winner": "fidesz"
+    },
+    "PE-02": {
+      "fideszPct": 46.77,
+      "megjelentek": 75256,
+      "oppPct": 44.92,
+      "turnoutPct": 79.76,
+      "valasztopolgar": 94355,
+      "winner": "fidesz"
+    },
+    "PE-03": {
+      "fideszPct": 51.94,
+      "megjelentek": 71765,
+      "oppPct": 37.38,
+      "turnoutPct": 77.75,
+      "valasztopolgar": 92307,
+      "winner": "fidesz"
+    },
+    "PE-04": {
+      "fideszPct": 55.46,
+      "megjelentek": 56153,
+      "oppPct": 33.83,
+      "turnoutPct": 74.73,
+      "valasztopolgar": 75140,
+      "winner": "fidesz"
+    },
+    "PE-05": {
+      "fideszPct": 46.3,
+      "megjelentek": 75062,
+      "oppPct": 42.04,
+      "turnoutPct": 76.88,
+      "valasztopolgar": 97639,
+      "winner": "fidesz"
+    },
+    "PE-06": {
+      "fideszPct": 49.05,
+      "megjelentek": 68385,
+      "oppPct": 38.17,
+      "turnoutPct": 75.27,
+      "valasztopolgar": 90850,
+      "winner": "fidesz"
+    },
+    "PE-07": {
+      "fideszPct": 49.22,
+      "megjelentek": 65045,
+      "oppPct": 36.5,
+      "turnoutPct": 71.76,
+      "valasztopolgar": 90638,
+      "winner": "fidesz"
+    },
+    "PE-08": {
+      "fideszPct": 45.55,
+      "megjelentek": 65729,
+      "oppPct": 42.65,
+      "turnoutPct": 71.28,
+      "valasztopolgar": 92212,
+      "winner": "fidesz"
+    },
+    "PE-09": {
+      "fideszPct": 60.22,
+      "megjelentek": 49929,
+      "oppPct": 28.65,
+      "turnoutPct": 64.98,
+      "valasztopolgar": 76839,
+      "winner": "fidesz"
+    },
+    "PE-10": {
+      "fideszPct": 59.71,
+      "megjelentek": 52655,
+      "oppPct": 28.52,
+      "turnoutPct": 66.45,
+      "valasztopolgar": 79235,
+      "winner": "fidesz"
+    },
+    "PE-11": {
+      "fideszPct": 56.81,
+      "megjelentek": 63328,
+      "oppPct": 31.71,
+      "turnoutPct": 71.05,
+      "valasztopolgar": 89136,
+      "winner": "fidesz"
+    },
+    "PE-12": {
+      "fideszPct": 59.11,
+      "megjelentek": 48478,
+      "oppPct": 28.66,
+      "turnoutPct": 65.31,
+      "valasztopolgar": 74223,
+      "winner": "fidesz"
+    },
+    "SO-01": {
+      "fideszPct": 47.63,
+      "megjelentek": 42832,
+      "oppPct": 34.83,
+      "turnoutPct": 69.84,
+      "valasztopolgar": 61327,
+      "winner": "fidesz"
+    },
+    "SO-02": {
+      "fideszPct": 57.86,
+      "megjelentek": 37898,
+      "oppPct": 37.16,
+      "turnoutPct": 63.89,
+      "valasztopolgar": 59317,
+      "winner": "fidesz"
+    },
+    "SO-03": {
+      "fideszPct": 57.92,
+      "megjelentek": 42363,
+      "oppPct": 35.41,
+      "turnoutPct": 68.01,
+      "valasztopolgar": 62285,
+      "winner": "fidesz"
+    },
+    "SO-04": {
+      "fideszPct": 59.94,
+      "megjelentek": 45410,
+      "oppPct": 35.76,
+      "turnoutPct": 70.59,
+      "valasztopolgar": 64327,
+      "winner": "fidesz"
+    },
+    "SZ-01": {
+      "fideszPct": 44.92,
+      "megjelentek": 52418,
+      "oppPct": 42.12,
+      "turnoutPct": 71.11,
+      "valasztopolgar": 73713,
+      "winner": "fidesz"
+    },
+    "SZ-02": {
+      "fideszPct": 58.13,
+      "megjelentek": 45971,
+      "oppPct": 32.65,
+      "turnoutPct": 64.38,
+      "valasztopolgar": 71410,
+      "winner": "fidesz"
+    },
+    "SZ-03": {
+      "fideszPct": 65.31,
+      "megjelentek": 49744,
+      "oppPct": 26.13,
+      "turnoutPct": 64.19,
+      "valasztopolgar": 77500,
+      "winner": "fidesz"
+    },
+    "SZ-04": {
+      "fideszPct": 68.71,
+      "megjelentek": 46721,
+      "oppPct": 24.86,
+      "turnoutPct": 64.27,
+      "valasztopolgar": 72700,
+      "winner": "fidesz"
+    },
+    "SZ-05": {
+      "fideszPct": 64.79,
+      "megjelentek": 46556,
+      "oppPct": 24.58,
+      "turnoutPct": 63.72,
+      "valasztopolgar": 73065,
+      "winner": "fidesz"
+    },
+    "SZ-06": {
+      "fideszPct": 65.69,
+      "megjelentek": 46401,
+      "oppPct": 26.45,
+      "turnoutPct": 64.77,
+      "valasztopolgar": 71642,
+      "winner": "fidesz"
+    },
+    "TO-01": {
+      "fideszPct": 55.51,
+      "megjelentek": 41349,
+      "oppPct": 35.0,
+      "turnoutPct": 69.67,
+      "valasztopolgar": 59349,
+      "winner": "fidesz"
+    },
+    "TO-02": {
+      "fideszPct": 62.44,
+      "megjelentek": 39625,
+      "oppPct": 27.0,
+      "turnoutPct": 67.58,
+      "valasztopolgar": 58630,
+      "winner": "fidesz"
+    },
+    "TO-03": {
+      "fideszPct": 62.98,
+      "megjelentek": 40606,
+      "oppPct": 27.87,
+      "turnoutPct": 68.98,
+      "valasztopolgar": 58863,
+      "winner": "fidesz"
+    },
+    "VA-01": {
+      "fideszPct": 49.95,
+      "megjelentek": 52279,
+      "oppPct": 40.23,
+      "turnoutPct": 76.41,
+      "valasztopolgar": 68418,
+      "winner": "fidesz"
+    },
+    "VA-02": {
+      "fideszPct": 64.38,
+      "megjelentek": 50658,
+      "oppPct": 26.02,
+      "turnoutPct": 74.4,
+      "valasztopolgar": 68087,
+      "winner": "fidesz"
+    },
+    "VA-03": {
+      "fideszPct": 66.4,
+      "megjelentek": 48820,
+      "oppPct": 26.76,
+      "turnoutPct": 73.65,
+      "valasztopolgar": 66285,
+      "winner": "fidesz"
+    },
+    "VE-01": {
+      "fideszPct": 50.48,
+      "megjelentek": 52364,
+      "oppPct": 39.24,
+      "turnoutPct": 74.51,
+      "valasztopolgar": 70276,
+      "winner": "fidesz"
+    },
+    "VE-02": {
+      "fideszPct": 50.99,
+      "megjelentek": 53101,
+      "oppPct": 36.53,
+      "turnoutPct": 72.11,
+      "valasztopolgar": 73635,
+      "winner": "fidesz"
+    },
+    "VE-03": {
+      "fideszPct": 50.7,
+      "megjelentek": 47264,
+      "oppPct": 44.51,
+      "turnoutPct": 70.0,
+      "valasztopolgar": 67516,
+      "winner": "fidesz"
+    },
+    "VE-04": {
+      "fideszPct": 62.7,
+      "megjelentek": 48130,
+      "oppPct": 29.09,
+      "turnoutPct": 70.4,
+      "valasztopolgar": 68362,
+      "winner": "fidesz"
+    },
+    "ZA-01": {
+      "fideszPct": 56.8,
+      "megjelentek": 55753,
+      "oppPct": 30.95,
+      "turnoutPct": 74.42,
+      "valasztopolgar": 74913,
+      "winner": "fidesz"
+    },
+    "ZA-02": {
+      "fideszPct": 59.84,
+      "megjelentek": 52031,
+      "oppPct": 30.11,
+      "turnoutPct": 70.53,
+      "valasztopolgar": 73769,
+      "winner": "fidesz"
+    },
+    "ZA-03": {
+      "fideszPct": 52.98,
+      "megjelentek": 49982,
+      "oppPct": 37.45,
+      "turnoutPct": 69.62,
+      "valasztopolgar": 71793,
+      "winner": "fidesz"
+    }
+  },
+  "counties": {
+    "Baranya": {
+      "fideszPct": 49.67,
+      "megjelentek": 201122,
+      "oppPct": 36.08,
+      "turnoutPct": 67.54,
+      "valasztopolgar": 297766
+    },
+    "Borsod-Abaúj-Zemplén": {
+      "fideszPct": 54.38,
+      "megjelentek": 332153,
+      "oppPct": 34.29,
+      "turnoutPct": 64.68,
+      "valasztopolgar": 513533
+    },
+    "Budapest": {
+      "fideszPct": 40.84,
+      "megjelentek": 959956,
+      "oppPct": 47.84,
+      "turnoutPct": 75.33,
+      "valasztopolgar": 1274341
+    },
+    "Bács-Kiskun": {
+      "fideszPct": 57.25,
+      "megjelentek": 277136,
+      "oppPct": 29.66,
+      "turnoutPct": 67.47,
+      "valasztopolgar": 410773
+    },
+    "Békés": {
+      "fideszPct": 52.81,
+      "megjelentek": 184000,
+      "oppPct": 34.36,
+      "turnoutPct": 66.45,
+      "valasztopolgar": 276919
+    },
+    "Csongrád-Csanád": {
+      "fideszPct": 47.44,
+      "megjelentek": 228796,
+      "oppPct": 39.69,
+      "turnoutPct": 70.47,
+      "valasztopolgar": 324665
+    },
+    "Fejér": {
+      "fideszPct": 53.55,
+      "megjelentek": 242993,
+      "oppPct": 33.8,
+      "turnoutPct": 71.46,
+      "valasztopolgar": 340038
+    },
+    "Győr-Moson-Sopron": {
+      "fideszPct": 57.07,
+      "megjelentek": 264668,
+      "oppPct": 30.83,
+      "turnoutPct": 73.74,
+      "valasztopolgar": 358935
+    },
+    "Hajdú-Bihar": {
+      "fideszPct": 57.88,
+      "megjelentek": 280425,
+      "oppPct": 30.87,
+      "turnoutPct": 66.13,
+      "valasztopolgar": 424025
+    },
+    "Heves": {
+      "fideszPct": 54.98,
+      "megjelentek": 163978,
+      "oppPct": 33.37,
+      "turnoutPct": 68.98,
+      "valasztopolgar": 237735
+    },
+    "Jász-Nagykun-Szolnok": {
+      "fideszPct": 55.58,
+      "megjelentek": 195859,
+      "oppPct": 33.02,
+      "turnoutPct": 65.92,
+      "valasztopolgar": 297113
+    },
+    "Komárom-Esztergom": {
+      "fideszPct": 50.53,
+      "megjelentek": 168243,
+      "oppPct": 36.32,
+      "turnoutPct": 69.35,
+      "valasztopolgar": 242610
+    },
+    "Nógrád": {
+      "fideszPct": 59.0,
+      "megjelentek": 103015,
+      "oppPct": 29.27,
+      "turnoutPct": 66.9,
+      "valasztopolgar": 153973
+    },
+    "Pest": {
+      "fideszPct": 50.88,
+      "megjelentek": 757766,
+      "oppPct": 36.44,
+      "turnoutPct": 72.89,
+      "valasztopolgar": 1039597
+    },
+    "Somogy": {
+      "fideszPct": 56.33,
+      "megjelentek": 168517,
+      "oppPct": 33.48,
+      "turnoutPct": 68.15,
+      "valasztopolgar": 247256
+    },
+    "Szabolcs-Szatmár-Bereg": {
+      "fideszPct": 61.86,
+      "megjelentek": 287823,
+      "oppPct": 29.04,
+      "turnoutPct": 65.41,
+      "valasztopolgar": 440009
+    },
+    "Tolna": {
+      "fideszPct": 58.95,
+      "megjelentek": 121547,
+      "oppPct": 28.49,
+      "turnoutPct": 68.73,
+      "valasztopolgar": 176841
+    },
+    "Vas": {
+      "fideszPct": 59.94,
+      "megjelentek": 151761,
+      "oppPct": 29.55,
+      "turnoutPct": 74.84,
+      "valasztopolgar": 202787
+    },
+    "Veszprém": {
+      "fideszPct": 52.57,
+      "megjelentek": 200882,
+      "oppPct": 34.44,
+      "turnoutPct": 71.8,
+      "valasztopolgar": 279788
+    },
+    "Zala": {
+      "fideszPct": 56.72,
+      "megjelentek": 157776,
+      "oppPct": 31.98,
+      "turnoutPct": 71.56,
+      "valasztopolgar": 220471
+    }
+  },
+  "generatedFrom": "NVI 2022 parliamentary XLSX protocol files"
+}
