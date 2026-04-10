@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hungary 2026 – Constituency Results</title>
+<title>Hungary 2026 – Turnout</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -32,19 +32,13 @@ h1 { font-size: 20px; font-weight: 700; color: #0F172A; letter-spacing: -0.3px; 
   position: relative; width: 100%; overflow: hidden;
   background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0,0,0,.06);
-  touch-action: none; /* enable custom touch handling */
+  touch-action: none;
 }
 svg { width: 100%; height: auto; display: block; cursor: grab; }
 svg:active { cursor: grabbing; }
 .district { stroke-width: 0.3; cursor: pointer; transition: opacity .2s ease; stroke-linejoin: round; }
 .district:hover { opacity: 0.7; }
 .border-line { fill: none; stroke: rgba(255,255,255,0.7); stroke-width: 0.5; pointer-events: none; stroke-linejoin: round; }
-.district-label {
-  font-family: 'Inter', sans-serif; font-size: 5.5px; fill: #fff;
-  text-anchor: middle; pointer-events: none; font-weight: 600;
-  paint-order: stroke; stroke: rgba(0,0,0,0.25); stroke-width: 0.4px;
-}
-.district-label.dark { fill: #94A3B8; stroke: none; }
 
 /* Logo overlay */
 .map-logo {
@@ -84,29 +78,57 @@ svg:active { cursor: grabbing; }
   box-shadow: 0 4px 12px rgba(0,0,0,.12); z-index: 10; min-width: 200px; max-width: 280px;
 }
 #tooltip h3 { font-size: 13px; font-weight: 600; color: #0F172A; margin-bottom: 6px; }
-#tooltip .counted { font-size: 11px; color: #64748B; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #F1F5F9; }
-#tooltip .party-row { display: flex; align-items: center; justify-content: space-between; padding: 2px 0; }
-#tooltip .party-name { font-weight: 500; }
-#tooltip .party-pct { color: #64748B; font-variant-numeric: tabular-nums; }
+#tooltip .reported { font-size: 11px; color: #64748B; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #F1F5F9; }
+#tooltip .turnout-row { display: flex; align-items: center; justify-content: space-between; padding: 2px 0; }
+#tooltip .turnout-label { font-weight: 500; color: #475569; }
+#tooltip .turnout-value { color: #0F172A; font-weight: 600; font-variant-numeric: tabular-nums; }
+#tooltip .voters { font-size: 11px; color: #94A3B8; margin-top: 4px; padding-top: 4px; border-top: 1px solid #F1F5F9; }
 #tooltip .no-data { color: #94A3B8; font-style: italic; }
 
-/* Seat count */
-.seat-count {
-  margin-top: 10px; padding: 10px 14px; font-size: 13px;
+/* National summary */
+.national-summary {
+  margin-top: 10px; padding: 12px 16px;
   background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
-  display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
 }
-.seat-count .label { font-weight: 600; color: #475569; }
-.seat-count .party-seats { font-weight: 600; font-variant-numeric: tabular-nums; }
-.seat-count .total { color: #94A3B8; font-size: 12px; }
+.national-summary .label { font-size: 12px; font-weight: 600; color: #475569; }
+.national-summary .big-number {
+  font-size: 22px; font-weight: 700; color: #0F172A;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.national-summary .voters-info {
+  font-size: 11px; color: #94A3B8; font-variant-numeric: tabular-nums;
+}
+.national-summary .report-time {
+  font-size: 11px; color: #64748B; margin-left: auto;
+  padding: 4px 10px; background: #F1F5F9; border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
 
-/* Legend */
+/* Legend gradient */
 .legend {
   display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px;
   font-size: 12px; color: #475569; align-items: center;
 }
-.legend-item { display: flex; align-items: center; gap: 5px; cursor: default; }
-.legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+.legend-gradient {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 280px;
+}
+.legend-gradient .gradient-bar {
+  flex: 1; height: 12px; border-radius: 3px;
+  background: linear-gradient(to right,
+    #FEF3C7 0%,
+    #FDE68A 15%,
+    #FCD34D 30%,
+    #F59E0B 45%,
+    #D97706 60%,
+    #B45309 75%,
+    #92400E 90%,
+    #78350F 100%);
+  border: 1px solid #E2E8F0;
+}
+.legend-gradient .gradient-label { font-size: 11px; color: #64748B; font-variant-numeric: tabular-nums; }
+.legend-item.no-data-item { display: flex; align-items: center; gap: 5px; }
+.legend-item .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .district { transition: none; }
@@ -117,8 +139,8 @@ svg:active { cursor: grabbing; }
 <body>
 <div class="container">
   <div class="header">
-    <h1>Constituency Results – Hungary 2026</h1>
-    <div class="subtitle">106 single-member constituencies (OEVK)</div>
+    <h1>Turnout – Hungary 2026</h1>
+    <div class="subtitle">Live voter turnout by constituency (OEVK), updated every 2 hours</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
   </div>
   <div id="map-container">
@@ -132,54 +154,58 @@ svg:active { cursor: grabbing; }
       <button class="zoom-btn reset" id="zoomReset" title="Reset view">&#8634;</button>
     </div>
   </div>
-  <div class="seat-count" id="seatCount"></div>
+  <div class="national-summary" id="nationalSummary"></div>
   <div class="legend" id="legend"></div>
   <div class="footer">Map created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
 </div>
 
 <script src="map-data.js"></script>
 <script>
-const PARTIES = {
-  'FIDESZ-KDNP': { color: '#000000', name: 'FIDESZ-KDNP (PfE)' },
-  'TISZA':       { color: '#3399FF', name: 'TISZA (EPP)' },
-  'DK':          { color: '#FF0000', name: 'DK (S&D)' },
-  'Mi Hazánk':   { color: '#70463A', name: 'Mi Hazánk (ESN)' },
-  'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
-  'Egyéb':       { color: '#9CA3AF', name: 'Other' }
-};
 const NO_DATA_COLOR = '#E2E8F0';
 
-const COUNTY_GROUPS = {};
-MAP_DATA.forEach(d => {
-  if (!COUNTY_GROUPS[d.county]) COUNTY_GROUPS[d.county] = [];
-  COUNTY_GROUPS[d.county].push(d);
-});
+// Sequential colour scale: amber → dark brown
+// Anchored at fixed turnout %s so colour stays meaningful across the day
+const COLOR_STOPS = [
+  { pct: 0,  color: [254, 243, 199] }, // #FEF3C7
+  { pct: 15, color: [253, 230, 138] }, // #FDE68A
+  { pct: 30, color: [252, 211, 77]  }, // #FCD34D
+  { pct: 45, color: [245, 158, 11]  }, // #F59E0B
+  { pct: 60, color: [217, 119, 6]   }, // #D97706
+  { pct: 75, color: [180, 83,  9]   }, // #B45309
+  { pct: 85, color: [146, 64,  14]  }, // #92400E
+  { pct: 95, color: [120, 53,  15]  }, // #78350F
+];
 
-function buildMap(results) {
+function turnoutColor(pct) {
+  if (pct === null || pct === undefined || pct === 0) return NO_DATA_COLOR;
+  // Find the bracket and interpolate
+  for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
+    const a = COLOR_STOPS[i], b = COLOR_STOPS[i + 1];
+    if (pct >= a.pct && pct <= b.pct) {
+      const t = (pct - a.pct) / (b.pct - a.pct);
+      const r = Math.round(a.color[0] + (b.color[0] - a.color[0]) * t);
+      const g = Math.round(a.color[1] + (b.color[1] - a.color[1]) * t);
+      const bb = Math.round(a.color[2] + (b.color[2] - a.color[2]) * t);
+      return `rgb(${r},${g},${bb})`;
+    }
+  }
+  // Above 95% — use final colour
+  const last = COLOR_STOPS[COLOR_STOPS.length - 1].color;
+  return `rgb(${last[0]},${last[1]},${last[2]})`;
+}
+
+function buildMap(turnoutData) {
   const svg = document.getElementById('map');
   const ns = 'http://www.w3.org/2000/svg';
   svg.setAttribute('viewBox', `0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`);
   svg.innerHTML = '';
 
-  const seatCounts = {};
-  const districtColors = {};
+  const constituencies = (turnoutData && turnoutData.constituencies) || {};
 
   MAP_DATA.forEach(d => {
-    let fillColor = NO_DATA_COLOR;
-    let winnerParty = null;
-    const cResult = results[d.id];
-    if (cResult) {
-      let maxVote = 0;
-      for (const [party, pct] of Object.entries(cResult)) {
-        if (party === 'counted' || party === 'turnout') continue;
-        if (pct > maxVote) { maxVote = pct; winnerParty = party; }
-      }
-      if (winnerParty && PARTIES[winnerParty]) {
-        fillColor = PARTIES[winnerParty].color;
-        seatCounts[winnerParty] = (seatCounts[winnerParty] || 0) + 1;
-      }
-    }
-    districtColors[d.id] = fillColor;
+    const record = constituencies[d.id];
+    const pct = record ? record.pct : null;
+    const fillColor = turnoutColor(pct);
 
     const path = document.createElementNS(ns, 'path');
     path.setAttribute('d', d.d);
@@ -187,39 +213,32 @@ function buildMap(results) {
     path.setAttribute('data-id', d.id);
     path.setAttribute('fill', fillColor);
     path.setAttribute('stroke', fillColor);
-    path.addEventListener('mouseenter', (e) => showTooltip(e, d, cResult));
+    path.addEventListener('mouseenter', (e) => showTooltip(e, d, record));
     path.addEventListener('mousemove', moveTooltip);
     path.addEventListener('mouseleave', hideTooltip);
     svg.appendChild(path);
   });
 
+  // Border lines (over the fill)
   MAP_DATA.forEach(d => {
     const b = document.createElementNS(ns, 'path');
     b.setAttribute('d', d.d);
     b.setAttribute('class', 'border-line');
     svg.appendChild(b);
   });
-
-  // District number labels removed for cleaner look
-
-  updateSeatCount(seatCounts);
 }
 
-function showTooltip(e, d, result) {
+function showTooltip(e, d, record) {
   const tt = document.getElementById('tooltip');
   let html = `<h3>${d.county} – #${d.n}</h3>`;
-  if (result) {
-    const entries = Object.entries(result).filter(([k]) => k !== 'counted' && k !== 'turnout');
-    entries.sort((a, b) => b[1] - a[1]);
-    if (result.counted !== undefined) {
-      html += `<div class="counted">${result.counted}% counted</div>`;
+  if (record && record.pct !== undefined) {
+    html += `<div class="reported">Reported at ${record.time}</div>`;
+    html += `<div class="turnout-row"><span class="turnout-label">Turnout</span><span class="turnout-value">${record.pct.toFixed(2)}%</span></div>`;
+    if (record.megj !== undefined && record.vp !== undefined) {
+      html += `<div class="voters">${record.megj.toLocaleString('en-GB')} of ${record.vp.toLocaleString('en-GB')} eligible voters</div>`;
     }
-    entries.forEach(([party, pct]) => {
-      const col = PARTIES[party] ? PARTIES[party].color : '#9CA3AF';
-      html += `<div class="party-row"><span class="party-name" style="color:${col}">${party}</span><span class="party-pct">${pct.toFixed(1)}%</span></div>`;
-    });
   } else {
-    html += '<div class="no-data">No data</div>';
+    html += '<div class="no-data">No turnout data yet</div>';
   }
   tt.innerHTML = html;
   tt.style.display = 'block';
@@ -237,28 +256,36 @@ function moveTooltip(e) {
 
 function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
 
-function updateSeatCount(seatCounts) {
-  const div = document.getElementById('seatCount');
-  const total = Object.values(seatCounts).reduce((a, b) => a + b, 0);
-  if (total === 0) {
-    div.innerHTML = '<span class="label">Constituency seats:</span> <span class="total">no results yet</span>';
+function updateNationalSummary(turnoutData) {
+  const div = document.getElementById('nationalSummary');
+  if (!turnoutData || !turnoutData.national) {
+    div.innerHTML = '<span class="label">National turnout:</span> <span class="voters-info">Awaiting first report (7:00)</span>';
     return;
   }
-  let html = '<span class="label">Seats:</span> ';
-  Object.entries(seatCounts).sort((a, b) => b[1] - a[1]).forEach(([party, seats]) => {
-    const col = PARTIES[party] ? PARTIES[party].color : '#9CA3AF';
-    html += `<span class="party-seats" style="color:${col}">${party} ${seats}</span>`;
-  });
-  html += `<span class="total">(${total}/106)</span>`;
-  div.innerHTML = html;
+  const nat = turnoutData.national;
+  const reportTime = turnoutData.lastReportTime || nat.time || '–';
+  const megjFmt = nat.megj.toLocaleString('en-GB');
+  const vpFmt = nat.vp.toLocaleString('en-GB');
+  div.innerHTML = `
+    <div>
+      <div class="label">National turnout</div>
+      <div class="big-number">${nat.pct.toFixed(2)}%</div>
+      <div class="voters-info">${megjFmt} of ${vpFmt} voters</div>
+    </div>
+    <div class="report-time">As of ${reportTime}</div>
+  `;
 }
 
 function buildLegend() {
   const lg = document.getElementById('legend');
-  for (const [, p] of Object.entries(PARTIES)) {
-    lg.innerHTML += `<div class="legend-item"><div class="legend-swatch" style="background:${p.color}"></div>${p.name}</div>`;
-  }
-  lg.innerHTML += `<div class="legend-item"><div class="legend-swatch" style="background:${NO_DATA_COLOR}"></div>No data</div>`;
+  lg.innerHTML = `
+    <div class="legend-gradient">
+      <span class="gradient-label">0%</span>
+      <div class="gradient-bar"></div>
+      <span class="gradient-label">100%</span>
+    </div>
+    <div class="legend-item no-data-item"><div class="legend-swatch" style="background:${NO_DATA_COLOR}"></div>No data</div>
+  `;
 }
 
 async function loadResults() {
@@ -266,9 +293,15 @@ async function loadResults() {
     const data = await (await fetch('results.json?' + Date.now())).json();
     const el = document.getElementById('lastUpdated');
     el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
-    buildMap(data.constituencies || {});
-  } catch (e) { buildMap({}); }
+    const turnout = data.turnout || {};
+    const hasData = turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
+    el.classList.toggle('live', hasData);
+    buildMap(turnout);
+    updateNationalSummary(turnout);
+  } catch (e) {
+    buildMap({});
+    updateNationalSummary(null);
+  }
 }
 
 setInterval(async () => {
@@ -276,16 +309,19 @@ setInterval(async () => {
     const data = await (await fetch('results.json?' + Date.now())).json();
     const el = document.getElementById('lastUpdated');
     el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
-    el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
+    const turnout = data.turnout || {};
+    const hasData = turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
+    el.classList.toggle('live', hasData);
     document.getElementById('map').innerHTML = '';
-    buildMap(data.constituencies || {});
+    buildMap(turnout);
+    updateNationalSummary(turnout);
   } catch(e) {}
 }, 30000);
 
 buildLegend();
 loadResults();
 
-// ── Zoom & Pan ──
+// ── Zoom & Pan (identical to constituency-map.html) ──
 const zoomState = {
   scale: 1,
   vbX: 0, vbY: 0,
@@ -313,11 +349,8 @@ function clampViewBox() {
 function zoomAt(cx, cy, factor) {
   const newScale = Math.max(zoomState.minScale, Math.min(zoomState.maxScale, zoomState.scale * factor));
   if (newScale === zoomState.scale) return;
-
   const newW = SVG_WIDTH / newScale;
   const newH = SVG_HEIGHT / newScale;
-
-  // Zoom toward the cursor position (cx, cy are in viewBox coords)
   const ratio = 1 - newW / zoomState.vbW;
   zoomState.vbX += (cx - zoomState.vbX) * ratio;
   zoomState.vbY += (cy - zoomState.vbY) * ratio;
@@ -338,7 +371,6 @@ function resetZoom() {
 }
 
 function svgPoint(e) {
-  // Convert screen coords to SVG viewBox coords
   const svg = document.getElementById('map');
   const rect = svg.getBoundingClientRect();
   const sx = (e.clientX - rect.left) / rect.width;
@@ -349,7 +381,6 @@ function svgPoint(e) {
   };
 }
 
-// Mouse wheel zoom
 document.getElementById('map-container').addEventListener('wheel', (e) => {
   e.preventDefault();
   const pt = svgPoint(e);
@@ -357,7 +388,6 @@ document.getElementById('map-container').addEventListener('wheel', (e) => {
   zoomAt(pt.x, pt.y, factor);
 }, { passive: false });
 
-// Mouse drag pan
 const mapEl = document.getElementById('map-container');
 
 mapEl.addEventListener('mousedown', (e) => {
@@ -383,7 +413,6 @@ window.addEventListener('mousemove', (e) => {
 
 window.addEventListener('mouseup', () => { zoomState.isPanning = false; });
 
-// Touch: pinch-to-zoom + drag pan
 function getTouchDist(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
@@ -433,14 +462,12 @@ mapEl.addEventListener('touchmove', (e) => {
 
 mapEl.addEventListener('touchend', () => { zoomState.isPanning = false; });
 
-// Double-click to zoom in
 mapEl.addEventListener('dblclick', (e) => {
   e.preventDefault();
   const pt = svgPoint(e);
   zoomAt(pt.x, pt.y, 2);
 });
 
-// Button controls
 document.getElementById('zoomIn').addEventListener('click', () => {
   const cx = zoomState.vbX + zoomState.vbW / 2;
   const cy = zoomState.vbY + zoomState.vbH / 2;

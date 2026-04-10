@@ -25,6 +25,12 @@ iframe { width: 100%; border: none; }
   <div class="subtitle">Live results · National Assembly elections</div>
 
   <div class="map-section">
+    <h2>Voter Turnout</h2>
+    <p>Live turnout by constituency, updated every 2 hours from 7:00 to 18:30</p>
+    <iframe src="turnout-map.html" height="600"></iframe>
+  </div>
+
+  <div class="map-section">
     <h2>Single-Member Constituencies (106 OEVK)</h2>
     <p>Each district elects one MP by first-past-the-post</p>
     <iframe src="constituency-map.html" height="520"></iframe>
@@ -39,6 +45,8 @@ iframe { width: 100%; border: none; }
   <div class="embed-info">
     <h3>WordPress Embedding</h3>
     <p style="font-size:13px;color:#666;margin-bottom:8px">Paste into a Custom HTML block:</p>
+    <p style="font-size:12px;font-weight:600">Turnout map:</p>
+    <code>&lt;iframe src="https://europe-elects.github.io/hungary-election/turnout-map.html" width="100%" height="600" style="border:none;"&gt;&lt;/iframe&gt;</code>
     <p style="font-size:12px;font-weight:600">Constituency map:</p>
     <code>&lt;iframe src="https://europe-elects.github.io/hungary-election/constituency-map.html" width="100%" height="620" style="border:none;"&gt;&lt;/iframe&gt;</code>
     <p style="font-size:12px;font-weight:600">National list map:</p>
