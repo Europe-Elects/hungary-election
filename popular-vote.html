@@ -276,7 +276,7 @@ function renderChart(voteData, minorityData, source) {
   // Centre the whole row within the plot
   let cursor = PAD_LEFT + (plotW - totalWidth) / 2;
 
-  function drawBar(pct, cx, color, barW, isMain, labelText) {
+  function drawBar(pct, cx, color, barW, isMain, labelText, minorityIdx) {
     const barH = Math.max(minBarH, plotH * (pct / yMax));
     const y = PAD_TOP + plotH - barH;
 
@@ -296,9 +296,12 @@ function renderChart(voteData, minorityData, source) {
     if (isMain) {
       val.setAttribute('y', Math.max(PAD_TOP - 6, y - 6));
     } else {
-      // Minority bars are all tiny — pin every label to a single Y so
-      // they align cleanly instead of jittering with each bar's height.
-      val.setAttribute('y', PAD_TOP + plotH - 6);
+      // Minority bars are all tiny — stagger labels between two Y rows
+      // (even indices low, odd indices high) so adjacent values don't
+      // collide horizontally even with 12+ bars in a narrow group.
+      const lowY = PAD_TOP + plotH - 6;
+      const highY = PAD_TOP + plotH - 18;
+      val.setAttribute('y', minorityIdx % 2 === 0 ? lowY : highY);
       val.setAttribute('font-size', '8');
     }
     val.setAttribute('class', 'bar-value');
@@ -313,7 +316,7 @@ function renderChart(voteData, minorityData, source) {
       lbl.setAttribute('y', PAD_TOP + plotH + 16);
       lbl.textContent = labelText;
     } else {
-      // Rotate -60° around the top of the label position for readability
+      // Rotate -55° around the label anchor for density
       const ly = PAD_TOP + plotH + 10;
       lbl.setAttribute('x', cx);
       lbl.setAttribute('y', ly);
@@ -327,15 +330,15 @@ function renderChart(voteData, minorityData, source) {
 
   mainEntries.forEach(([party, pct]) => {
     const cx = cursor + mainSlot / 2;
-    drawBar(pct, cx, PARTIES[party].color, mainBarWidth, true, party);
+    drawBar(pct, cx, PARTIES[party].color, mainBarWidth, true, party, -1);
     cursor += mainSlot;
   });
 
   if (nMin > 0) {
     cursor += gap;
-    minorityEntries.forEach(([, pct, label]) => {
+    minorityEntries.forEach(([, pct, label], i) => {
       const cx = cursor + minoritySlot / 2;
-      drawBar(pct, cx, MINORITY_COLOR, minorityBarWidth, false, label);
+      drawBar(pct, cx, MINORITY_COLOR, minorityBarWidth, false, label, i);
       cursor += minoritySlot;
     });
   }
