@@ -85,10 +85,45 @@ body {
 }
 
 .donut-slice {
-  transition: opacity .15s;
+  transition: opacity .15s, filter .15s;
   cursor: pointer;
 }
-.donut-slice:hover { opacity: 0.75; }
+/* When hovering one party across the chart, dim everything else */
+#chart-container.has-hover .donut-slice { opacity: 0.18; }
+#chart-container.has-hover .donut-slice.party-hover {
+  opacity: 1;
+  filter: drop-shadow(0 1px 4px rgba(15,23,42,.25));
+}
+.legend-row .item {
+  cursor: pointer; user-select: none;
+  padding: 2px 4px; border-radius: 4px;
+  transition: background .12s;
+}
+.legend-row .item:hover { background: #F1F5F9; }
+#chart-container.has-hover .legend-row .item { opacity: 0.4; }
+#chart-container.has-hover .legend-row .item.party-hover { opacity: 1; }
+
+#bdTooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 12px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 30; min-width: 180px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s, transform .12s;
+}
+#bdTooltip.visible { opacity: 1; transform: translateY(0); }
+#bdTooltip h4 {
+  font-size: 12px; font-weight: 700; color: #0F172A;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+#bdTooltip h4 .swatch { width: 10px; height: 10px; border-radius: 2px; }
+#bdTooltip .row {
+  display: flex; justify-content: space-between; gap: 12px;
+  font-size: 11px; color: #475569; padding: 1px 0;
+}
+#bdTooltip .row .lbl { color: #64748B; }
+#bdTooltip .row .v { font-variant-numeric: tabular-nums; font-weight: 600; color: #0F172A; }
+#bdTooltip .row.na .v { color: #94A3B8; font-style: italic; font-weight: 400; }
 .donut-center {
   font-size: 13px; font-weight: 700; fill: #0F172A; text-anchor: middle;
   font-variant-numeric: tabular-nums;
@@ -125,10 +160,10 @@ body {
   <div id="chart-container">
     <div class="legend-row" id="chartLegend"></div>
     <div class="donuts" id="donuts"></div>
+    <div id="bdTooltip" role="tooltip"></div>
     <div class="chart-footnote">
-      <strong>Voters Abroad</strong> = mail ballots from dual-citizens
-      without a Hungarian residence; NVI counts them over the
-      <strong>5–6 days</strong> after election day.
+      <strong>Voters Abroad</strong> are counted <strong>5–6 days</strong>
+      after election day.
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
@@ -152,9 +187,79 @@ const BUCKETS = [
 
 function buildLegend() {
   const el = document.getElementById('chartLegend');
-  el.innerHTML = Object.entries(PARTIES).map(([, p]) =>
-    `<div class="item"><div class="swatch" style="background:${p.color}"></div>${p.name}</div>`
+  el.innerHTML = Object.entries(PARTIES).map(([key, p]) =>
+    `<div class="item" data-party="${key}"><div class="swatch" style="background:${p.color}"></div>${p.name}</div>`
   ).join('');
+  // Hover handlers on the legend items
+  el.querySelectorAll('.item').forEach(item => {
+    item.addEventListener('mouseenter', (e) => highlightParty(item.dataset.party, e));
+    item.addEventListener('mousemove', moveTooltip);
+    item.addEventListener('mouseleave', clearHighlight);
+  });
+}
+
+// Cross-donut highlight: any hover on a slice or legend item dims the
+// other parties across all 3 donuts and pops the matching slices.
+let lastBreakdown = null;
+
+function highlightParty(party, event) {
+  const wrap = document.getElementById('chart-container');
+  wrap.classList.add('has-hover');
+  // Slices
+  document.querySelectorAll('.donut-slice').forEach(s => {
+    s.classList.toggle('party-hover', s.dataset.party === party);
+  });
+  // Legend items
+  document.querySelectorAll('.legend-row .item').forEach(it => {
+    it.classList.toggle('party-hover', it.dataset.party === party);
+  });
+  showTooltip(party, event);
+}
+
+function clearHighlight() {
+  const wrap = document.getElementById('chart-container');
+  wrap.classList.remove('has-hover');
+  document.querySelectorAll('.donut-slice.party-hover').forEach(s => s.classList.remove('party-hover'));
+  document.querySelectorAll('.legend-row .item.party-hover').forEach(it => it.classList.remove('party-hover'));
+  hideTooltip();
+}
+
+function showTooltip(party, event) {
+  const tt = document.getElementById('bdTooltip');
+  const p = PARTIES[party];
+  if (!p) { hideTooltip(); return; }
+  let html = `<h4><span class="swatch" style="background:${p.color}"></span>${p.name}</h4>`;
+  for (const b of BUCKETS) {
+    const data = lastBreakdown && lastBreakdown[b.key];
+    const pct = data && typeof data[party] === 'number' ? data[party] : null;
+    if (pct === null) {
+      html += `<div class="row na"><span class="lbl">${b.label}</span><span class="v">awaiting</span></div>`;
+    } else {
+      html += `<div class="row"><span class="lbl">${b.label}</span><span class="v">${pct.toFixed(2)}%</span></div>`;
+    }
+  }
+  tt.innerHTML = html;
+  tt.classList.add('visible');
+  moveTooltip(event);
+}
+
+function hideTooltip() {
+  document.getElementById('bdTooltip').classList.remove('visible');
+}
+
+function moveTooltip(event) {
+  const tt = document.getElementById('bdTooltip');
+  const wrap = document.getElementById('chart-container');
+  const rect = wrap.getBoundingClientRect();
+  let left = event.clientX - rect.left + 12;
+  let top  = event.clientY - rect.top + 12;
+  const ttRect = tt.getBoundingClientRect();
+  if (left + ttRect.width > rect.width - 6) left = event.clientX - rect.left - ttRect.width - 12;
+  if (top + ttRect.height > rect.height - 6) top = event.clientY - rect.top - ttRect.height - 12;
+  if (left < 6) left = 6;
+  if (top < 6) top = 6;
+  tt.style.left = left + 'px';
+  tt.style.top = top + 'px';
 }
 
 // Build one donut SVG for a party→pct dict.
@@ -231,9 +336,10 @@ function buildDonutSVG(container, data, labelText, subText) {
     path.setAttribute('d', d);
     path.setAttribute('fill', s.color);
     path.setAttribute('class', 'donut-slice');
-    const title = document.createElementNS(ns, 'title');
-    title.textContent = `${PARTIES[s.party].name}: ${s.pct.toFixed(2)}%`;
-    path.appendChild(title);
+    path.setAttribute('data-party', s.party);
+    path.addEventListener('mouseenter', (e) => highlightParty(s.party, e));
+    path.addEventListener('mousemove', moveTooltip);
+    path.addEventListener('mouseleave', clearHighlight);
     svg.appendChild(path);
 
     // Slice label: only draw if the slice is big enough (>6%) to avoid
@@ -296,6 +402,7 @@ function applyResults(data) {
   const el = document.getElementById('lastUpdated');
   el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
   const breakdown = data.nationalBreakdown || {};
+  lastBreakdown = breakdown;
   const hasAny = Object.values(breakdown).some(b => b && Object.values(b).some(v => v > 0));
   el.classList.toggle('live', hasAny);
   renderChart(data);
