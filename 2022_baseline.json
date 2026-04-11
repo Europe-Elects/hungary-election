@@ -1,6 +1,7 @@
 {
   "constituencies": {
     "BA-01": {
+      "county": "Baranya",
       "fideszPct": 41.78,
       "megjelentek": 52327,
       "oppPct": 44.01,
@@ -9,6 +10,7 @@
       "winner": "opposition"
     },
     "BA-02": {
+      "county": "Baranya",
       "fideszPct": 44.41,
       "megjelentek": 52392,
       "oppPct": 41.17,
@@ -17,6 +19,7 @@
       "winner": "fidesz"
     },
     "BA-03": {
+      "county": "Baranya",
       "fideszPct": 60.44,
       "megjelentek": 47422,
       "oppPct": 29.94,
@@ -25,6 +28,7 @@
       "winner": "fidesz"
     },
     "BA-04": {
+      "county": "Baranya",
       "fideszPct": 61.08,
       "megjelentek": 48961,
       "oppPct": 28.74,
@@ -33,6 +37,7 @@
       "winner": "fidesz"
     },
     "BE-01": {
+      "county": "Békés",
       "fideszPct": 48.27,
       "megjelentek": 48255,
       "oppPct": 40.05,
@@ -41,6 +46,7 @@
       "winner": "fidesz"
     },
     "BE-02": {
+      "county": "Békés",
       "fideszPct": 57.71,
       "megjelentek": 45224,
       "oppPct": 29.37,
@@ -49,6 +55,7 @@
       "winner": "fidesz"
     },
     "BE-03": {
+      "county": "Békés",
       "fideszPct": 55.76,
       "megjelentek": 44757,
       "oppPct": 33.93,
@@ -57,6 +64,7 @@
       "winner": "fidesz"
     },
     "BE-04": {
+      "county": "Békés",
       "fideszPct": 49.82,
       "megjelentek": 45750,
       "oppPct": 39.67,
@@ -65,6 +73,7 @@
       "winner": "fidesz"
     },
     "BK-01": {
+      "county": "Bács-Kiskun",
       "fideszPct": 59.02,
       "megjelentek": 47068,
       "oppPct": 28.98,
@@ -73,6 +82,7 @@
       "winner": "fidesz"
     },
     "BK-02": {
+      "county": "Bács-Kiskun",
       "fideszPct": 53.0,
       "megjelentek": 50963,
       "oppPct": 34.28,
@@ -81,6 +91,7 @@
       "winner": "fidesz"
     },
     "BK-03": {
+      "county": "Bács-Kiskun",
       "fideszPct": 59.7,
       "megjelentek": 45135,
       "oppPct": 30.23,
@@ -89,6 +100,7 @@
       "winner": "fidesz"
     },
     "BK-04": {
+      "county": "Bács-Kiskun",
       "fideszPct": 62.97,
       "megjelentek": 48039,
       "oppPct": 24.75,
@@ -97,6 +109,7 @@
       "winner": "fidesz"
     },
     "BK-05": {
+      "county": "Bács-Kiskun",
       "fideszPct": 60.16,
       "megjelentek": 43458,
       "oppPct": 28.53,
@@ -105,6 +118,7 @@
       "winner": "fidesz"
     },
     "BK-06": {
+      "county": "Bács-Kiskun",
       "fideszPct": 57.26,
       "megjelentek": 42458,
       "oppPct": 32.71,
@@ -113,6 +127,7 @@
       "winner": "fidesz"
     },
     "BO-01": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 46.5,
       "megjelentek": 50030,
       "oppPct": 41.37,
@@ -121,6 +136,7 @@
       "winner": "fidesz"
     },
     "BO-02": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 43.85,
       "megjelentek": 47536,
       "oppPct": 42.8,
@@ -129,6 +145,7 @@
       "winner": "fidesz"
     },
     "BO-03": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 58.93,
       "megjelentek": 40970,
       "oppPct": 27.08,
@@ -137,6 +154,7 @@
       "winner": "fidesz"
     },
     "BO-04": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 54.39,
       "megjelentek": 46060,
       "oppPct": 34.55,
@@ -145,6 +163,7 @@
       "winner": "fidesz"
     },
     "BO-05": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 60.6,
       "megjelentek": 45998,
       "oppPct": 29.99,
@@ -153,6 +172,7 @@
       "winner": "fidesz"
     },
     "BO-06": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 59.0,
       "megjelentek": 51084,
       "oppPct": 36.94,
@@ -161,6 +181,7 @@
       "winner": "fidesz"
     },
     "BO-07": {
+      "county": "Borsod-Abaúj-Zemplén",
       "fideszPct": 60.42,
       "megjelentek": 50420,
       "oppPct": 26.96,
@@ -169,6 +190,7 @@
       "winner": "fidesz"
     },
     "BP-01": {
+      "county": "Budapest",
       "fideszPct": 42.6,
       "megjelentek": 45391,
       "oppPct": 48.47,
@@ -177,6 +199,7 @@
       "winner": "opposition"
     },
     "BP-02": {
+      "county": "Budapest",
       "fideszPct": 40.73,
       "megjelentek": 54198,
       "oppPct": 51.94,
@@ -185,6 +208,7 @@
       "winner": "opposition"
     },
     "BP-03": {
+      "county": "Budapest",
       "fideszPct": 41.82,
       "megjelentek": 52830,
       "oppPct": 48.42,
@@ -193,6 +217,7 @@
       "winner": "opposition"
     },
     "BP-04": {
+      "county": "Budapest",
       "fideszPct": 40.6,
       "megjelentek": 58354,
       "oppPct": 51.89,
@@ -201,6 +226,7 @@
       "winner": "opposition"
     },
     "BP-05": {
+      "county": "Budapest",
       "fideszPct": 37.79,
       "megjelentek": 40486,
       "oppPct": 51.39,
@@ -209,6 +235,7 @@
       "winner": "opposition"
     },
     "BP-06": {
+      "county": "Budapest",
       "fideszPct": 41.78,
       "megjelentek": 44953,
       "oppPct": 48.31,
@@ -217,6 +244,7 @@
       "winner": "opposition"
     },
     "BP-07": {
+      "county": "Budapest",
       "fideszPct": 30.39,
       "megjelentek": 58820,
       "oppPct": 60.53,
@@ -225,6 +253,7 @@
       "winner": "opposition"
     },
     "BP-08": {
+      "county": "Budapest",
       "fideszPct": 36.54,
       "megjelentek": 56351,
       "oppPct": 54.09,
@@ -233,6 +262,7 @@
       "winner": "opposition"
     },
     "BP-09": {
+      "county": "Budapest",
       "fideszPct": 42.55,
       "megjelentek": 50657,
       "oppPct": 45.97,
@@ -241,6 +271,7 @@
       "winner": "opposition"
     },
     "BP-10": {
+      "county": "Budapest",
       "fideszPct": 41.12,
       "megjelentek": 53916,
       "oppPct": 48.82,
@@ -249,6 +280,7 @@
       "winner": "opposition"
     },
     "BP-11": {
+      "county": "Budapest",
       "fideszPct": 39.08,
       "megjelentek": 56036,
       "oppPct": 50.82,
@@ -257,6 +289,7 @@
       "winner": "opposition"
     },
     "BP-12": {
+      "county": "Budapest",
       "fideszPct": 42.39,
       "megjelentek": 52422,
       "oppPct": 45.11,
@@ -265,6 +298,7 @@
       "winner": "opposition"
     },
     "BP-13": {
+      "county": "Budapest",
       "fideszPct": 44.61,
       "megjelentek": 55884,
       "oppPct": 45.46,
@@ -273,6 +307,7 @@
       "winner": "opposition"
     },
     "BP-14": {
+      "county": "Budapest",
       "fideszPct": 44.66,
       "megjelentek": 56808,
       "oppPct": 43.98,
@@ -281,6 +316,7 @@
       "winner": "fidesz"
     },
     "BP-15": {
+      "county": "Budapest",
       "fideszPct": 43.26,
       "megjelentek": 58810,
       "oppPct": 44.6,
@@ -289,6 +325,7 @@
       "winner": "opposition"
     },
     "BP-16": {
+      "county": "Budapest",
       "fideszPct": 42.34,
       "megjelentek": 49913,
       "oppPct": 46.35,
@@ -297,6 +334,7 @@
       "winner": "opposition"
     },
     "BP-17": {
+      "county": "Budapest",
       "fideszPct": 41.69,
       "megjelentek": 53612,
       "oppPct": 46.49,
@@ -305,6 +343,7 @@
       "winner": "opposition"
     },
     "BP-18": {
+      "county": "Budapest",
       "fideszPct": 42.03,
       "megjelentek": 60456,
       "oppPct": 48.47,
@@ -313,6 +352,7 @@
       "winner": "opposition"
     },
     "CS-01": {
+      "county": "Csongrád-Csanád",
       "fideszPct": 36.37,
       "megjelentek": 56077,
       "oppPct": 49.51,
@@ -321,6 +361,7 @@
       "winner": "opposition"
     },
     "CS-02": {
+      "county": "Csongrád-Csanád",
       "fideszPct": 45.29,
       "megjelentek": 61622,
       "oppPct": 40.23,
@@ -329,6 +370,7 @@
       "winner": "fidesz"
     },
     "CS-03": {
+      "county": "Csongrád-Csanád",
       "fideszPct": 54.74,
       "megjelentek": 54742,
       "oppPct": 31.36,
@@ -337,6 +379,7 @@
       "winner": "fidesz"
     },
     "CS-04": {
+      "county": "Csongrád-Csanád",
       "fideszPct": 51.77,
       "megjelentek": 56338,
       "oppPct": 40.2,
@@ -345,6 +388,7 @@
       "winner": "fidesz"
     },
     "FE-01": {
+      "county": "Fejér",
       "fideszPct": 47.43,
       "megjelentek": 45879,
       "oppPct": 41.81,
@@ -353,6 +397,7 @@
       "winner": "fidesz"
     },
     "FE-02": {
+      "county": "Fejér",
       "fideszPct": 56.01,
       "megjelentek": 51245,
       "oppPct": 30.04,
@@ -361,6 +406,7 @@
       "winner": "fidesz"
     },
     "FE-03": {
+      "county": "Fejér",
       "fideszPct": 57.34,
       "megjelentek": 57441,
       "oppPct": 31.9,
@@ -369,6 +415,7 @@
       "winner": "fidesz"
     },
     "FE-04": {
+      "county": "Fejér",
       "fideszPct": 46.17,
       "megjelentek": 45117,
       "oppPct": 43.81,
@@ -377,6 +424,7 @@
       "winner": "fidesz"
     },
     "FE-05": {
+      "county": "Fejér",
       "fideszPct": 64.55,
       "megjelentek": 43292,
       "oppPct": 24.39,
@@ -385,6 +433,7 @@
       "winner": "fidesz"
     },
     "GY-01": {
+      "county": "Győr-Moson-Sopron",
       "fideszPct": 50.44,
       "megjelentek": 48434,
       "oppPct": 38.29,
@@ -393,6 +442,7 @@
       "winner": "fidesz"
     },
     "GY-02": {
+      "county": "Győr-Moson-Sopron",
       "fideszPct": 60.13,
       "megjelentek": 53299,
       "oppPct": 31.37,
@@ -401,6 +451,7 @@
       "winner": "fidesz"
     },
     "GY-03": {
+      "county": "Győr-Moson-Sopron",
       "fideszPct": 71.22,
       "megjelentek": 49916,
       "oppPct": 21.48,
@@ -409,6 +460,7 @@
       "winner": "fidesz"
     },
     "GY-04": {
+      "county": "Győr-Moson-Sopron",
       "fideszPct": 57.35,
       "megjelentek": 57263,
       "oppPct": 33.26,
@@ -417,6 +469,7 @@
       "winner": "fidesz"
     },
     "GY-05": {
+      "county": "Győr-Moson-Sopron",
       "fideszPct": 59.23,
       "megjelentek": 55698,
       "oppPct": 30.47,
@@ -425,6 +478,7 @@
       "winner": "fidesz"
     },
     "HB-01": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 48.95,
       "megjelentek": 48311,
       "oppPct": 39.75,
@@ -433,6 +487,7 @@
       "winner": "fidesz"
     },
     "HB-02": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 55.61,
       "megjelentek": 49583,
       "oppPct": 40.12,
@@ -441,6 +496,7 @@
       "winner": "fidesz"
     },
     "HB-03": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 63.51,
       "megjelentek": 50035,
       "oppPct": 27.68,
@@ -449,6 +505,7 @@
       "winner": "fidesz"
     },
     "HB-04": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 61.66,
       "megjelentek": 42001,
       "oppPct": 23.01,
@@ -457,6 +514,7 @@
       "winner": "fidesz"
     },
     "HB-05": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 60.61,
       "megjelentek": 45119,
       "oppPct": 30.39,
@@ -465,6 +523,7 @@
       "winner": "fidesz"
     },
     "HB-06": {
+      "county": "Hajdú-Bihar",
       "fideszPct": 58.19,
       "megjelentek": 45369,
       "oppPct": 31.1,
@@ -473,6 +532,7 @@
       "winner": "fidesz"
     },
     "HE-01": {
+      "county": "Heves",
       "fideszPct": 52.19,
       "megjelentek": 57616,
       "oppPct": 36.5,
@@ -481,6 +541,7 @@
       "winner": "fidesz"
     },
     "HE-02": {
+      "county": "Heves",
       "fideszPct": 54.91,
       "megjelentek": 53270,
       "oppPct": 36.41,
@@ -489,6 +550,7 @@
       "winner": "fidesz"
     },
     "HE-03": {
+      "county": "Heves",
       "fideszPct": 59.06,
       "megjelentek": 53094,
       "oppPct": 29.56,
@@ -497,6 +559,7 @@
       "winner": "fidesz"
     },
     "JN-01": {
+      "county": "Jász-Nagykun-Szolnok",
       "fideszPct": 46.91,
       "megjelentek": 54064,
       "oppPct": 39.2,
@@ -505,6 +568,7 @@
       "winner": "fidesz"
     },
     "JN-02": {
+      "county": "Jász-Nagykun-Szolnok",
       "fideszPct": 59.81,
       "megjelentek": 47749,
       "oppPct": 33.74,
@@ -513,6 +577,7 @@
       "winner": "fidesz"
     },
     "JN-03": {
+      "county": "Jász-Nagykun-Szolnok",
       "fideszPct": 64.14,
       "megjelentek": 47417,
       "oppPct": 29.18,
@@ -521,6 +586,7 @@
       "winner": "fidesz"
     },
     "JN-04": {
+      "county": "Jász-Nagykun-Szolnok",
       "fideszPct": 51.5,
       "megjelentek": 46625,
       "oppPct": 37.1,
@@ -529,6 +595,7 @@
       "winner": "fidesz"
     },
     "KE-01": {
+      "county": "Komárom-Esztergom",
       "fideszPct": 48.18,
       "megjelentek": 55037,
       "oppPct": 41.16,
@@ -537,6 +604,7 @@
       "winner": "fidesz"
     },
     "KE-02": {
+      "county": "Komárom-Esztergom",
       "fideszPct": 49.96,
       "megjelentek": 56364,
       "oppPct": 38.8,
@@ -545,6 +613,7 @@
       "winner": "fidesz"
     },
     "KE-03": {
+      "county": "Komárom-Esztergom",
       "fideszPct": 55.1,
       "megjelentek": 56822,
       "oppPct": 33.11,
@@ -553,6 +622,7 @@
       "winner": "fidesz"
     },
     "NO-01": {
+      "county": "Nógrád",
       "fideszPct": 53.85,
       "megjelentek": 49173,
       "oppPct": 36.15,
@@ -561,6 +631,7 @@
       "winner": "fidesz"
     },
     "NO-02": {
+      "county": "Nógrád",
       "fideszPct": 60.08,
       "megjelentek": 53849,
       "oppPct": 23.95,
@@ -569,6 +640,7 @@
       "winner": "fidesz"
     },
     "PE-01": {
+      "county": "Pest",
       "fideszPct": 45.38,
       "megjelentek": 65894,
       "oppPct": 43.05,
@@ -577,6 +649,7 @@
       "winner": "fidesz"
     },
     "PE-02": {
+      "county": "Pest",
       "fideszPct": 46.77,
       "megjelentek": 75256,
       "oppPct": 44.92,
@@ -585,6 +658,7 @@
       "winner": "fidesz"
     },
     "PE-03": {
+      "county": "Pest",
       "fideszPct": 51.94,
       "megjelentek": 71765,
       "oppPct": 37.38,
@@ -593,6 +667,7 @@
       "winner": "fidesz"
     },
     "PE-04": {
+      "county": "Pest",
       "fideszPct": 55.46,
       "megjelentek": 56153,
       "oppPct": 33.83,
@@ -601,6 +676,7 @@
       "winner": "fidesz"
     },
     "PE-05": {
+      "county": "Pest",
       "fideszPct": 46.3,
       "megjelentek": 75062,
       "oppPct": 42.04,
@@ -609,6 +685,7 @@
       "winner": "fidesz"
     },
     "PE-06": {
+      "county": "Pest",
       "fideszPct": 49.05,
       "megjelentek": 68385,
       "oppPct": 38.17,
@@ -617,6 +694,7 @@
       "winner": "fidesz"
     },
     "PE-07": {
+      "county": "Pest",
       "fideszPct": 49.22,
       "megjelentek": 65045,
       "oppPct": 36.5,
@@ -625,6 +703,7 @@
       "winner": "fidesz"
     },
     "PE-08": {
+      "county": "Pest",
       "fideszPct": 45.55,
       "megjelentek": 65729,
       "oppPct": 42.65,
@@ -633,6 +712,7 @@
       "winner": "fidesz"
     },
     "PE-09": {
+      "county": "Pest",
       "fideszPct": 60.22,
       "megjelentek": 49929,
       "oppPct": 28.65,
@@ -641,6 +721,7 @@
       "winner": "fidesz"
     },
     "PE-10": {
+      "county": "Pest",
       "fideszPct": 59.71,
       "megjelentek": 52655,
       "oppPct": 28.52,
@@ -649,6 +730,7 @@
       "winner": "fidesz"
     },
     "PE-11": {
+      "county": "Pest",
       "fideszPct": 56.81,
       "megjelentek": 63328,
       "oppPct": 31.71,
@@ -657,6 +739,7 @@
       "winner": "fidesz"
     },
     "PE-12": {
+      "county": "Pest",
       "fideszPct": 59.11,
       "megjelentek": 48478,
       "oppPct": 28.66,
@@ -665,6 +748,7 @@
       "winner": "fidesz"
     },
     "SO-01": {
+      "county": "Somogy",
       "fideszPct": 47.63,
       "megjelentek": 42832,
       "oppPct": 34.83,
@@ -673,6 +757,7 @@
       "winner": "fidesz"
     },
     "SO-02": {
+      "county": "Somogy",
       "fideszPct": 57.86,
       "megjelentek": 37898,
       "oppPct": 37.16,
@@ -681,6 +766,7 @@
       "winner": "fidesz"
     },
     "SO-03": {
+      "county": "Somogy",
       "fideszPct": 57.92,
       "megjelentek": 42363,
       "oppPct": 35.41,
@@ -689,6 +775,7 @@
       "winner": "fidesz"
     },
     "SO-04": {
+      "county": "Somogy",
       "fideszPct": 59.94,
       "megjelentek": 45410,
       "oppPct": 35.76,
@@ -697,6 +784,7 @@
       "winner": "fidesz"
     },
     "SZ-01": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 44.92,
       "megjelentek": 52418,
       "oppPct": 42.12,
@@ -705,6 +793,7 @@
       "winner": "fidesz"
     },
     "SZ-02": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 58.13,
       "megjelentek": 45971,
       "oppPct": 32.65,
@@ -713,6 +802,7 @@
       "winner": "fidesz"
     },
     "SZ-03": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 65.31,
       "megjelentek": 49744,
       "oppPct": 26.13,
@@ -721,6 +811,7 @@
       "winner": "fidesz"
     },
     "SZ-04": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 68.71,
       "megjelentek": 46721,
       "oppPct": 24.86,
@@ -729,6 +820,7 @@
       "winner": "fidesz"
     },
     "SZ-05": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 64.79,
       "megjelentek": 46556,
       "oppPct": 24.58,
@@ -737,6 +829,7 @@
       "winner": "fidesz"
     },
     "SZ-06": {
+      "county": "Szabolcs-Szatmár-Bereg",
       "fideszPct": 65.69,
       "megjelentek": 46401,
       "oppPct": 26.45,
@@ -745,6 +838,7 @@
       "winner": "fidesz"
     },
     "TO-01": {
+      "county": "Tolna",
       "fideszPct": 55.51,
       "megjelentek": 41349,
       "oppPct": 35.0,
@@ -753,6 +847,7 @@
       "winner": "fidesz"
     },
     "TO-02": {
+      "county": "Tolna",
       "fideszPct": 62.44,
       "megjelentek": 39625,
       "oppPct": 27.0,
@@ -761,6 +856,7 @@
       "winner": "fidesz"
     },
     "TO-03": {
+      "county": "Tolna",
       "fideszPct": 62.98,
       "megjelentek": 40606,
       "oppPct": 27.87,
@@ -769,6 +865,7 @@
       "winner": "fidesz"
     },
     "VA-01": {
+      "county": "Vas",
       "fideszPct": 49.95,
       "megjelentek": 52279,
       "oppPct": 40.23,
@@ -777,6 +874,7 @@
       "winner": "fidesz"
     },
     "VA-02": {
+      "county": "Vas",
       "fideszPct": 64.38,
       "megjelentek": 50658,
       "oppPct": 26.02,
@@ -785,6 +883,7 @@
       "winner": "fidesz"
     },
     "VA-03": {
+      "county": "Vas",
       "fideszPct": 66.4,
       "megjelentek": 48820,
       "oppPct": 26.76,
@@ -793,6 +892,7 @@
       "winner": "fidesz"
     },
     "VE-01": {
+      "county": "Veszprém",
       "fideszPct": 50.48,
       "megjelentek": 52364,
       "oppPct": 39.24,
@@ -801,6 +901,7 @@
       "winner": "fidesz"
     },
     "VE-02": {
+      "county": "Veszprém",
       "fideszPct": 50.99,
       "megjelentek": 53101,
       "oppPct": 36.53,
@@ -809,6 +910,7 @@
       "winner": "fidesz"
     },
     "VE-03": {
+      "county": "Veszprém",
       "fideszPct": 50.7,
       "megjelentek": 47264,
       "oppPct": 44.51,
@@ -817,6 +919,7 @@
       "winner": "fidesz"
     },
     "VE-04": {
+      "county": "Veszprém",
       "fideszPct": 62.7,
       "megjelentek": 48130,
       "oppPct": 29.09,
@@ -825,6 +928,7 @@
       "winner": "fidesz"
     },
     "ZA-01": {
+      "county": "Zala",
       "fideszPct": 56.8,
       "megjelentek": 55753,
       "oppPct": 30.95,
@@ -833,6 +937,7 @@
       "winner": "fidesz"
     },
     "ZA-02": {
+      "county": "Zala",
       "fideszPct": 59.84,
       "megjelentek": 52031,
       "oppPct": 30.11,
@@ -841,6 +946,7 @@
       "winner": "fidesz"
     },
     "ZA-03": {
+      "county": "Zala",
       "fideszPct": 52.98,
       "megjelentek": 49982,
       "oppPct": 37.45,
@@ -992,12 +1098,195 @@
     }
   },
   "generatedFrom": "NVI 2022 parliamentary XLSX protocol files",
+  "hourlyByCounty2022": {
+    "Baranya": {
+      "07:00": 1.71,
+      "09:00": 9.99,
+      "11:00": 24.63,
+      "13:00": 37.19,
+      "15:00": 50.11,
+      "17:00": 60.14,
+      "18:30": 64.84
+    },
+    "Borsod-Abaúj-Zemplén": {
+      "07:00": 1.55,
+      "09:00": 9.09,
+      "11:00": 23.34,
+      "13:00": 36.36,
+      "15:00": 47.92,
+      "17:00": 57.51,
+      "18:30": 62.19
+    },
+    "Budapest": {
+      "07:00": 1.82,
+      "09:00": 9.61,
+      "11:00": 25.01,
+      "13:00": 42.7,
+      "15:00": 56.44,
+      "17:00": 66.82,
+      "18:30": 72.35
+    },
+    "Bács-Kiskun": {
+      "07:00": 1.91,
+      "09:00": 11.34,
+      "11:00": 27.09,
+      "13:00": 39.54,
+      "15:00": 51.21,
+      "17:00": 60.85,
+      "18:30": 65.38
+    },
+    "Békés": {
+      "07:00": 1.9,
+      "09:00": 11.43,
+      "11:00": 28.03,
+      "13:00": 40.55,
+      "15:00": 52.02,
+      "17:00": 60.49,
+      "18:30": 64.13
+    },
+    "Csongrád-Csanád": {
+      "07:00": 1.9,
+      "09:00": 11.13,
+      "11:00": 26.85,
+      "13:00": 40.82,
+      "15:00": 52.97,
+      "17:00": 63.13,
+      "18:30": 67.91
+    },
+    "Fejér": {
+      "07:00": 1.82,
+      "09:00": 10.86,
+      "11:00": 27.08,
+      "13:00": 41.31,
+      "15:00": 53.79,
+      "17:00": 64.25,
+      "18:30": 69.05
+    },
+    "Győr-Moson-Sopron": {
+      "07:00": 1.87,
+      "09:00": 11.06,
+      "11:00": 27.35,
+      "13:00": 40.59,
+      "15:00": 54.21,
+      "17:00": 66.08,
+      "18:30": 71.52
+    },
+    "Hajdú-Bihar": {
+      "07:00": 1.95,
+      "09:00": 10.61,
+      "11:00": 24.94,
+      "13:00": 37.86,
+      "15:00": 49.6,
+      "17:00": 59.07,
+      "18:30": 63.76
+    },
+    "Heves": {
+      "07:00": 1.91,
+      "09:00": 11.05,
+      "11:00": 27.29,
+      "13:00": 41.03,
+      "15:00": 52.76,
+      "17:00": 62.26,
+      "18:30": 66.72
+    },
+    "Jász-Nagykun-Szolnok": {
+      "07:00": 1.76,
+      "09:00": 11.37,
+      "11:00": 27.03,
+      "13:00": 39.39,
+      "15:00": 50.51,
+      "17:00": 59.24,
+      "18:30": 63.41
+    },
+    "Komárom-Esztergom": {
+      "07:00": 1.68,
+      "09:00": 9.66,
+      "11:00": 25.46,
+      "13:00": 39.37,
+      "15:00": 51.73,
+      "17:00": 62.19,
+      "18:30": 67.18
+    },
+    "Nógrád": {
+      "07:00": 1.73,
+      "09:00": 9.49,
+      "11:00": 24.53,
+      "13:00": 38.03,
+      "15:00": 50.35,
+      "17:00": 60.04,
+      "18:30": 64.43
+    },
+    "Pest": {
+      "07:00": 2.04,
+      "09:00": 10.76,
+      "11:00": 26.6,
+      "13:00": 42.2,
+      "15:00": 55.15,
+      "17:00": 65.56,
+      "18:30": 70.76
+    },
+    "Somogy": {
+      "07:00": 1.71,
+      "09:00": 10.19,
+      "11:00": 25.82,
+      "13:00": 38.54,
+      "15:00": 51.64,
+      "17:00": 61.45,
+      "18:30": 65.76
+    },
+    "Szabolcs-Szatmár-Bereg": {
+      "07:00": 1.54,
+      "09:00": 8.78,
+      "11:00": 22.22,
+      "13:00": 35.26,
+      "15:00": 48.18,
+      "17:00": 58.29,
+      "18:30": 62.89
+    },
+    "Tolna": {
+      "07:00": 1.83,
+      "09:00": 10.91,
+      "11:00": 26.57,
+      "13:00": 38.8,
+      "15:00": 51.6,
+      "17:00": 61.89,
+      "18:30": 66.28
+    },
+    "Vas": {
+      "07:00": 1.8,
+      "09:00": 10.44,
+      "11:00": 26.43,
+      "13:00": 40.16,
+      "15:00": 54.81,
+      "17:00": 67.09,
+      "18:30": 72.49
+    },
+    "Veszprém": {
+      "07:00": 1.78,
+      "09:00": 10.45,
+      "11:00": 26.74,
+      "13:00": 40.33,
+      "15:00": 53.8,
+      "17:00": 64.71,
+      "18:30": 69.63
+    },
+    "Zala": {
+      "07:00": 1.63,
+      "09:00": 9.86,
+      "11:00": 26.1,
+      "13:00": 39.42,
+      "15:00": 53.76,
+      "17:00": 64.42,
+      "18:30": 69.27
+    }
+  },
   "hourlyNational2022": {
-    "09:00": 10.3,
-    "11:00": 25.8,
-    "13:00": 40.0,
-    "15:00": 52.8,
-    "17:00": 62.9,
+    "07:00": 1.82,
+    "09:00": 10.31,
+    "11:00": 25.77,
+    "13:00": 40.01,
+    "15:00": 52.75,
+    "17:00": 62.92,
     "18:30": 67.8
   },
   "nationalFinal2022": 69.59,
