@@ -62,29 +62,48 @@ MAZ_TO_ID = {
     '19': 'VE', '20': 'ZA',
 }
 
-# Hungarian 2022 parliamentary election — national at-the-polls turnout
-# at each intraday snapshot time. These come from valasztas.hu's live
-# feed, preserved by Europe Elects' 2022 coverage on X/Twitter.
-# All values are WITHOUT mail-in ballots (in-person voting only).
+# Hungarian 2022 parliamentary election — at-the-polls turnout curves.
+# Originally pulled from valasztas.hu live feed via Europe Elects'
+# 2022 X/Twitter coverage (national-only). NOW computed exactly from
+# the official Napközbeni_részvételi_jelentések xlsx, which gives us
+# per-county granularity. parse_napkozbeni() is what populates these.
 #
 # Used to compute a time-adjusted 2022 baseline per constituency:
-#   2022-at-time-T (constituency) ≈ 2022-final (constituency)
-#                                    × (HOURLY_2022[T] / NATIONAL_FINAL_2022)
+#   2022-at-time-T (district) ≈ 2022-final (district)
+#                                × (county_curve[T] / county_curve[18:30])
 #
-# This assumes constituencies share roughly the same intraday curve
-# shape as the national average — not exact but good enough to make
-# 2026 vs 2022 comparisons meaningful mid-day instead of only at 18:30.
-HOURLY_NATIONAL_2022 = {
-    '09:00': 10.3,   # Europe Elects, source: valasztas.hu
-    '11:00': 25.8,
-    '13:00': 40.0,
-    '15:00': 52.8,
-    '17:00': 62.9,
-    '18:30': 67.8,   # final "at-the-polls" number before mail counting
-}
+# Per-county curves remove the (small) urban-vs-rural intraday-shape
+# bias that a single national curve baked in.
+HOURLY_TIMES = ['07:00', '09:00', '11:00', '13:00', '15:00', '17:00', '18:30']
+
 # Final including mail-in ballots; from Országos_listás_eredmény.xlsx
 # (5,717,182 megjelentek / 8,215,304 eligible).
 NATIONAL_FINAL_2022 = 69.59
+
+# County name normalisation: napközbeni xlsx uses uppercase Hungarian
+# names; the rest of the project uses MAZ_TO_COUNTY's mixed-case form.
+NAPKOZBENI_TO_COUNTY = {
+    'BUDAPEST': 'Budapest',
+    'BARANYA': 'Baranya',
+    'BÁCS-KISKUN': 'Bács-Kiskun',
+    'BÉKÉS': 'Békés',
+    'BORSOD-ABAÚJ-ZEMPLÉN': 'Borsod-Abaúj-Zemplén',
+    'CSONGRÁD-CSANÁD': 'Csongrád-Csanád',
+    'FEJÉR': 'Fejér',
+    'GYŐR-MOSON-SOPRON': 'Győr-Moson-Sopron',
+    'HAJDÚ-BIHAR': 'Hajdú-Bihar',
+    'HEVES': 'Heves',
+    'JÁSZ-NAGYKUN-SZOLNOK': 'Jász-Nagykun-Szolnok',
+    'KOMÁROM-ESZTERGOM': 'Komárom-Esztergom',
+    'NÓGRÁD': 'Nógrád',
+    'PEST': 'Pest',
+    'SOMOGY': 'Somogy',
+    'SZABOLCS-SZATMÁR-BEREG': 'Szabolcs-Szatmár-Bereg',
+    'TOLNA': 'Tolna',
+    'VAS': 'Vas',
+    'VESZPRÉM': 'Veszprém',
+    'ZALA': 'Zala',
+}
 
 
 # Party-name matching for 2022. The XLSX uses the long registered
@@ -190,6 +209,10 @@ def parse_constituencies(path):
         erv = r['ervenyes'] or 1
         fidesz_pct = r['votes']['fidesz'] / erv * 100
         opp_pct = r['votes']['opp'] / erv * 100
+        # Derive county from the district id prefix (e.g. "BP-01" → "Budapest")
+        prefix = did.split('-')[0]
+        maz = next((k for k, v in MAZ_TO_ID.items() if v == prefix), None)
+        county = MAZ_TO_COUNTY.get(maz) if maz else None
         out[did] = {
             'turnoutPct': round(megj / vp * 100, 2) if vp else 0,
             'valasztopolgar': vp,
@@ -197,6 +220,7 @@ def parse_constituencies(path):
             'fideszPct': round(fidesz_pct, 2),
             'oppPct': round(opp_pct, 2),
             'winner': 'fidesz' if fidesz_pct > opp_pct else 'opposition',
+            'county': county,
         }
     return out
 
@@ -274,6 +298,71 @@ def parse_county_list(path):
     return out
 
 
+def parse_napkozbeni(path):
+    """Parse Napközbeni_részvételi_jelentések_OGY2022.xlsx.
+
+    The file has 7 sheets, one per snapshot time (07_00, 09_00, ...,
+    18_30). Each sheet has 3178 rows of municipality-level data with
+    columns: Megye, Település, eligible voters, megjelentek, turnout %.
+
+    Returns:
+        {
+          'national': {'07:00': pct, '09:00': pct, ...},
+          'byCounty': {
+            'Budapest': {'07:00': pct, ..., '18:30': pct},
+            'Baranya':  {...},
+            ...
+          },
+        }
+    All values are at-the-polls (mail-in not yet counted).
+    """
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+
+    by_county = {NAPKOZBENI_TO_COUNTY[k]: {} for k in NAPKOZBENI_TO_COUNTY}
+    national = {}
+
+    for sheet_name in HOURLY_TIMES:
+        # Sheet names use underscore: 07_00, 09_00, ...
+        sheet_key = sheet_name.replace(':', '_')
+        if sheet_key not in wb.sheetnames:
+            continue
+        ws = wb[sheet_key]
+
+        # Aggregate eligible + voted per county across all rows
+        county_elig = {NAPKOZBENI_TO_COUNTY[k]: 0 for k in NAPKOZBENI_TO_COUNTY}
+        county_voted = {NAPKOZBENI_TO_COUNTY[k]: 0 for k in NAPKOZBENI_TO_COUNTY}
+        nat_elig = 0
+        nat_voted = 0
+
+        # Skip header row 1
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            megye_raw = row[0]
+            elig = row[2]
+            voted = row[3]
+            if not megye_raw or elig is None or voted is None:
+                continue
+            try:
+                e = int(elig); v = int(voted)
+            except (TypeError, ValueError):
+                continue
+            county = NAPKOZBENI_TO_COUNTY.get(megye_raw)
+            if county:
+                county_elig[county] += e
+                county_voted[county] += v
+            nat_elig += e
+            nat_voted += v
+
+        # Compute county-level turnout for this snapshot
+        for county in by_county:
+            ce = county_elig[county]
+            cv = county_voted[county]
+            by_county[county][sheet_name] = round(cv / ce * 100, 2) if ce else 0.0
+        national[sheet_name] = round(nat_voted / nat_elig * 100, 2) if nat_elig else 0.0
+
+    wb.close()
+    return {'national': national, 'byCounty': by_county}
+
+
 def parse_national_list(path):
     """Parse Országos_listás_eredmény.xlsx sheet 1 for the final 2022
     nationwide party list percentages.
@@ -348,6 +437,13 @@ def main():
             national_path = f
             break
 
+    # Napközbeni hourly turnout report (per municipality, 7 sheets)
+    napkozbeni_path = None
+    for f in glob.glob('*.xlsx') + glob.glob('2022_parlamenti/*.xlsx'):
+        if 'napk' in f.lower():
+            napkozbeni_path = f
+            break
+
     if not const_path:
         print('ERROR: could not find constituency xlsx', file=sys.stderr)
         sys.exit(1)
@@ -369,12 +465,20 @@ def main():
         national = parse_national_list(national_path)
         print(f'  national list: {national}')
 
+    hourly_data = {'national': {}, 'byCounty': {}}
+    if napkozbeni_path:
+        print(f'Reading {napkozbeni_path}')
+        hourly_data = parse_napkozbeni(napkozbeni_path)
+        print(f'  national curve: {hourly_data["national"]}')
+        print(f'  parsed curves for {len(hourly_data["byCounty"])} counties')
+
     out = {
         'generatedFrom': 'NVI 2022 parliamentary XLSX protocol files',
         'constituencies': constituencies,
         'counties': counties,
         'nationalVote2022': national,
-        'hourlyNational2022': HOURLY_NATIONAL_2022,
+        'hourlyNational2022': hourly_data['national'],
+        'hourlyByCounty2022': hourly_data['byCounty'],
         'nationalFinal2022': NATIONAL_FINAL_2022,
     }
 

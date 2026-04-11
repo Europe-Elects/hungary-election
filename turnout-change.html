@@ -246,8 +246,9 @@ svg#chart {
     <svg id="chart"></svg>
     <div class="chart-footnote" id="chartFootnote">
       Each dot is a constituency. X = Fidesz-KDNP's 2022 share, Y =
-      2026 turnout − <strong>time-matched</strong> 2022 turnout. Rising
-      turnout in opposition-won districts = opposition mobilising.<span id="budapestNote"></span>
+      2026 turnout − <strong>time-matched, per-county</strong> 2022
+      turnout. Rising turnout in opposition-won districts = opposition
+      mobilising.<span id="budapestNote"></span>
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · 2022 baseline from NVI XLSX</div>
@@ -293,27 +294,45 @@ async function loadResults() {
   }
 }
 
-// Given a snapshot time like "11:00", return the per-constituency
-// 2022 baseline ADJUSTED to that point in the day.
+// Given a snapshot time like "11:00" and the constituency's 2022 county,
+// return the per-constituency 2022 baseline ADJUSTED to that point in
+// the day, using that county's actual 2022 hourly curve.
 //
-// Approach: use the national hourly curve as a ratio of the national
-// final, then multiply by that constituency's 2022 final. This assumes
-// all constituencies share roughly the same intraday curve shape —
-// which isn't exactly true (Budapest tends to vote earlier than rural
-// areas) but is accurate enough at ~±2 pp to make the delta meaningful.
+// Formula:
+//   2022_at_T (district) ≈ district_final × (county_curve[T] / county_final)
 //
-// If the snapshot time isn't in the curve (e.g. some weird off-cycle
-// snapshot) or the baseline has no hourly data, fall back to the raw
-// 2022 final.
-function adjust2022ForTime(constFinal2022, reportTime) {
-  if (!baseline || !baseline.hourlyNational2022) return constFinal2022;
-  if (!reportTime) return constFinal2022;
-  const hourly = baseline.hourlyNational2022[reportTime];
-  const natFinal = baseline.nationalFinal2022;
-  if (typeof hourly !== 'number' || typeof natFinal !== 'number' || natFinal === 0) {
-    return constFinal2022;
+// Why per-county instead of one national curve: counties' intraday
+// shapes vary (11:00 spread 22%-28% across the 20 counties in 2022).
+// Using each constituency's own county curve removes that bias and
+// reveals real mobilisation differences that a national average would
+// otherwise hide — especially in Budapest, which actually voted
+// slightly SLOWER than the national average at 2022's mid-morning
+// snapshots.
+//
+// Falls back to the national curve if a county lacks hourly data, and
+// to the raw 2022 final if even that's missing.
+function adjust2022ForTime(constFinal2022, reportTime, county) {
+  if (!baseline || !reportTime) return constFinal2022;
+
+  // Per-county path (preferred)
+  const byCounty = baseline.hourlyByCounty2022 || {};
+  const countyCurve = county && byCounty[county];
+  const counties2022 = baseline.counties || {};
+  const countyFinal = county && counties2022[county] && counties2022[county].turnoutPct;
+  if (countyCurve && typeof countyCurve[reportTime] === 'number'
+      && typeof countyFinal === 'number' && countyFinal > 0) {
+    return constFinal2022 * (countyCurve[reportTime] / countyFinal);
   }
-  return constFinal2022 * (hourly / natFinal);
+
+  // National-curve fallback
+  const natCurve = baseline.hourlyNational2022 || {};
+  const natFinal = baseline.nationalFinal2022;
+  if (typeof natCurve[reportTime] === 'number'
+      && typeof natFinal === 'number' && natFinal > 0) {
+    return constFinal2022 * (natCurve[reportTime] / natFinal);
+  }
+
+  return constFinal2022;
 }
 
 function buildPoints() {
@@ -325,9 +344,10 @@ function buildPoints() {
     const t2026 = r2026 && typeof r2026.pct === 'number' ? r2026.pct : null;
     const t2022final = base2022.turnoutPct;
     const reportTime = r2026 && r2026.time;
-    // Time-matched 2022 baseline, so a 2026 11:00 snapshot compares to
-    // 2022's estimated level at 11:00 instead of 2022's final total.
-    const t2022adjusted = adjust2022ForTime(t2022final, reportTime);
+    // Time-matched 2022 baseline using THIS constituency's county curve.
+    // Each county has its own 2022 intraday shape, parsed from the
+    // Napközbeni xlsx — see adjust2022ForTime.
+    const t2022adjusted = adjust2022ForTime(t2022final, reportTime, base2022.county);
     const delta = t2026 !== null ? +(t2026 - t2022adjusted).toFixed(2) : null;
     points.push({
       id,
@@ -339,6 +359,7 @@ function buildPoints() {
       delta,
       reportTime,
       winner: base2022.winner,
+      county: base2022.county,
       isBudapest: id.startsWith('BP-'),
     });
   }
@@ -665,7 +686,8 @@ function renderDotTooltipHtml(p) {
   let html = `<h3>${p.id} ${winnerBadge}</h3>`;
   html += `<div class="tt-row"><span class="label">2022 final turnout</span><span class="value">${p.turnout2022.toFixed(1)}%</span></div>`;
   if (timeAdjusted) {
-    html += `<div class="tt-row"><span class="label">2022 at ${t} (est.)</span><span class="value">${p.turnout2022Adjusted.toFixed(1)}%</span></div>`;
+    const countyTag = p.county ? ` · ${p.county}` : '';
+    html += `<div class="tt-row"><span class="label">2022 at ${t} (est.${countyTag})</span><span class="value">${p.turnout2022Adjusted.toFixed(1)}%</span></div>`;
   }
   html += `<div class="tt-row"><span class="label">2022 Fidesz-KDNP</span><span class="value">${p.fidesz2022.toFixed(1)}%</span></div>`;
   html += `<div class="tt-row"><span class="label">2022 Opposition bloc</span><span class="value">${p.opp2022.toFixed(1)}%</span></div>`;
