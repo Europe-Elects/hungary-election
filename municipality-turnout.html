@@ -130,8 +130,8 @@ svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: b
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="legend">
-      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#2563EB"></div>Opposition area (blue)</div>
-      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#111"></div>Fidesz area (dark)</div>
+      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#3399FF"></div>TISZA (EPP) area</div>
+      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#000000"></div>FIDESZ-KDNP (PfE) area</div>
       <div class="note" id="modeNote"></div>
     </div>
     <svg id="chart"></svg>
@@ -168,13 +168,13 @@ const MAZ_TO_COUNTY = {
   '17':'Tolna','18':'Vas','19':'Veszprém','20':'Zala',
 };
 
-// Interpolate fill: blue (opposition) → black (Fidesz stronghold)
+// Interpolate fill: TISZA blue (#3399FF) → FIDESZ black (#000000)
 function strongholdColor(fideszPct) {
   const lo = 30, hi = 65;
   const t = Math.max(0, Math.min(1, (fideszPct - lo) / (hi - lo)));
-  const r = Math.round(37 + (17 - 37) * t);
-  const g = Math.round(99 + (17 - 99) * t);
-  const b = Math.round(235 + (17 - 235) * t);
+  const r = Math.round(51 + (0 - 51) * t);   // 51 → 0
+  const g = Math.round(153 + (0 - 153) * t); // 153 → 0
+  const b = Math.round(255 + (0 - 255) * t); // 255 → 0
   return `rgb(${r},${g},${b})`;
 }
 
