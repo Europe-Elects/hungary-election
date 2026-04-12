@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T02:46:18.166136",
+  "lastUpdated": "2026-04-13T02:56:24.363051",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -618,12 +618,12 @@
       "counted": 98.7
     },
     "PE-09": {
-      "FIDESZ-KDNP": 37.2,
-      "TISZA": 53.5,
+      "FIDESZ-KDNP": 37.4,
+      "TISZA": 53.4,
       "DK": 1.0,
-      "Mi Hazánk": 7.4,
+      "Mi Hazánk": 7.3,
       "MKKP": 0.7,
-      "counted": 97.44
+      "counted": 98.72
     },
     "PE-10": {
       "FIDESZ-KDNP": 30.2,
@@ -996,7 +996,7 @@
     "FIDESZ-KDNP": 36.972,
     "TISZA": 54.326,
     "DK": 1.187,
-    "Mi Hazánk": 5.965,
+    "Mi Hazánk": 5.964,
     "MKKP": 0.832
   },
   "minorityVote": {
@@ -1029,11 +1029,11 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 86.61,
-      "TISZA": 11.43,
-      "DK": 0.23,
-      "Mi Hazánk": 1.45,
-      "MKKP": 0.29
+      "FIDESZ-KDNP": 86.79,
+      "TISZA": 11.27,
+      "DK": 0.22,
+      "Mi Hazánk": 1.43,
+      "MKKP": 0.28
     }
   },
   "turnout": {
@@ -20879,6 +20879,6 @@
     }
   },
   "processingPctDomestic": 98.84,
-  "nviVersion": "2026.04.13.01:43:08",
+  "nviVersion": "2026.04.13.01:53:45",
   "processingPct": 98.87
 }
