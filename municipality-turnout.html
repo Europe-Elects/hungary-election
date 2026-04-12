@@ -58,9 +58,32 @@ body {
 .chart-legend {
   display: flex; gap: 14px; font-size: 12px; color: #334155; margin-bottom: 4px;
 }
-.chart-legend .item { display: flex; align-items: center; gap: 5px; }
+.chart-legend .item {
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; user-select: none;
+  padding: 2px 6px; border-radius: 4px; border: 1px solid transparent;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.chart-legend .item:hover { background: #F1F5F9; }
+.chart-legend .item.active { border-color: #94A3B8; background: #fff; }
+.chart-legend .item.dimmed { opacity: 0.3; }
 .chart-legend .swatch { width: 10px; height: 10px; border-radius: 50%; }
 .chart-legend .note { font-size: 11px; color: #64748B; }
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 12px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 30; min-width: 180px;
+  opacity: 0; transition: opacity .12s;
+}
+#tooltip.visible { opacity: 1; }
+#tooltip h4 { font-size: 12px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
+#tooltip .row { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #475569; padding: 1px 0; }
+#tooltip .row .v { font-weight: 600; color: #0F172A; font-variant-numeric: tabular-nums; }
+#tooltip .delta { font-size: 16px; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums; }
+#tooltip .delta.up { color: #16A34A; }
+#tooltip .delta.down { color: #DC2626; }
 
 svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: block; font-family: inherit; }
 .grid-line { stroke: #F1F5F9; stroke-width: 1; }
@@ -106,12 +129,13 @@ svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: b
     </div>
   </div>
   <div id="chart-container">
-    <div class="chart-legend">
-      <div class="item"><div class="swatch" style="background:#2563EB"></div>Budapest</div>
-      <div class="item"><div class="swatch" style="background:#94A3B8"></div>Rest of country</div>
+    <div class="chart-legend" id="legend">
+      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#2563EB"></div>Budapest (23)</div>
+      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#94A3B8"></div>Rest of country</div>
       <div class="note" id="modeNote"></div>
     </div>
     <svg id="chart"></svg>
+    <div id="tooltip"></div>
     <div class="chart-footnote">
       Each dot is a municipality. X = 2022 turnout at the <strong>same
       hour</strong>, Y = 2026 turnout at the latest snapshot. Dots above
@@ -130,6 +154,42 @@ const PAD_BOTTOM = 36;
 
 let baseline2022 = null;
 let lastResults = null;
+let filterGroup = null; // 'bp' | 'rest' | null
+
+function updateLegendState() {
+  const bp = document.getElementById('legendBp');
+  const rest = document.getElementById('legendRest');
+  bp.classList.toggle('active', filterGroup === 'bp');
+  bp.classList.toggle('dimmed', filterGroup === 'rest');
+  rest.classList.toggle('active', filterGroup === 'rest');
+  rest.classList.toggle('dimmed', filterGroup === 'bp');
+}
+
+function showTooltip(p, event) {
+  const tt = document.getElementById('tooltip');
+  const cls = p.delta > 0 ? 'up' : p.delta < 0 ? 'down' : '';
+  const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
+  tt.innerHTML = `
+    <h4>${p.key} ${p.isBudapest ? '(Budapest)' : ''}</h4>
+    <div class="row"><span>2022 at ${p.time}</span><span class="v">${p.x.toFixed(1)}%</span></div>
+    <div class="row"><span>2026 at ${p.time}</span><span class="v">${p.y.toFixed(1)}%</span></div>
+    <div class="delta ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp</div>
+  `;
+  tt.classList.add('visible');
+  const container = document.getElementById('chart-container');
+  const rect = container.getBoundingClientRect();
+  let left = event.clientX - rect.left + 12;
+  let top = event.clientY - rect.top + 12;
+  const ttRect = tt.getBoundingClientRect();
+  if (left + ttRect.width > rect.width - 6) left = event.clientX - rect.left - ttRect.width - 12;
+  if (top + ttRect.height > rect.height - 6) top = event.clientY - rect.top - ttRect.height - 12;
+  tt.style.left = Math.max(6, left) + 'px';
+  tt.style.top = Math.max(6, top) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
 
 async function loadBaseline() {
   try {
@@ -281,32 +341,35 @@ function renderChart() {
   const restPts = points.filter(p => !p.isBudapest);
   const bpPts = points.filter(p => p.isBudapest);
 
-  for (const p of restPts) {
+  function makeDot(p, isBp) {
     const dot = document.createElementNS(ns, 'circle');
     dot.setAttribute('cx', xScale(p.x));
     dot.setAttribute('cy', yScale(p.y));
-    dot.setAttribute('r', 2);
-    dot.setAttribute('fill', '#94A3B8');
-    dot.setAttribute('opacity', '0.35');
-    const t = document.createElementNS(ns, 'title');
-    t.textContent = `${p.key}\n2022 at ${p.time}: ${p.x.toFixed(1)}%\n2026 at ${p.time}: ${p.y.toFixed(1)}%\nΔ ${p.delta > 0 ? '+' : ''}${p.delta} pp`;
-    dot.appendChild(t);
+    dot.setAttribute('r', isBp ? 4.5 : 2.2);
+    dot.setAttribute('fill', isBp ? '#2563EB' : '#94A3B8');
+    dot.setAttribute('stroke', isBp ? '#fff' : 'none');
+    dot.setAttribute('stroke-width', isBp ? '1' : '0');
+    dot.style.cursor = 'pointer';
+    dot.style.transition = 'opacity .15s, r .1s';
+    // Apply filter dimming
+    const dimmed = (filterGroup === 'bp' && !isBp) || (filterGroup === 'rest' && isBp);
+    dot.setAttribute('opacity', dimmed ? '0.06' : (isBp ? '0.85' : '0.35'));
+    dot.addEventListener('mouseenter', (e) => {
+      dot.setAttribute('r', isBp ? 7 : 4);
+      showTooltip(p, e);
+    });
+    dot.addEventListener('mousemove', (e) => {
+      showTooltip(p, e);
+    });
+    dot.addEventListener('mouseleave', () => {
+      dot.setAttribute('r', isBp ? 4.5 : 2.2);
+      hideTooltip();
+    });
     svg.appendChild(dot);
   }
-  for (const p of bpPts) {
-    const dot = document.createElementNS(ns, 'circle');
-    dot.setAttribute('cx', xScale(p.x));
-    dot.setAttribute('cy', yScale(p.y));
-    dot.setAttribute('r', 4.5);
-    dot.setAttribute('fill', '#2563EB');
-    dot.setAttribute('opacity', '0.8');
-    dot.setAttribute('stroke', '#fff');
-    dot.setAttribute('stroke-width', '1');
-    const t = document.createElementNS(ns, 'title');
-    t.textContent = `${p.key}\n2022 at ${p.time}: ${p.x.toFixed(1)}%\n2026 at ${p.time}: ${p.y.toFixed(1)}%\nΔ ${p.delta > 0 ? '+' : ''}${p.delta} pp`;
-    dot.appendChild(t);
-    svg.appendChild(dot);
-  }
+
+  for (const p of restPts) makeDot(p, false);
+  for (const p of bpPts) makeDot(p, true);
 
   // "Above diagonal" label
   const diagLabel = document.createElementNS(ns, 'text');
@@ -333,6 +396,19 @@ async function init() {
   await loadBaseline();
   await loadResults();
   applyUpdate();
+
+  // Clickable legend to isolate Budapest or Rest
+  document.getElementById('legendBp').addEventListener('click', () => {
+    filterGroup = filterGroup === 'bp' ? null : 'bp';
+    updateLegendState();
+    renderChart();
+  });
+  document.getElementById('legendRest').addEventListener('click', () => {
+    filterGroup = filterGroup === 'rest' ? null : 'rest';
+    updateLegendState();
+    renderChart();
+  });
+
   setInterval(async () => { await loadResults(); applyUpdate(); }, 30000);
   let t = null;
   window.addEventListener('resize', () => { if (t) clearTimeout(t); t = setTimeout(renderChart, 150); });
