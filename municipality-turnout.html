@@ -113,25 +113,25 @@ svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: b
   </div>
   <div class="stats-row">
     <div class="stat-card bp">
-      <div class="stat-label">Budapest avg</div>
+      <div class="stat-label">Opposition-won 2022</div>
       <div class="stat-value" id="statBp">—</div>
-      <div class="stat-sub" id="statBpSub">23 districts</div>
+      <div class="stat-sub" id="statBpSub">322 municipalities</div>
     </div>
     <div class="stat-card rest">
-      <div class="stat-label">Rest of country avg</div>
+      <div class="stat-label">Fidesz-won 2022</div>
       <div class="stat-value" id="statRest">—</div>
-      <div class="stat-sub" id="statRestSub">3154 municipalities</div>
+      <div class="stat-sub" id="statRestSub">2855 municipalities</div>
     </div>
     <div class="stat-card diff" id="diffCard">
-      <div class="stat-label">Budapest vs Rest</div>
+      <div class="stat-label">Opposition vs Fidesz</div>
       <div class="stat-value" id="statDiff">—</div>
-      <div class="stat-sub" id="statDiffSub">Budapest mobilisation edge</div>
+      <div class="stat-sub" id="statDiffSub">Opposition mobilisation edge</div>
     </div>
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="legend">
-      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#3399FF"></div>Opposition area</div>
-      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#000000"></div>Fidesz area</div>
+      <div class="item" id="legendOpp" data-group="opp"><div class="swatch" style="background:#3399FF"></div>Opposition won 2022 (322)</div>
+      <div class="item" id="legendFid" data-group="fid"><div class="swatch" style="background:#000000"></div>Fidesz won 2022</div>
       <div class="note" id="modeNote"></div>
     </div>
     <svg id="chart"></svg>
@@ -183,12 +183,12 @@ function strongholdColor(fideszPct) {
 }
 
 function updateLegendState() {
-  const bp = document.getElementById('legendBp');
-  const rest = document.getElementById('legendRest');
-  bp.classList.toggle('active', filterGroup === 'bp');
-  bp.classList.toggle('dimmed', filterGroup === 'rest');
-  rest.classList.toggle('active', filterGroup === 'rest');
-  rest.classList.toggle('dimmed', filterGroup === 'bp');
+  const opp = document.getElementById('legendOpp');
+  const fid = document.getElementById('legendFid');
+  opp.classList.toggle('active', filterGroup === 'opp');
+  opp.classList.toggle('dimmed', filterGroup === 'fid');
+  fid.classList.toggle('active', filterGroup === 'fid');
+  fid.classList.toggle('dimmed', filterGroup === 'opp');
 }
 
 function showTooltip(p, event) {
@@ -197,9 +197,12 @@ function showTooltip(p, event) {
   const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
   const name = (muniNames && muniNames[p.key]) || p.key;
   const countyLabel = p.county || '';
+  const winnerLine = p.isOpposition
+    ? `<div class="row"><span>${countyLabel} · Opposition 2022</span><span class="v" style="color:#3399FF">${p.oppPct}%</span></div>`
+    : `<div class="row"><span>${countyLabel} · Fidesz 2022</span><span class="v">${p.fideszPct.toFixed(0)}%</span></div>`;
   tt.innerHTML = `
     <h4>${name}</h4>
-    <div class="row"><span>${countyLabel} · Fidesz 2022</span><span class="v">${p.fideszPct.toFixed(0)}%</span></div>
+    ${winnerLine}
     <div class="row"><span>2022 at ${p.time}</span><span class="v">${p.x.toFixed(1)}%</span></div>
     <div class="row"><span>2026 at ${p.time}</span><span class="v">${p.y.toFixed(1)}%</span></div>
     <div class="delta ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp</div>
@@ -267,15 +270,18 @@ function buildPoints() {
       const co = baselineConst.counties[county];
       if (co && typeof co.fideszPct === 'number') fideszPct = co.fideszPct;
     }
+    const isOpposition = fideszPct < 50;
     points.push({
       key,
       isBudapest: key.startsWith('01-'),
+      isOpposition,
       x: base2022AtTime,
       y: live.pct,
       delta: +(live.pct - base2022AtTime).toFixed(2),
       vp: live.vp,
       time: snapshotTime,
       fideszPct,
+      oppPct: +(100 - fideszPct).toFixed(1),  // approximate opposition share
       county,
     });
   }
@@ -283,24 +289,24 @@ function buildPoints() {
 }
 
 function updateStats(points) {
-  const bp = points.filter(p => p.isBudapest);
-  const rest = points.filter(p => !p.isBudapest);
+  const opp = points.filter(p => p.isOpposition);
+  const fid = points.filter(p => !p.isOpposition);
   const avg = arr => arr.length ? arr.reduce((s, p) => s + p.delta, 0) / arr.length : null;
-  const bpAvg = avg(bp);
-  const restAvg = avg(rest);
+  const oppAvg = avg(opp);
+  const fidAvg = avg(fid);
 
-  document.getElementById('statBp').textContent = bpAvg !== null ? (bpAvg > 0 ? '+' : '') + bpAvg.toFixed(1) + ' pp' : '—';
-  document.getElementById('statBpSub').textContent = `${bp.length} districts with data`;
-  document.getElementById('statRest').textContent = restAvg !== null ? (restAvg > 0 ? '+' : '') + restAvg.toFixed(1) + ' pp' : '—';
-  document.getElementById('statRestSub').textContent = `${rest.length} municipalities with data`;
+  document.getElementById('statBp').textContent = oppAvg !== null ? (oppAvg > 0 ? '+' : '') + oppAvg.toFixed(1) + ' pp' : '—';
+  document.getElementById('statBpSub').textContent = `${opp.length} municipalities with data`;
+  document.getElementById('statRest').textContent = fidAvg !== null ? (fidAvg > 0 ? '+' : '') + fidAvg.toFixed(1) + ' pp' : '—';
+  document.getElementById('statRestSub').textContent = `${fid.length} municipalities with data`;
 
-  if (bpAvg !== null && restAvg !== null) {
-    const diff = bpAvg - restAvg;
+  if (oppAvg !== null && fidAvg !== null) {
+    const diff = oppAvg - fidAvg;
     document.getElementById('statDiff').textContent = (diff > 0 ? '+' : '') + diff.toFixed(1) + ' pp';
     document.getElementById('diffCard').classList.toggle('negative', diff < -0.5);
     document.getElementById('statDiffSub').textContent = diff > 0.5
-      ? 'Budapest mobilising more'
-      : diff < -0.5 ? 'Rest of country mobilising more' : 'Balanced';
+      ? 'Opposition mobilising more'
+      : diff < -0.5 ? 'Fidesz mobilising more' : 'Balanced';
   }
 
   const latest = points.map(p => p.time).filter(Boolean).sort().pop() || '—';
@@ -406,7 +412,8 @@ function renderChart() {
     dot.setAttribute('stroke-width', isBp ? '1.5' : '0');
     dot.style.cursor = 'pointer';
     dot.style.transition = 'opacity .15s, r .1s';
-    const dimmed = (filterGroup === 'bp' && !isBp) || (filterGroup === 'rest' && isBp);
+    // Filter: 'opp' shows all opposition-won (Fidesz < 50%), 'fid' shows Fidesz-won
+    const dimmed = (filterGroup === 'opp' && !p.isOpposition) || (filterGroup === 'fid' && p.isOpposition);
     dot.setAttribute('opacity', dimmed ? '0.06' : (isBp ? '0.9' : '0.5'));
     dot.addEventListener('mouseenter', (e) => {
       dot.setAttribute('r', isBp ? 5.5 : 3.5);
@@ -451,14 +458,14 @@ async function init() {
   await loadResults();
   applyUpdate();
 
-  // Clickable legend to isolate Budapest or Rest
-  document.getElementById('legendBp').addEventListener('click', () => {
-    filterGroup = filterGroup === 'bp' ? null : 'bp';
+  // Clickable legend to isolate opposition-won or Fidesz-won municipalities
+  document.getElementById('legendOpp').addEventListener('click', () => {
+    filterGroup = filterGroup === 'opp' ? null : 'opp';
     updateLegendState();
     renderChart();
   });
-  document.getElementById('legendRest').addEventListener('click', () => {
-    filterGroup = filterGroup === 'rest' ? null : 'rest';
+  document.getElementById('legendFid').addEventListener('click', () => {
+    filterGroup = filterGroup === 'fid' ? null : 'fid';
     updateLegendState();
     renderChart();
   });
