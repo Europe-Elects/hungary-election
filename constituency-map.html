@@ -272,9 +272,12 @@ function buildLegend() {
 
 function updateCountedPill(data) {
   const pill = document.getElementById('countedPill');
-  if (typeof data.processingPct === 'number' && data.processingPct > 0) {
+  const pct = (typeof data.processingPctDomestic === 'number' && data.processingPctDomestic > 0)
+    ? data.processingPctDomestic
+    : data.processingPct;
+  if (typeof pct === 'number' && pct > 0) {
     pill.style.display = 'inline-block';
-    pill.textContent = data.processingPct.toFixed(1) + '% counted';
+    pill.textContent = pct.toFixed(1) + '% counted (domestic)';
   } else {
     pill.style.display = 'none';
   }
