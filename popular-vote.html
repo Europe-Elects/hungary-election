@@ -126,6 +126,7 @@ svg#chart {
   <div class="header">
     <div class="subtitle">Popular vote — national party list (grand total)</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
+    <span id="countedPill" style="display:none; margin-left:6px; font-size:11px; padding:3px 8px; background:#FEF3C7; color:#92400E; border-radius:4px; font-weight:600;"></span>
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="chartLegend"></div>
@@ -428,6 +429,13 @@ function applyResults(data) {
   const { data: voteData, source } = pickNationalVote(data);
   el.classList.toggle('live', !!voteData);
   renderChart(voteData, source);
+  const pill = document.getElementById('countedPill');
+  if (typeof data.processingPct === 'number' && data.processingPct > 0) {
+    pill.style.display = 'inline-block';
+    pill.textContent = data.processingPct.toFixed(1) + '% counted';
+  } else {
+    pill.style.display = 'none';
+  }
 }
 
 async function loadResults() {
