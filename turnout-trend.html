@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Turnout Trend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #1E293B;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.container {
+  max-width: 960px; margin: 0 auto; padding: 16px 16px 16px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+.header { margin-bottom: 10px; }
+.subtitle { font-size: 13px; color: #64748B; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.last-updated::before {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: #64748B;
+}
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#chart-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  flex: 1 1 auto; min-height: 0;
+  padding: 14px 14px 8px;
+  display: flex; flex-direction: column;
+}
+.legend-row {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 12px; color: #334155; margin-bottom: 6px;
+}
+.legend-row .item { display: flex; align-items: center; gap: 5px; }
+.legend-row .line-swatch {
+  width: 24px; height: 3px; border-radius: 2px;
+}
+.legend-row .item.y2026 { font-weight: 700; }
+.legend-row .item.y2026 .line-swatch { height: 4px; }
+
+svg#chart {
+  width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
+  display: block; font-family: inherit;
+}
+.grid-line { stroke: #F1F5F9; stroke-width: 1; }
+.grid-line.axis { stroke: #CBD5E1; }
+.axis-label { font-size: 10px; fill: #64748B; font-variant-numeric: tabular-nums; }
+.axis-title { font-size: 11px; fill: #475569; font-weight: 600; }
+
+.chart-footnote {
+  font-size: 10px; color: #64748B; margin-top: 4px; line-height: 1.45;
+}
+.chart-footnote strong { color: #334155; }
+.footer {
+  margin-top: 8px; font-size: 11px; color: #64748B; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pulse { 0%, 100% { opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">Turnout progression through election day — 2026 vs previous elections</div>
+    <div class="last-updated" id="lastUpdated">Last updated: –</div>
+  </div>
+  <div id="chart-container">
+    <div class="legend-row" id="legend"></div>
+    <svg id="chart"></svg>
+    <div class="chart-footnote">
+      Intraday at-the-polls turnout (without mail-in ballots). <strong>2026</strong>
+      updates live every ~2 hours. Historical data from valasztas.hu.
+    </div>
+  </div>
+  <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
+</div>
+
+<script>
+// Historical election turnout at each NVI snapshot time.
+// Source: valasztas.hu, preserved by Europe Elects.
+const HISTORICAL = {
+  '2022': {
+    color: '#64748B', width: 2, dash: '',
+    data: {'07:00':1.82,'09:00':10.31,'11:00':25.77,'13:00':40.01,'15:00':52.75,'17:00':62.92,'18:30':67.80},
+    final: 70.21,
+  },
+  '2018': {
+    color: '#94A3B8', width: 1.5, dash: '6 3',
+    data: {'07:00':2.24,'09:00':13.17,'11:00':29.93,'13:00':42.32,'15:00':53.64,'17:00':63.21,'18:30':68.13},
+    final: 70.22,
+  },
+  '2014': {
+    color: '#CBD5E1', width: 1.5, dash: '4 4',
+    data: {'07:00':1.64,'09:00':9.50,'11:00':23.23,'13:00':34.33,'15:00':45.02,'17:00':56.77,'18:30':61.73},
+    final: null,
+  },
+  '2010': {
+    color: '#E2E8F0', width: 1.5, dash: '2 3',
+    data: {'07:00':1.61,'09:00':10.23,'11:00':24.78,'13:00':35.88,'15:00':46.78,'17:00':59.28,'18:30':64.36},
+    final: null,
+  },
+};
+
+const YEAR_2026 = {
+  color: '#2563EB', width: 3.5, dash: '',
+};
+
+// X-axis: time slots as minutes from 06:00
+const TIME_SLOTS = ['07:00','09:00','11:00','13:00','15:00','17:00','18:30'];
+function timeToMinutes(t) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m - 360; // minutes after 06:00
+}
+const X_MIN = 0;   // 06:00
+const X_MAX = timeToMinutes('19:00'); // 780 - 360 = 420 (not used, we go to 19:00)
+
+const PAD_LEFT = 48;
+const PAD_RIGHT = 20;
+const PAD_TOP = 20;
+const PAD_BOTTOM = 32;
+
+function buildLegend() {
+  const el = document.getElementById('legend');
+  let html = `<div class="item y2026"><div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 (live)</div>`;
+  for (const [year, cfg] of Object.entries(HISTORICAL)) {
+    html += `<div class="item"><div class="line-swatch" style="background:${cfg.color}"></div>${year}</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderChart(history2026) {
+  const svg = document.getElementById('chart');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const rect = svg.getBoundingClientRect();
+  const VB_W = Math.max(400, Math.round(rect.width));
+  const VB_H = Math.max(200, Math.round(rect.height));
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+
+  const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
+  const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
+
+  // X range: 06:00 to 19:00 (0 to 780 minutes)
+  const xMin = 0, xMax = 13 * 60; // 780 min
+  // Y range: 0% to 80% (covers all historical + room for 2026)
+  const yMin = 0, yMax = 80;
+
+  function xScale(min) { return PAD_LEFT + (min / xMax) * plotW; }
+  function yScale(pct) { return PAD_TOP + plotH - (pct / yMax) * plotH; }
+
+  // Y gridlines every 20%
+  for (let y = 0; y <= yMax; y += 20) {
+    const yy = yScale(y);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', PAD_LEFT);
+    line.setAttribute('x2', PAD_LEFT + plotW);
+    line.setAttribute('y1', yy);
+    line.setAttribute('y2', yy);
+    line.setAttribute('class', y === 0 ? 'grid-line axis' : 'grid-line');
+    svg.appendChild(line);
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', PAD_LEFT - 6);
+    lbl.setAttribute('y', yy + 3);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('class', 'axis-label');
+    lbl.textContent = y + '%';
+    svg.appendChild(lbl);
+  }
+
+  // X gridlines + labels at each snapshot time
+  for (const t of TIME_SLOTS) {
+    const m = timeToMinutes(t);
+    const xx = xScale(m);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', xx);
+    line.setAttribute('x2', xx);
+    line.setAttribute('y1', PAD_TOP);
+    line.setAttribute('y2', PAD_TOP + plotH);
+    line.setAttribute('class', 'grid-line');
+    svg.appendChild(line);
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', xx);
+    lbl.setAttribute('y', PAD_TOP + plotH + 14);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('class', 'axis-label');
+    lbl.textContent = t;
+    svg.appendChild(lbl);
+  }
+
+  // Draw a polyline from a {time: pct} dict
+  function drawLine(dataDict, color, width, dash, drawDots) {
+    const sorted = TIME_SLOTS
+      .filter(t => typeof dataDict[t] === 'number')
+      .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(dataDict[t]), pct: dataDict[t], time: t }));
+    if (sorted.length < 1) return;
+
+    if (sorted.length > 1) {
+      const points = sorted.map(p => `${p.x},${p.y}`).join(' ');
+      const pl = document.createElementNS(ns, 'polyline');
+      pl.setAttribute('points', points);
+      pl.setAttribute('fill', 'none');
+      pl.setAttribute('stroke', color);
+      pl.setAttribute('stroke-width', width);
+      if (dash) pl.setAttribute('stroke-dasharray', dash);
+      pl.setAttribute('stroke-linecap', 'round');
+      pl.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(pl);
+    }
+
+    if (drawDots) {
+      for (const p of sorted) {
+        const circle = document.createElementNS(ns, 'circle');
+        circle.setAttribute('cx', p.x);
+        circle.setAttribute('cy', p.y);
+        circle.setAttribute('r', 4);
+        circle.setAttribute('fill', color);
+        circle.setAttribute('stroke', '#fff');
+        circle.setAttribute('stroke-width', 1.5);
+        const title = document.createElementNS(ns, 'title');
+        title.textContent = `${p.time}: ${p.pct.toFixed(2)}%`;
+        circle.appendChild(title);
+        svg.appendChild(circle);
+
+        // Value label on the last dot
+        if (p === sorted[sorted.length - 1]) {
+          const lbl = document.createElementNS(ns, 'text');
+          lbl.setAttribute('x', p.x + 6);
+          lbl.setAttribute('y', p.y - 6);
+          lbl.setAttribute('font-size', '11');
+          lbl.setAttribute('font-weight', '700');
+          lbl.setAttribute('fill', color);
+          lbl.textContent = p.pct.toFixed(1) + '%';
+          svg.appendChild(lbl);
+        }
+      }
+    }
+  }
+
+  // Draw historical lines (bottom layer)
+  for (const [year, cfg] of Object.entries(HISTORICAL).reverse()) {
+    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, false);
+    // Year label at the end of the line
+    const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
+    if (lastTime) {
+      const lbl = document.createElementNS(ns, 'text');
+      lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 5);
+      lbl.setAttribute('y', yScale(cfg.data[lastTime]) + 4);
+      lbl.setAttribute('font-size', '10');
+      lbl.setAttribute('font-weight', '500');
+      lbl.setAttribute('fill', cfg.color);
+      lbl.textContent = year;
+      svg.appendChild(lbl);
+    }
+  }
+
+  // Draw 2026 line (top layer, with dots)
+  if (history2026 && Object.keys(history2026).length > 0) {
+    drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
+  }
+}
+
+function applyResults(data) {
+  const el = document.getElementById('lastUpdated');
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
+  const turnout = data.turnout || {};
+  const history = turnout.nationalHistory || {};
+  el.classList.toggle('live', Object.keys(history).length > 0);
+  renderChart(history);
+}
+
+async function loadResults() {
+  try {
+    const data = await (await fetch('results.json?' + Date.now())).json();
+    applyResults(data);
+  } catch (e) {
+    renderChart({});
+  }
+}
+
+setInterval(async () => {
+  try {
+    const data = await (await fetch('results.json?' + Date.now())).json();
+    applyResults(data);
+  } catch (e) {}
+}, 30000);
+
+let resizeTimer = null;
+let lastData = null;
+const origApply = applyResults;
+applyResults = function(data) { lastData = data; origApply(data); };
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (lastData) origApply(lastData); }, 150);
+});
+
+buildLegend();
+loadResults();
+</script>
+</body>
+</html>
