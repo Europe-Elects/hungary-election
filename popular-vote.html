@@ -124,7 +124,7 @@ svg#chart {
 <body>
 <div class="container">
   <div class="header">
-    <div class="subtitle">Popular vote — national party list (grand total)</div>
+    <div class="subtitle">Popular vote — national party list, domestic polling stations only (abroad counted separately)</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
     <span id="countedPill" style="display:none; margin-left:6px; font-size:11px; padding:3px 8px; background:#FEF3C7; color:#92400E; border-radius:4px; font-weight:600;"></span>
   </div>
@@ -430,9 +430,13 @@ function applyResults(data) {
   el.classList.toggle('live', !!voteData);
   renderChart(voteData, source);
   const pill = document.getElementById('countedPill');
-  if (typeof data.processingPct === 'number' && data.processingPct > 0) {
+  // Show DOMESTIC counting %, not the composite (which blends mail)
+  const pct = (typeof data.processingPctDomestic === 'number' && data.processingPctDomestic > 0)
+    ? data.processingPctDomestic
+    : data.processingPct;
+  if (typeof pct === 'number' && pct > 0) {
     pill.style.display = 'inline-block';
-    pill.textContent = data.processingPct.toFixed(1) + '% counted';
+    pill.textContent = pct.toFixed(1) + '% counted (domestic)';
   } else {
     pill.style.display = 'none';
   }
