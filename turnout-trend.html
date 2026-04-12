@@ -107,22 +107,22 @@ svg#chart {
 // Source: valasztas.hu, preserved by Europe Elects.
 const HISTORICAL = {
   '2022': {
-    color: '#64748B', width: 2, dash: '',
+    color: '#E11D48', width: 2, dash: '',
     data: {'07:00':1.82,'09:00':10.31,'11:00':25.77,'13:00':40.01,'15:00':52.75,'17:00':62.92,'18:30':67.80},
     final: 70.21,
   },
   '2018': {
-    color: '#94A3B8', width: 1.5, dash: '6 3',
+    color: '#F59E0B', width: 2, dash: '',
     data: {'07:00':2.24,'09:00':13.17,'11:00':29.93,'13:00':42.32,'15:00':53.64,'17:00':63.21,'18:30':68.13},
     final: 70.22,
   },
   '2014': {
-    color: '#CBD5E1', width: 1.5, dash: '4 4',
+    color: '#10B981', width: 2, dash: '6 3',
     data: {'07:00':1.64,'09:00':9.50,'11:00':23.23,'13:00':34.33,'15:00':45.02,'17:00':56.77,'18:30':61.73},
     final: null,
   },
   '2010': {
-    color: '#E2E8F0', width: 1.5, dash: '2 3',
+    color: '#8B5CF6', width: 2, dash: '6 3',
     data: {'07:00':1.61,'09:00':10.23,'11:00':24.78,'13:00':35.88,'15:00':46.78,'17:00':59.28,'18:30':64.36},
     final: null,
   },
@@ -152,30 +152,30 @@ let isolatedYear = null;
 function buildLegend() {
   const el = document.getElementById('legend');
   el.innerHTML = '';
-  // 2026 always visible, clicking it resets to "show all"
+
+  // 2026 item — always shown, clicking resets to "show all"
   const item2026 = document.createElement('div');
-  item2026.className = 'item y2026' + (isolatedYear === null ? ' active' : isolatedYear === '2026' ? ' active' : ' dimmed');
-  item2026.dataset.year = '2026';
+  const is2026Active = isolatedYear === null || isolatedYear === '2026';
+  item2026.className = 'item y2026' + (is2026Active ? '' : ' dimmed');
   item2026.innerHTML = `<div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 (live)`;
-  item2026.addEventListener('click', () => toggleYear('2026'));
+  item2026.addEventListener('click', () => { isolatedYear = null; updateChart(); });
   el.appendChild(item2026);
 
   for (const [year, cfg] of Object.entries(HISTORICAL)) {
     const item = document.createElement('div');
-    item.className = 'item' + (isolatedYear === year ? ' active' : isolatedYear !== null && isolatedYear !== year ? ' dimmed' : '');
-    item.dataset.year = year;
+    const isThis = isolatedYear === year;
+    const isDimmed = isolatedYear !== null && isolatedYear !== year && isolatedYear !== '2026';
+    item.className = 'item' + (isThis ? ' active' : isDimmed ? ' dimmed' : '');
     item.innerHTML = `<div class="line-swatch" style="background:${cfg.color}"></div>${year}`;
-    item.addEventListener('click', () => toggleYear(year));
+    item.addEventListener('click', () => {
+      isolatedYear = (isolatedYear === year) ? null : year;
+      updateChart();
+    });
     el.appendChild(item);
   }
 }
 
-function toggleYear(year) {
-  if (isolatedYear === year) {
-    isolatedYear = null; // toggle off → show all
-  } else {
-    isolatedYear = year;
-  }
+function updateChart() {
   buildLegend();
   if (lastData) origApply(lastData);
 }
@@ -291,22 +291,24 @@ function renderChart(history2026) {
     }
   }
 
-  // Draw historical lines (bottom layer)
+  // Draw historical lines (bottom layer) — with dots at each snapshot
   for (const [year, cfg] of Object.entries(HISTORICAL).reverse()) {
     const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
     const opacity = visible ? 1 : 0.08;
-    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, false, opacity);
-    // Year label at the end of the line
+    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, true, opacity);
+    // Final turnout label at the end of the line (instead of year name)
     if (visible) {
       const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
       if (lastTime) {
+        const lastVal = cfg.data[lastTime];
+        const finalVal = cfg.final;
         const lbl = document.createElementNS(ns, 'text');
         lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 5);
-        lbl.setAttribute('y', yScale(cfg.data[lastTime]) + 4);
+        lbl.setAttribute('y', yScale(lastVal) + 4);
         lbl.setAttribute('font-size', '10');
-        lbl.setAttribute('font-weight', '500');
+        lbl.setAttribute('font-weight', '600');
         lbl.setAttribute('fill', cfg.color);
-        lbl.textContent = year;
+        lbl.textContent = finalVal ? `${year}: ${finalVal}%` : `${year}: ${lastVal}%`;
         svg.appendChild(lbl);
       }
     }
