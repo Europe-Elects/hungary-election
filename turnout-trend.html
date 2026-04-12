@@ -271,6 +271,73 @@ function renderChart(history2026) {
   // Draw 2026 line (top layer, with dots)
   if (history2026 && Object.keys(history2026).length > 0) {
     drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
+
+    // Projection: extrapolate from the 2022 curve shape.
+    // Take the ratio (2026_latest / 2022_at_same_time) and apply it
+    // to 2022's remaining snapshots. This assumes the 2026 turnout
+    // follows the same intraday shape as 2022 but scaled up.
+    const ref = HISTORICAL['2022'].data;
+    const availableTimes = TIME_SLOTS.filter(t => typeof history2026[t] === 'number');
+    const latestTime = availableTimes[availableTimes.length - 1];
+    if (latestTime && ref[latestTime] && ref[latestTime] > 0) {
+      const ratio = history2026[latestTime] / ref[latestTime];
+      const futureTimes = TIME_SLOTS.filter(t => timeToMinutes(t) > timeToMinutes(latestTime));
+      if (futureTimes.length > 0) {
+        // Build projection points starting from the last real point
+        const projData = {};
+        projData[latestTime] = history2026[latestTime]; // connect to the real line
+        for (const t of futureTimes) {
+          if (typeof ref[t] === 'number') {
+            projData[t] = Math.min(100, +(ref[t] * ratio).toFixed(1));
+          }
+        }
+        // Also project the "final" estimate at 19:00 using 2022's final
+        const final2022 = HISTORICAL['2022'].final;
+        if (final2022) {
+          const projFinal = Math.min(100, +(final2022 * ratio).toFixed(1));
+          // Draw the projected final as a label at the end
+          const lastProjTime = futureTimes.filter(t => projData[t]).pop();
+          if (lastProjTime) {
+            // Add small annotation for projected final
+            const lx = xScale(timeToMinutes(lastProjTime)) + 6;
+            const ly = yScale(projData[lastProjTime]);
+            const ann = document.createElementNS(ns, 'text');
+            ann.setAttribute('x', lx);
+            ann.setAttribute('y', ly - 6);
+            ann.setAttribute('font-size', '10');
+            ann.setAttribute('font-weight', '700');
+            ann.setAttribute('fill', '#93C5FD');
+            ann.textContent = '~' + projData[lastProjTime].toFixed(0) + '%';
+            svg.appendChild(ann);
+            // Projected final label below
+            const ann2 = document.createElementNS(ns, 'text');
+            ann2.setAttribute('x', lx);
+            ann2.setAttribute('y', ly + 6);
+            ann2.setAttribute('font-size', '9');
+            ann2.setAttribute('fill', '#93C5FD');
+            ann2.textContent = 'proj. final ~' + projFinal.toFixed(0) + '%';
+            svg.appendChild(ann2);
+          }
+        }
+
+        // Draw the projection as a dashed lighter blue line
+        const projSorted = TIME_SLOTS
+          .filter(t => typeof projData[t] === 'number')
+          .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(projData[t]) }));
+        if (projSorted.length > 1) {
+          const points = projSorted.map(p => `${p.x},${p.y}`).join(' ');
+          const pl = document.createElementNS(ns, 'polyline');
+          pl.setAttribute('points', points);
+          pl.setAttribute('fill', 'none');
+          pl.setAttribute('stroke', '#93C5FD');
+          pl.setAttribute('stroke-width', 2.5);
+          pl.setAttribute('stroke-dasharray', '6 4');
+          pl.setAttribute('stroke-linecap', 'round');
+          pl.setAttribute('stroke-linejoin', 'round');
+          svg.appendChild(pl);
+        }
+      }
+    }
   }
 }
 
