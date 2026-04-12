@@ -277,53 +277,69 @@ function renderChart(history2026) {
   if (history2026 && Object.keys(history2026).length > 0) {
     drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
 
-    // Projection: extrapolate using a DECLINING ratio model.
+    // Projection: "remaining-voter capture rate" model.
     //
-    // The 2026/2022 ratio at each snapshot typically declines through
-    // the day (morning surge fades, afternoon converges). We fit a
-    // linear trend to the observed ratios and extrapolate forward,
-    // floored at 1.0 (2026 can't fall below 2022's curve). This is
-    // more conservative than a fixed-ratio projection — and matches
-    // the historical pattern where high-turnout elections converge
-    // with the baseline in the late afternoon.
-    const ref = HISTORICAL['2022'].data;
-    const availableTimes = TIME_SLOTS.filter(t =>
-      typeof history2026[t] === 'number' && typeof ref[t] === 'number' && ref[t] > 0
-    );
-    if (availableTimes.length >= 2) {
-      // Compute ratio at each available time + linear regression
-      const ratioPoints = availableTimes.map(t => ({
-        x: timeToMinutes(t),
-        ratio: history2026[t] / ref[t],
-      }));
-      const n = ratioPoints.length;
-      const xMean = ratioPoints.reduce((s, p) => s + p.x, 0) / n;
-      const yMean = ratioPoints.reduce((s, p) => s + p.ratio, 0) / n;
-      const num = ratioPoints.reduce((s, p) => s + (p.x - xMean) * (p.ratio - yMean), 0);
-      const den = ratioPoints.reduce((s, p) => s + (p.x - xMean) ** 2, 0);
-      const slope = den !== 0 ? num / den : 0;
-      const intercept = yMean - slope * xMean;
+    // Instead of extrapolating ratios (which mathematically compress
+    // toward 1.0 and give unrealistically low projections), we ask:
+    // "In past elections, what fraction of voters who HADN'T voted by
+    // this hour ended up voting by the end?" Then apply that same
+    // fraction to 2026's remaining pool.
+    //
+    // This naturally accounts for the ceiling effect — if 54% have
+    // already voted, only 46% remain, so even a high capture rate
+    // can't push past ~77%.
+    //
+    // We average the capture rates from 2022 and 2018 (the two
+    // elections with known finals) for a robust estimate.
+    const refElections = [
+      { data: HISTORICAL['2022'].data, final: HISTORICAL['2022'].final },
+      { data: HISTORICAL['2018'].data, final: HISTORICAL['2018'].final },
+    ].filter(e => e.final);
 
-      function projRatio(t) {
-        const m = timeToMinutes(t);
-        return Math.max(1.0, intercept + slope * m);
-      }
+    const availableTimes = TIME_SLOTS.filter(t => typeof history2026[t] === 'number');
+    const latestTime = availableTimes[availableTimes.length - 1];
 
-      const latestTime = availableTimes[availableTimes.length - 1];
+    if (latestTime && refElections.length > 0) {
+      const now2026 = history2026[latestTime];
       const futureTimes = TIME_SLOTS.filter(t => timeToMinutes(t) > timeToMinutes(latestTime));
+
       if (futureTimes.length > 0) {
         const projData = {};
-        projData[latestTime] = history2026[latestTime]; // anchor to last real point
+        projData[latestTime] = now2026; // anchor to last real point
+
+        // For each future time, average across reference elections
         for (const t of futureTimes) {
-          if (typeof ref[t] === 'number') {
-            projData[t] = Math.min(100, +(ref[t] * projRatio(t)).toFixed(1));
+          let projSum = 0, projCount = 0;
+          for (const ref of refElections) {
+            const refNow = ref.data[latestTime];
+            const refAtT = ref.data[t];
+            const refFinal = ref.final;
+            if (typeof refNow !== 'number' || typeof refAtT !== 'number' ||
+                !refFinal || refFinal <= refNow) continue;
+            // What fraction of the 13:00→final journey had ref completed by T?
+            const frac = (refAtT - refNow) / (refFinal - refNow);
+            // Capture rate: what fraction of remaining voters showed up
+            const captureRate = (refFinal - refNow) / (100 - refNow);
+            // 2026's projected afternoon gain × the fraction completed by T
+            const afternoonGain = (100 - now2026) * captureRate;
+            projSum += now2026 + afternoonGain * frac;
+            projCount++;
+          }
+          if (projCount > 0) {
+            projData[t] = Math.min(100, +(projSum / projCount).toFixed(1));
           }
         }
 
-        // Projected final estimate
-        const final2022 = HISTORICAL['2022'].final;
-        const projFinalRatio = Math.max(1.0, intercept + slope * (13 * 60));
-        const projFinal = final2022 ? Math.min(100, +(final2022 * projFinalRatio).toFixed(1)) : null;
+        // Projected final: average capture rate across reference elections
+        let finalSum = 0, finalCount = 0;
+        for (const ref of refElections) {
+          const refNow = ref.data[latestTime];
+          if (typeof refNow !== 'number' || !ref.final || ref.final <= refNow) continue;
+          const captureRate = (ref.final - refNow) / (100 - refNow);
+          finalSum += now2026 + (100 - now2026) * captureRate;
+          finalCount++;
+        }
+        const projFinal = finalCount > 0 ? Math.min(100, +(finalSum / finalCount).toFixed(1)) : null;
 
         // Draw annotation at end of projection
         const lastProjTime = futureTimes.filter(t => projData[t]).pop();
@@ -332,7 +348,7 @@ function renderChart(history2026) {
           const ly = yScale(projData[lastProjTime]);
           const ann = document.createElementNS(ns, 'text');
           ann.setAttribute('x', lx);
-          ann.setAttribute('y', ly - 6);
+          ann.setAttribute('y', ly - 8);
           ann.setAttribute('font-size', '10');
           ann.setAttribute('font-weight', '700');
           ann.setAttribute('fill', '#93C5FD');
@@ -341,7 +357,7 @@ function renderChart(history2026) {
           if (projFinal !== null) {
             const ann2 = document.createElementNS(ns, 'text');
             ann2.setAttribute('x', lx);
-            ann2.setAttribute('y', ly + 6);
+            ann2.setAttribute('y', ly + 4);
             ann2.setAttribute('font-size', '9');
             ann2.setAttribute('fill', '#93C5FD');
             ann2.textContent = 'proj. final ~' + projFinal.toFixed(0) + '%';
