@@ -154,6 +154,7 @@ const PAD_BOTTOM = 36;
 
 let baseline2022 = null;
 let lastResults = null;
+let muniNames = null;
 let filterGroup = null; // 'bp' | 'rest' | null
 
 function updateLegendState() {
@@ -169,8 +170,9 @@ function showTooltip(p, event) {
   const tt = document.getElementById('tooltip');
   const cls = p.delta > 0 ? 'up' : p.delta < 0 ? 'down' : '';
   const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
+  const name = (muniNames && muniNames[p.key]) || p.key;
   tt.innerHTML = `
-    <h4>${p.key} ${p.isBudapest ? '(Budapest)' : ''}</h4>
+    <h4>${name}</h4>
     <div class="row"><span>2022 at ${p.time}</span><span class="v">${p.x.toFixed(1)}%</span></div>
     <div class="row"><span>2026 at ${p.time}</span><span class="v">${p.y.toFixed(1)}%</span></div>
     <div class="delta ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp</div>
@@ -196,6 +198,10 @@ async function loadBaseline() {
     const r = await fetch('2022_municipality_baseline.json?v=' + Date.now());
     baseline2022 = await r.json();
   } catch (e) { baseline2022 = null; }
+  try {
+    const r = await fetch('municipality_names.json?v=' + Date.now());
+    muniNames = await r.json();
+  } catch (e) { muniNames = null; }
 }
 
 async function loadResults() {
