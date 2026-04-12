@@ -779,7 +779,7 @@ function setFilterGroup(group) {
 function applyUpdate() {
   const el = document.getElementById('lastUpdated');
   if (lastResults) {
-    el.textContent = 'Last updated: ' + new Date(lastResults.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+    el.textContent = 'Last updated: ' + new Date(lastResults.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
     const hasData = lastResults.turnout && lastResults.turnout.constituencies
       && Object.values(lastResults.turnout.constituencies).some(r => r && r.pct > 0);
     el.classList.toggle('live', !!hasData);

@@ -400,7 +400,7 @@ function renderChart(data) {
 
 function applyResults(data) {
   const el = document.getElementById('lastUpdated');
-  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
   const breakdown = data.nationalBreakdown || {};
   lastBreakdown = breakdown;
   const hasAny = Object.values(breakdown).some(b => b && Object.values(b).some(v => v > 0));

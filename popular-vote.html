@@ -424,7 +424,7 @@ function renderChart(voteData, source) {
 
 function applyResults(data) {
   const el = document.getElementById('lastUpdated');
-  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
   const { data: voteData, source } = pickNationalVote(data);
   el.classList.toggle('live', !!voteData);
   renderChart(voteData, source);

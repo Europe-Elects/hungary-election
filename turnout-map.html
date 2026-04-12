@@ -376,7 +376,7 @@ function buildLegend() {
 
 function applyTurnoutData(data) {
   const el = document.getElementById('lastUpdated');
-  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
   const turnout = data.turnout || {};
   lastTurnoutData = turnout;
   const layerHasData = currentLayer === 'county'

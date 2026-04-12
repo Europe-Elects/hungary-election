@@ -366,7 +366,7 @@ function updateLegendHint() {
 
 function applyResults(data) {
   const el = document.getElementById('lastUpdated');
-  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+  el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
   const countyData = data.countyList || {};
   lastCountyData = countyData;
   const hasAny = Object.values(countyData).some(d => hasData(d));

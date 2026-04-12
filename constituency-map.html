@@ -273,7 +273,7 @@ async function loadResults() {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
     const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
     el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
     buildMap(data.constituencies || {});
   } catch (e) { buildMap({}); }
@@ -283,7 +283,7 @@ setInterval(async () => {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
     const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium'});
+    el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
     el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
     document.getElementById('map').innerHTML = '';
     buildMap(data.constituencies || {});
