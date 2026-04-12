@@ -156,6 +156,7 @@ let baseline2022 = null;
 let lastResults = null;
 let muniNames = null;
 let baselineConst = null;  // 2022_baseline.json (has county-level fideszPct)
+let muniFidesz = null;     // municipality_fidesz_2022.json (per-municipality)
 let filterGroup = null; // 'bp' | 'rest' | null
 
 // Map maz code → county name (same as scraper)
@@ -232,6 +233,10 @@ async function loadBaseline() {
     const r = await fetch('2022_baseline.json?v=' + Date.now());
     baselineConst = await r.json();
   } catch (e) { baselineConst = null; }
+  try {
+    const r = await fetch('municipality_fidesz_2022.json?v=' + Date.now());
+    muniFidesz = await r.json();
+  } catch (e) { muniFidesz = null; }
 }
 
 async function loadResults() {
@@ -251,11 +256,14 @@ function buildPoints() {
     const snapshotTime = live.time;
     const base2022AtTime = base[snapshotTime];
     if (typeof base2022AtTime !== 'number') continue;
-    // Get county-level 2022 Fidesz share for the stronghold gradient
+    // Get per-municipality 2022 Fidesz share for the stronghold gradient
+    // Falls back to county-level if municipality data isn't available
     const maz = key.split('-')[0];
     const county = MAZ_TO_COUNTY[maz];
-    let fideszPct = 50;  // fallback
-    if (baselineConst && baselineConst.counties && county) {
+    let fideszPct = 50;
+    if (muniFidesz && typeof muniFidesz[key] === 'number') {
+      fideszPct = muniFidesz[key];
+    } else if (baselineConst && baselineConst.counties && county) {
       const co = baselineConst.counties[county];
       if (co && typeof co.fideszPct === 'number') fideszPct = co.fideszPct;
     }
