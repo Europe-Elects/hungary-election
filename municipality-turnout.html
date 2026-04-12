@@ -130,8 +130,8 @@ svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: b
   </div>
   <div id="chart-container">
     <div class="chart-legend" id="legend">
-      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#2563EB"></div>Budapest (23)</div>
-      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#94A3B8"></div>Rest of country</div>
+      <div class="item" id="legendBp" data-group="bp"><div class="swatch" style="background:#2563EB"></div>Opposition area (blue)</div>
+      <div class="item" id="legendRest" data-group="rest"><div class="swatch" style="background:#111"></div>Fidesz area (dark)</div>
       <div class="note" id="modeNote"></div>
     </div>
     <svg id="chart"></svg>
@@ -155,7 +155,28 @@ const PAD_BOTTOM = 36;
 let baseline2022 = null;
 let lastResults = null;
 let muniNames = null;
+let baselineConst = null;  // 2022_baseline.json (has county-level fideszPct)
 let filterGroup = null; // 'bp' | 'rest' | null
+
+// Map maz code → county name (same as scraper)
+const MAZ_TO_COUNTY = {
+  '01':'Budapest','02':'Baranya','03':'Bács-Kiskun','04':'Békés',
+  '05':'Borsod-Abaúj-Zemplén','06':'Csongrád-Csanád','07':'Fejér',
+  '08':'Győr-Moson-Sopron','09':'Hajdú-Bihar','10':'Heves',
+  '11':'Jász-Nagykun-Szolnok','12':'Komárom-Esztergom','13':'Nógrád',
+  '14':'Pest','15':'Somogy','16':'Szabolcs-Szatmár-Bereg',
+  '17':'Tolna','18':'Vas','19':'Veszprém','20':'Zala',
+};
+
+// Interpolate fill: blue (opposition) → black (Fidesz stronghold)
+function strongholdColor(fideszPct) {
+  const lo = 30, hi = 65;
+  const t = Math.max(0, Math.min(1, (fideszPct - lo) / (hi - lo)));
+  const r = Math.round(37 + (17 - 37) * t);
+  const g = Math.round(99 + (17 - 99) * t);
+  const b = Math.round(235 + (17 - 235) * t);
+  return `rgb(${r},${g},${b})`;
+}
 
 function updateLegendState() {
   const bp = document.getElementById('legendBp');
@@ -171,8 +192,10 @@ function showTooltip(p, event) {
   const cls = p.delta > 0 ? 'up' : p.delta < 0 ? 'down' : '';
   const arrow = p.delta > 0 ? '▲' : p.delta < 0 ? '▼' : '–';
   const name = (muniNames && muniNames[p.key]) || p.key;
+  const countyLabel = p.county || '';
   tt.innerHTML = `
     <h4>${name}</h4>
+    <div class="row"><span>${countyLabel} · Fidesz 2022</span><span class="v">${p.fideszPct.toFixed(0)}%</span></div>
     <div class="row"><span>2022 at ${p.time}</span><span class="v">${p.x.toFixed(1)}%</span></div>
     <div class="row"><span>2026 at ${p.time}</span><span class="v">${p.y.toFixed(1)}%</span></div>
     <div class="delta ${cls}">${arrow} ${p.delta > 0 ? '+' : ''}${p.delta} pp</div>
@@ -202,6 +225,10 @@ async function loadBaseline() {
     const r = await fetch('municipality_names.json?v=' + Date.now());
     muniNames = await r.json();
   } catch (e) { muniNames = null; }
+  try {
+    const r = await fetch('2022_baseline.json?v=' + Date.now());
+    baselineConst = await r.json();
+  } catch (e) { baselineConst = null; }
 }
 
 async function loadResults() {
@@ -221,14 +248,24 @@ function buildPoints() {
     const snapshotTime = live.time;
     const base2022AtTime = base[snapshotTime];
     if (typeof base2022AtTime !== 'number') continue;
+    // Get county-level 2022 Fidesz share for the stronghold gradient
+    const maz = key.split('-')[0];
+    const county = MAZ_TO_COUNTY[maz];
+    let fideszPct = 50;  // fallback
+    if (baselineConst && baselineConst.counties && county) {
+      const co = baselineConst.counties[county];
+      if (co && typeof co.fideszPct === 'number') fideszPct = co.fideszPct;
+    }
     points.push({
       key,
       isBudapest: key.startsWith('01-'),
-      x: base2022AtTime,    // 2022 turnout at same hour
-      y: live.pct,          // 2026 turnout now
+      x: base2022AtTime,
+      y: live.pct,
       delta: +(live.pct - base2022AtTime).toFixed(2),
       vp: live.vp,
       time: snapshotTime,
+      fideszPct,
+      county,
     });
   }
   return points;
@@ -351,24 +388,24 @@ function renderChart() {
     const dot = document.createElementNS(ns, 'circle');
     dot.setAttribute('cx', xScale(p.x));
     dot.setAttribute('cy', yScale(p.y));
-    dot.setAttribute('r', isBp ? 4.5 : 2.2);
-    dot.setAttribute('fill', isBp ? '#2563EB' : '#94A3B8');
+    const baseR = isBp ? 4.5 : 2.5;
+    dot.setAttribute('r', baseR);
+    dot.setAttribute('fill', strongholdColor(p.fideszPct));
     dot.setAttribute('stroke', isBp ? '#fff' : 'none');
-    dot.setAttribute('stroke-width', isBp ? '1' : '0');
+    dot.setAttribute('stroke-width', isBp ? '1.5' : '0');
     dot.style.cursor = 'pointer';
     dot.style.transition = 'opacity .15s, r .1s';
-    // Apply filter dimming
     const dimmed = (filterGroup === 'bp' && !isBp) || (filterGroup === 'rest' && isBp);
-    dot.setAttribute('opacity', dimmed ? '0.06' : (isBp ? '0.85' : '0.35'));
+    dot.setAttribute('opacity', dimmed ? '0.06' : (isBp ? '0.9' : '0.5'));
     dot.addEventListener('mouseenter', (e) => {
-      dot.setAttribute('r', isBp ? 7 : 4);
+      dot.setAttribute('r', isBp ? 7 : 4.5);
       showTooltip(p, e);
     });
     dot.addEventListener('mousemove', (e) => {
       showTooltip(p, e);
     });
     dot.addEventListener('mouseleave', () => {
-      dot.setAttribute('r', isBp ? 4.5 : 2.2);
+      dot.setAttribute('r', baseR);
       hideTooltip();
     });
     svg.appendChild(dot);
