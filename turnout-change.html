@@ -240,7 +240,7 @@ svg#chart {
     <div id="tooltip" role="tooltip"></div>
     <div class="chart-legend">
       <div class="item"><div class="swatch" style="background:#111111"></div>Fidesz won 2022 (87 districts)</div>
-      <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition won 2022 (19 districts)</div>
+      <div class="item"><div class="swatch" style="background:#3399FF"></div>Opposition won 2022 (17 districts)</div>
       <div class="note" id="modeNote">Waiting for first turnout snapshot</div>
     </div>
     <svg id="chart"></svg>
@@ -335,11 +335,17 @@ function adjust2022ForTime(constFinal2022, reportTime, county) {
   return constFinal2022;
 }
 
+// Constituencies that existed in 2022 but were abolished for 2026.
+// Budapest went from 18 OEVKs to 16 in the redistricting.
+// These will never receive 2026 data — exclude from the scatter.
+const ABOLISHED = new Set(['BP-17', 'BP-18']);
+
 function buildPoints() {
   if (!baseline || !lastResults) return [];
   const turnout2026 = (lastResults.turnout && lastResults.turnout.constituencies) || {};
   const points = [];
   for (const [id, base2022] of Object.entries(baseline.constituencies || {})) {
+    if (ABOLISHED.has(id)) continue;  // skip abolished constituencies
     const r2026 = turnout2026[id];
     const t2026 = r2026 && typeof r2026.pct === 'number' ? r2026.pct : null;
     const t2022final = base2022.turnoutPct;
