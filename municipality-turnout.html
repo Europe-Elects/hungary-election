@@ -169,12 +169,15 @@ const MAZ_TO_COUNTY = {
 };
 
 // Interpolate fill: TISZA blue (#3399FF) → FIDESZ black (#000000)
+// Range tightened to 40%→58% so the 3 opposition counties (Budapest
+// 40.8%, Csongrád 47.4%, Baranya 49.7%) are visibly blue and the
+// mid-range counties show real gradient instead of all looking dark.
 function strongholdColor(fideszPct) {
-  const lo = 30, hi = 65;
+  const lo = 40, hi = 58;
   const t = Math.max(0, Math.min(1, (fideszPct - lo) / (hi - lo)));
-  const r = Math.round(51 + (0 - 51) * t);   // 51 → 0
-  const g = Math.round(153 + (0 - 153) * t); // 153 → 0
-  const b = Math.round(255 + (0 - 255) * t); // 255 → 0
+  const r = Math.round(51 + (0 - 51) * t);
+  const g = Math.round(153 + (0 - 153) * t);
+  const b = Math.round(255 + (0 - 255) * t);
   return `rgb(${r},${g},${b})`;
 }
 
