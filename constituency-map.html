@@ -272,15 +272,20 @@ function buildLegend() {
 
 function updateCountedPill(data) {
   const pill = document.getElementById('countedPill');
-  const pct = (typeof data.processingPctDomestic === 'number' && data.processingPctDomestic > 0)
-    ? data.processingPctDomestic
-    : data.processingPct;
-  if (typeof pct === 'number' && pct > 0) {
-    pill.style.display = 'inline-block';
-    pill.textContent = pct.toFixed(1) + '% counted (domestic)';
-  } else {
+  // Constituency-level: use per-constituency 'counted' field (feldar per OEVK).
+  // Average across constituencies that actually have data.
+  const values = Object.values(data.constituencies || {})
+    .map(c => (c && typeof c.counted === 'number') ? c.counted : 0)
+    .filter(v => v > 0);
+  if (values.length === 0) {
     pill.style.display = 'none';
+    return;
   }
+  const avg = values.reduce((s, v) => s + v, 0) / values.length;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  pill.style.display = 'inline-block';
+  pill.textContent = `${avg.toFixed(1)}% counted avg (range ${min.toFixed(0)}–${max.toFixed(0)}%)`;
 }
 
 async function loadResults() {
