@@ -133,7 +133,7 @@ const YEAR_2026 = {
 };
 
 // X-axis: time slots as minutes from 06:00
-const TIME_SLOTS = ['07:00','09:00','11:00','13:00','15:00','17:00','18:30','19:00'];
+const TIME_SLOTS = ['07:00','09:00','11:00','13:00','15:00','17:00','19:00'];
 function timeToMinutes(t) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m - 360; // minutes after 06:00
