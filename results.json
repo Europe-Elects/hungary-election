@@ -1,109 +1,109 @@
 {
-  "lastUpdated": "2026-04-12T21:56:18.043632",
+  "lastUpdated": "2026-04-12T22:06:23.703329",
   "constituencies": {
     "BP-01": {
-      "FIDESZ-KDNP": 29.8,
-      "TISZA": 63.1,
-      "DK": 1.8,
-      "Mi Hazánk": 3.5,
+      "FIDESZ-KDNP": 30.3,
+      "TISZA": 62.8,
+      "DK": 1.7,
+      "Mi Hazánk": 3.3,
       "MKKP": 1.7,
-      "counted": 26.32
+      "counted": 30.26
     },
     "BP-02": {
-      "FIDESZ-KDNP": 30.9,
-      "TISZA": 62.3,
-      "DK": 1.0,
-      "Mi Hazánk": 3.4,
+      "FIDESZ-KDNP": 30.8,
+      "TISZA": 62.1,
+      "DK": 1.2,
+      "Mi Hazánk": 3.6,
       "MKKP": 1.3,
-      "counted": 36.36
+      "counted": 45.45
     },
     "BP-03": {
-      "FIDESZ-KDNP": 29.8,
-      "TISZA": 63.6,
+      "FIDESZ-KDNP": 29.9,
+      "TISZA": 63.5,
       "DK": 1.4,
-      "Mi Hazánk": 3.4,
+      "Mi Hazánk": 3.5,
       "MKKP": 1.6,
-      "counted": 39.33
+      "counted": 50.56
     },
     "BP-04": {
-      "FIDESZ-KDNP": 29.6,
-      "TISZA": 65.3,
-      "DK": 1.1,
-      "Mi Hazánk": 2.5,
+      "FIDESZ-KDNP": 29.9,
+      "TISZA": 64.7,
+      "DK": 1.2,
+      "Mi Hazánk": 2.7,
       "MKKP": 1.5,
-      "counted": 15.56
+      "counted": 23.33
     },
     "BP-05": {
-      "FIDESZ-KDNP": 24.7,
+      "FIDESZ-KDNP": 24.5,
       "TISZA": 67.3,
       "DK": 2.8,
       "Mi Hazánk": 3.9,
       "MKKP": 1.4,
-      "counted": 40.74
+      "counted": 48.15
     },
     "BP-06": {
-      "FIDESZ-KDNP": 24.5,
-      "TISZA": 52.6,
+      "FIDESZ-KDNP": 25.1,
+      "TISZA": 52.3,
       "DK": 0.0,
-      "Mi Hazánk": 4.7,
+      "Mi Hazánk": 4.6,
       "MKKP": 1.1,
-      "counted": 34.18
+      "counted": 43.04
     },
     "BP-07": {
-      "FIDESZ-KDNP": 29.1,
-      "TISZA": 62.6,
-      "DK": 2.3,
+      "FIDESZ-KDNP": 28.4,
+      "TISZA": 63.4,
+      "DK": 2.2,
       "Mi Hazánk": 4.3,
-      "MKKP": 1.2,
-      "counted": 33.77
+      "MKKP": 1.1,
+      "counted": 41.56
     },
     "BP-08": {
-      "FIDESZ-KDNP": 29.3,
-      "TISZA": 63.6,
+      "FIDESZ-KDNP": 29.4,
+      "TISZA": 63.4,
       "DK": 0.0,
-      "Mi Hazánk": 5.1,
+      "Mi Hazánk": 5.2,
       "MKKP": 1.5,
-      "counted": 51.81
+      "counted": 57.83
     },
     "BP-09": {
-      "FIDESZ-KDNP": 30.5,
-      "TISZA": 60.7,
+      "FIDESZ-KDNP": 30.2,
+      "TISZA": 61.1,
       "DK": 1.8,
       "Mi Hazánk": 5.4,
       "MKKP": 1.3,
-      "counted": 72.73
+      "counted": 81.82
     },
     "BP-10": {
-      "FIDESZ-KDNP": 29.9,
-      "TISZA": 61.8,
+      "FIDESZ-KDNP": 29.7,
+      "TISZA": 62.1,
       "DK": 1.7,
       "Mi Hazánk": 5.1,
       "MKKP": 1.4,
-      "counted": 34.85
+      "counted": 51.52
     },
     "BP-11": {
-      "FIDESZ-KDNP": 30.0,
-      "TISZA": 60.8,
-      "DK": 2.1,
-      "Mi Hazánk": 6.1,
-      "MKKP": 1.1,
-      "counted": 6.41
+      "FIDESZ-KDNP": 27.7,
+      "TISZA": 64.3,
+      "DK": 1.8,
+      "Mi Hazánk": 5.2,
+      "MKKP": 1.0,
+      "counted": 16.67
     },
     "BP-12": {
-      "FIDESZ-KDNP": 26.1,
-      "TISZA": 63.5,
-      "DK": 4.1,
-      "Mi Hazánk": 4.9,
-      "MKKP": 1.4,
-      "counted": 38.67
+      "FIDESZ-KDNP": 25.8,
+      "TISZA": 63.6,
+      "DK": 4.3,
+      "Mi Hazánk": 4.8,
+      "MKKP": 1.5,
+      "counted": 52.0
     },
     "BP-13": {
-      "FIDESZ-KDNP": 29.0,
-      "TISZA": 58.8,
-      "DK": 4.5,
-      "Mi Hazánk": 6.3,
-      "MKKP": 1.3,
-      "counted": 33.33
+      "FIDESZ-KDNP": 28.0,
+      "TISZA": 60.3,
+      "DK": 4.3,
+      "Mi Hazánk": 6.0,
+      "MKKP": 1.2,
+      "counted": 50.0
     },
     "BP-14": {
       "FIDESZ-KDNP": 32.9,
@@ -111,119 +111,119 @@
       "DK": 1.1,
       "Mi Hazánk": 3.9,
       "MKKP": 0.8,
-      "counted": 51.72
+      "counted": 62.07
     },
     "BP-15": {
-      "FIDESZ-KDNP": 31.2,
-      "TISZA": 60.6,
+      "FIDESZ-KDNP": 30.9,
+      "TISZA": 61.0,
       "DK": 1.7,
-      "Mi Hazánk": 5.2,
+      "Mi Hazánk": 5.1,
       "MKKP": 1.0,
-      "counted": 63.64
+      "counted": 80.68
     },
     "BP-16": {
-      "FIDESZ-KDNP": 30.0,
-      "TISZA": 58.3,
+      "FIDESZ-KDNP": 29.6,
+      "TISZA": 58.9,
       "DK": 1.3,
-      "Mi Hazánk": 5.4,
-      "MKKP": 1.0,
-      "counted": 46.39
+      "Mi Hazánk": 5.3,
+      "MKKP": 0.9,
+      "counted": 57.73
     },
     "BA-01": {
       "FIDESZ-KDNP": 31.4,
-      "TISZA": 61.2,
-      "DK": 1.6,
+      "TISZA": 61.5,
+      "DK": 1.5,
       "Mi Hazánk": 4.4,
-      "MKKP": 0.9,
-      "counted": 56.76
+      "MKKP": 0.8,
+      "counted": 67.57
     },
     "BA-02": {
-      "FIDESZ-KDNP": 32.0,
-      "TISZA": 59.9,
+      "FIDESZ-KDNP": 31.7,
+      "TISZA": 60.4,
       "DK": 1.5,
-      "Mi Hazánk": 5.6,
+      "Mi Hazánk": 5.4,
       "MKKP": 0.7,
-      "counted": 57.3
+      "counted": 70.79
     },
     "BA-03": {
-      "FIDESZ-KDNP": 45.8,
-      "TISZA": 47.0,
+      "FIDESZ-KDNP": 45.7,
+      "TISZA": 47.1,
       "DK": 0.7,
       "Mi Hazánk": 6.1,
       "MKKP": 0.0,
-      "counted": 47.3
+      "counted": 56.76
     },
     "BA-04": {
-      "FIDESZ-KDNP": 43.4,
-      "TISZA": 49.8,
+      "FIDESZ-KDNP": 43.1,
+      "TISZA": 50.1,
       "DK": 1.0,
-      "Mi Hazánk": 4.7,
+      "Mi Hazánk": 4.8,
       "MKKP": 0.6,
-      "counted": 55.91
+      "counted": 64.09
     },
     "BK-01": {
-      "FIDESZ-KDNP": 39.7,
-      "TISZA": 52.4,
+      "FIDESZ-KDNP": 39.5,
+      "TISZA": 52.6,
       "DK": 0.0,
-      "Mi Hazánk": 7.0,
+      "Mi Hazánk": 6.9,
       "MKKP": 0.9,
-      "counted": 62.82
+      "counted": 71.79
     },
     "BK-02": {
-      "FIDESZ-KDNP": 34.9,
-      "TISZA": 57.1,
+      "FIDESZ-KDNP": 34.8,
+      "TISZA": 57.2,
       "DK": 0.9,
       "Mi Hazánk": 6.1,
       "MKKP": 0.9,
-      "counted": 61.45
+      "counted": 66.27
     },
     "BK-03": {
-      "FIDESZ-KDNP": 40.7,
+      "FIDESZ-KDNP": 40.9,
       "TISZA": 50.7,
-      "DK": 1.8,
-      "Mi Hazánk": 6.1,
+      "DK": 1.7,
+      "Mi Hazánk": 5.9,
       "MKKP": 0.0,
-      "counted": 48.81
+      "counted": 61.9
     },
     "BK-04": {
-      "FIDESZ-KDNP": 41.1,
-      "TISZA": 50.5,
+      "FIDESZ-KDNP": 40.9,
+      "TISZA": 50.7,
       "DK": 0.7,
-      "Mi Hazánk": 7.1,
+      "Mi Hazánk": 7.0,
       "MKKP": 0.0,
-      "counted": 47.78
+      "counted": 54.44
     },
     "BK-05": {
-      "FIDESZ-KDNP": 40.8,
-      "TISZA": 49.0,
-      "DK": 1.5,
-      "Mi Hazánk": 8.4,
+      "FIDESZ-KDNP": 41.0,
+      "TISZA": 48.5,
+      "DK": 1.4,
+      "Mi Hazánk": 8.7,
       "MKKP": 0.0,
-      "counted": 51.28
+      "counted": 61.54
     },
     "BK-06": {
-      "FIDESZ-KDNP": 41.1,
-      "TISZA": 51.2,
-      "DK": 0.7,
-      "Mi Hazánk": 6.8,
+      "FIDESZ-KDNP": 41.3,
+      "TISZA": 51.1,
+      "DK": 0.8,
+      "Mi Hazánk": 6.7,
       "MKKP": 0.0,
-      "counted": 41.56
+      "counted": 46.75
     },
     "BE-01": {
       "FIDESZ-KDNP": 34.4,
       "TISZA": 57.1,
       "DK": 1.4,
-      "Mi Hazánk": 6.4,
-      "MKKP": 0.6,
-      "counted": 70.0
+      "Mi Hazánk": 6.5,
+      "MKKP": 0.7,
+      "counted": 76.0
     },
     "BE-02": {
-      "FIDESZ-KDNP": 41.5,
-      "TISZA": 49.5,
+      "FIDESZ-KDNP": 41.3,
+      "TISZA": 49.8,
       "DK": 1.0,
-      "Mi Hazánk": 7.1,
+      "Mi Hazánk": 6.9,
       "MKKP": 0.6,
-      "counted": 71.43
+      "counted": 75.82
     },
     "BE-03": {
       "FIDESZ-KDNP": 42.3,
@@ -231,71 +231,71 @@
       "DK": 0.8,
       "Mi Hazánk": 5.4,
       "MKKP": 0.6,
-      "counted": 72.73
+      "counted": 77.27
     },
     "BE-04": {
-      "FIDESZ-KDNP": 37.5,
-      "TISZA": 52.3,
-      "DK": 1.0,
-      "Mi Hazánk": 6.2,
+      "FIDESZ-KDNP": 37.4,
+      "TISZA": 52.5,
+      "DK": 0.9,
+      "Mi Hazánk": 6.0,
       "MKKP": 0.0,
-      "counted": 57.0
+      "counted": 65.0
     },
     "BO-01": {
-      "FIDESZ-KDNP": 31.9,
-      "TISZA": 59.1,
+      "FIDESZ-KDNP": 32.7,
+      "TISZA": 58.3,
       "DK": 2.1,
       "Mi Hazánk": 5.5,
-      "MKKP": 0.5,
-      "counted": 53.95
+      "MKKP": 0.6,
+      "counted": 65.79
     },
     "BO-02": {
-      "FIDESZ-KDNP": 32.2,
-      "TISZA": 59.0,
+      "FIDESZ-KDNP": 32.3,
+      "TISZA": 59.1,
       "DK": 1.0,
-      "Mi Hazánk": 6.4,
+      "Mi Hazánk": 6.3,
       "MKKP": 0.5,
-      "counted": 69.62
+      "counted": 75.95
     },
     "BO-03": {
-      "FIDESZ-KDNP": 47.2,
-      "TISZA": 44.8,
+      "FIDESZ-KDNP": 46.9,
+      "TISZA": 44.9,
       "DK": 0.7,
-      "Mi Hazánk": 5.7,
-      "MKKP": 0.4,
-      "counted": 64.12
+      "Mi Hazánk": 5.9,
+      "MKKP": 0.5,
+      "counted": 72.52
     },
     "BO-04": {
-      "FIDESZ-KDNP": 43.0,
-      "TISZA": 49.8,
+      "FIDESZ-KDNP": 42.8,
+      "TISZA": 50.0,
       "DK": 0.9,
       "Mi Hazánk": 6.2,
       "MKKP": 0.0,
-      "counted": 50.39
+      "counted": 54.26
     },
     "BO-05": {
-      "FIDESZ-KDNP": 47.4,
-      "TISZA": 46.5,
+      "FIDESZ-KDNP": 47.0,
+      "TISZA": 47.0,
       "DK": 0.6,
       "Mi Hazánk": 4.5,
       "MKKP": 0.4,
-      "counted": 63.76
+      "counted": 69.13
     },
     "BO-06": {
-      "FIDESZ-KDNP": 41.5,
-      "TISZA": 52.7,
+      "FIDESZ-KDNP": 42.5,
+      "TISZA": 51.6,
       "DK": 0.7,
       "Mi Hazánk": 4.8,
       "MKKP": 0.0,
-      "counted": 59.43
+      "counted": 66.98
     },
     "BO-07": {
-      "FIDESZ-KDNP": 41.1,
-      "TISZA": 51.3,
-      "DK": 0.7,
-      "Mi Hazánk": 5.9,
+      "FIDESZ-KDNP": 40.6,
+      "TISZA": 51.9,
+      "DK": 0.6,
+      "Mi Hazánk": 6.0,
       "MKKP": 0.6,
-      "counted": 61.39
+      "counted": 69.31
     },
     "CS-01": {
       "FIDESZ-KDNP": 25.1,
@@ -303,111 +303,111 @@
       "DK": 1.2,
       "Mi Hazánk": 5.5,
       "MKKP": 1.1,
-      "counted": 72.86
+      "counted": 80.0
     },
     "CS-02": {
-      "FIDESZ-KDNP": 32.2,
-      "TISZA": 55.6,
+      "FIDESZ-KDNP": 31.8,
+      "TISZA": 56.2,
       "DK": 0.9,
-      "Mi Hazánk": 10.5,
+      "Mi Hazánk": 10.3,
       "MKKP": 0.9,
-      "counted": 70.79
+      "counted": 74.16
     },
     "CS-03": {
-      "FIDESZ-KDNP": 35.1,
-      "TISZA": 49.4,
-      "DK": 5.2,
-      "Mi Hazánk": 9.4,
+      "FIDESZ-KDNP": 35.2,
+      "TISZA": 49.2,
+      "DK": 5.1,
+      "Mi Hazánk": 9.5,
       "MKKP": 0.7,
-      "counted": 79.13
+      "counted": 85.22
     },
     "CS-04": {
-      "FIDESZ-KDNP": 33.7,
-      "TISZA": 58.0,
+      "FIDESZ-KDNP": 34.1,
+      "TISZA": 57.5,
       "DK": 1.0,
       "Mi Hazánk": 6.0,
       "MKKP": 0.7,
-      "counted": 76.15
+      "counted": 85.32
     },
     "FE-01": {
       "FIDESZ-KDNP": 37.3,
-      "TISZA": 53.9,
+      "TISZA": 54.1,
       "DK": 1.6,
-      "Mi Hazánk": 5.7,
+      "Mi Hazánk": 5.6,
       "MKKP": 1.2,
-      "counted": 50.65
+      "counted": 57.14
     },
     "FE-02": {
-      "FIDESZ-KDNP": 36.4,
-      "TISZA": 52.7,
+      "FIDESZ-KDNP": 36.5,
+      "TISZA": 52.9,
       "DK": 1.0,
-      "Mi Hazánk": 7.8,
+      "Mi Hazánk": 7.5,
       "MKKP": 1.0,
-      "counted": 35.06
+      "counted": 38.96
     },
     "FE-03": {
-      "FIDESZ-KDNP": 40.6,
-      "TISZA": 52.2,
+      "FIDESZ-KDNP": 39.9,
+      "TISZA": 52.7,
       "DK": 0.9,
       "Mi Hazánk": 5.3,
       "MKKP": 1.0,
-      "counted": 39.74
+      "counted": 47.44
     },
     "FE-04": {
-      "FIDESZ-KDNP": 33.0,
-      "TISZA": 60.3,
+      "FIDESZ-KDNP": 32.6,
+      "TISZA": 60.7,
       "DK": 0.0,
-      "Mi Hazánk": 5.6,
-      "MKKP": 0.6,
-      "counted": 44.12
+      "Mi Hazánk": 5.5,
+      "MKKP": 0.7,
+      "counted": 54.41
     },
     "FE-05": {
-      "FIDESZ-KDNP": 46.6,
-      "TISZA": 44.6,
+      "FIDESZ-KDNP": 46.8,
+      "TISZA": 44.3,
       "DK": 1.0,
       "Mi Hazánk": 7.1,
       "MKKP": 0.7,
-      "counted": 68.69
+      "counted": 71.72
     },
     "GY-01": {
-      "FIDESZ-KDNP": 32.7,
-      "TISZA": 59.8,
+      "FIDESZ-KDNP": 33.4,
+      "TISZA": 59.0,
       "DK": 1.2,
-      "Mi Hazánk": 5.3,
+      "Mi Hazánk": 5.4,
       "MKKP": 0.9,
-      "counted": 22.06
+      "counted": 26.47
     },
     "GY-02": {
-      "FIDESZ-KDNP": 38.7,
-      "TISZA": 53.1,
+      "FIDESZ-KDNP": 38.3,
+      "TISZA": 53.5,
       "DK": 0.9,
       "Mi Hazánk": 6.3,
-      "MKKP": 0.7,
-      "counted": 27.06
+      "MKKP": 0.8,
+      "counted": 34.12
     },
     "GY-03": {
-      "FIDESZ-KDNP": 48.2,
-      "TISZA": 45.3,
+      "FIDESZ-KDNP": 47.9,
+      "TISZA": 45.5,
       "DK": 0.5,
-      "Mi Hazánk": 5.5,
+      "Mi Hazánk": 5.6,
       "MKKP": 0.0,
-      "counted": 38.68
+      "counted": 49.06
     },
     "GY-04": {
-      "FIDESZ-KDNP": 40.3,
-      "TISZA": 51.5,
+      "FIDESZ-KDNP": 40.4,
+      "TISZA": 51.4,
       "DK": 1.3,
       "Mi Hazánk": 5.8,
       "MKKP": 0.0,
-      "counted": 48.94
+      "counted": 58.51
     },
     "GY-05": {
       "FIDESZ-KDNP": 42.3,
-      "TISZA": 51.0,
-      "DK": 0.8,
+      "TISZA": 51.1,
+      "DK": 0.7,
       "Mi Hazánk": 5.1,
-      "MKKP": 0.7,
-      "counted": 57.41
+      "MKKP": 0.8,
+      "counted": 66.67
     },
     "HB-01": {
       "FIDESZ-KDNP": 34.4,
@@ -415,391 +415,391 @@
       "DK": 1.1,
       "Mi Hazánk": 4.6,
       "MKKP": 0.8,
-      "counted": 50.0
+      "counted": 51.67
     },
     "HB-02": {
-      "FIDESZ-KDNP": 34.9,
-      "TISZA": 58.1,
+      "FIDESZ-KDNP": 35.2,
+      "TISZA": 57.8,
       "DK": 1.0,
       "Mi Hazánk": 4.9,
-      "MKKP": 0.7,
-      "counted": 57.38
+      "MKKP": 0.8,
+      "counted": 68.85
     },
     "HB-03": {
-      "FIDESZ-KDNP": 42.1,
-      "TISZA": 51.0,
+      "FIDESZ-KDNP": 42.9,
+      "TISZA": 50.4,
       "DK": 0.7,
-      "Mi Hazánk": 5.6,
+      "Mi Hazánk": 5.4,
       "MKKP": 0.4,
-      "counted": 37.35
+      "counted": 43.37
     },
     "HB-04": {
-      "FIDESZ-KDNP": 49.8,
-      "TISZA": 43.2,
+      "FIDESZ-KDNP": 49.6,
+      "TISZA": 43.3,
       "DK": 0.7,
       "Mi Hazánk": 5.8,
       "MKKP": 0.4,
-      "counted": 49.46
+      "counted": 59.14
     },
     "HB-05": {
-      "FIDESZ-KDNP": 45.3,
-      "TISZA": 48.2,
+      "FIDESZ-KDNP": 44.8,
+      "TISZA": 48.4,
       "DK": 0.7,
-      "Mi Hazánk": 5.7,
+      "Mi Hazánk": 5.9,
       "MKKP": 0.0,
-      "counted": 58.54
+      "counted": 71.95
     },
     "HB-06": {
-      "FIDESZ-KDNP": 40.8,
-      "TISZA": 49.9,
+      "FIDESZ-KDNP": 40.3,
+      "TISZA": 50.2,
       "DK": 1.7,
-      "Mi Hazánk": 7.5,
+      "Mi Hazánk": 7.8,
       "MKKP": 0.0,
-      "counted": 35.8
+      "counted": 49.38
     },
     "HE-01": {
-      "FIDESZ-KDNP": 36.2,
-      "TISZA": 55.5,
-      "DK": 0.7,
+      "FIDESZ-KDNP": 36.3,
+      "TISZA": 55.3,
+      "DK": 0.8,
       "Mi Hazánk": 5.7,
       "MKKP": 0.7,
-      "counted": 54.44
+      "counted": 63.33
     },
     "HE-02": {
-      "FIDESZ-KDNP": 40.6,
-      "TISZA": 50.8,
+      "FIDESZ-KDNP": 40.4,
+      "TISZA": 50.9,
       "DK": 1.0,
       "Mi Hazánk": 6.1,
       "MKKP": 0.6,
-      "counted": 61.67
+      "counted": 71.67
     },
     "HE-03": {
-      "FIDESZ-KDNP": 39.9,
-      "TISZA": 50.4,
+      "FIDESZ-KDNP": 40.8,
+      "TISZA": 49.6,
       "DK": 0.8,
-      "Mi Hazánk": 8.7,
+      "Mi Hazánk": 8.5,
       "MKKP": 0.0,
-      "counted": 49.48
+      "counted": 59.79
     },
     "JN-01": {
-      "FIDESZ-KDNP": 34.1,
-      "TISZA": 56.5,
+      "FIDESZ-KDNP": 34.2,
+      "TISZA": 56.3,
       "DK": 1.3,
-      "Mi Hazánk": 7.2,
+      "Mi Hazánk": 7.3,
       "MKKP": 0.8,
-      "counted": 40.59
+      "counted": 49.5
     },
     "JN-02": {
-      "FIDESZ-KDNP": 44.0,
-      "TISZA": 48.2,
-      "DK": 0.7,
+      "FIDESZ-KDNP": 43.3,
+      "TISZA": 49.0,
+      "DK": 0.6,
       "Mi Hazánk": 6.1,
       "MKKP": 0.0,
-      "counted": 50.62
+      "counted": 59.26
     },
     "JN-03": {
-      "FIDESZ-KDNP": 51.0,
-      "TISZA": 42.6,
+      "FIDESZ-KDNP": 50.2,
+      "TISZA": 43.4,
       "DK": 0.7,
       "Mi Hazánk": 5.3,
       "MKKP": 0.0,
-      "counted": 51.11
+      "counted": 63.33
     },
     "JN-04": {
-      "FIDESZ-KDNP": 38.8,
-      "TISZA": 52.7,
-      "DK": 0.7,
-      "Mi Hazánk": 7.0,
+      "FIDESZ-KDNP": 38.9,
+      "TISZA": 52.6,
+      "DK": 0.8,
+      "Mi Hazánk": 7.1,
       "MKKP": 0.0,
-      "counted": 72.16
+      "counted": 77.32
     },
     "KE-01": {
-      "FIDESZ-KDNP": 34.5,
-      "TISZA": 59.2,
+      "FIDESZ-KDNP": 34.6,
+      "TISZA": 59.1,
       "DK": 1.5,
       "Mi Hazánk": 4.0,
       "MKKP": 0.9,
-      "counted": 60.47
+      "counted": 72.09
     },
     "KE-02": {
-      "FIDESZ-KDNP": 36.9,
-      "TISZA": 56.1,
+      "FIDESZ-KDNP": 37.1,
+      "TISZA": 55.9,
       "DK": 0.9,
       "Mi Hazánk": 5.6,
-      "MKKP": 0.5,
-      "counted": 56.57
+      "MKKP": 0.6,
+      "counted": 62.63
     },
     "KE-03": {
-      "FIDESZ-KDNP": 38.4,
-      "TISZA": 53.6,
+      "FIDESZ-KDNP": 38.3,
+      "TISZA": 53.8,
       "DK": 0.8,
-      "Mi Hazánk": 6.5,
+      "Mi Hazánk": 6.4,
       "MKKP": 0.7,
-      "counted": 56.88
+      "counted": 63.3
     },
     "NO-01": {
-      "FIDESZ-KDNP": 41.9,
-      "TISZA": 49.2,
+      "FIDESZ-KDNP": 41.8,
+      "TISZA": 49.3,
       "DK": 0.0,
-      "Mi Hazánk": 8.2,
+      "Mi Hazánk": 8.3,
       "MKKP": 0.0,
-      "counted": 47.32
+      "counted": 53.57
     },
     "NO-02": {
-      "FIDESZ-KDNP": 44.8,
+      "FIDESZ-KDNP": 44.7,
       "TISZA": 43.6,
       "DK": 0.7,
-      "Mi Hazánk": 10.2,
+      "Mi Hazánk": 10.4,
       "MKKP": 0.0,
-      "counted": 57.25
+      "counted": 64.89
     },
     "PE-01": {
-      "FIDESZ-KDNP": 33.7,
-      "TISZA": 58.4,
+      "FIDESZ-KDNP": 33.3,
+      "TISZA": 58.9,
       "DK": 1.2,
-      "Mi Hazánk": 5.6,
-      "MKKP": 1.2,
-      "counted": 36.11
+      "Mi Hazánk": 5.5,
+      "MKKP": 1.1,
+      "counted": 44.44
     },
     "PE-02": {
-      "FIDESZ-KDNP": 30.9,
-      "TISZA": 62.0,
+      "FIDESZ-KDNP": 31.2,
+      "TISZA": 61.6,
       "DK": 1.1,
-      "Mi Hazánk": 5.0,
+      "Mi Hazánk": 5.1,
       "MKKP": 1.0,
-      "counted": 53.41
+      "counted": 64.77
     },
     "PE-03": {
-      "FIDESZ-KDNP": 35.2,
-      "TISZA": 57.3,
-      "DK": 0.8,
-      "Mi Hazánk": 5.5,
-      "MKKP": 1.0,
-      "counted": 13.7
+      "FIDESZ-KDNP": 35.9,
+      "TISZA": 56.7,
+      "DK": 0.7,
+      "Mi Hazánk": 5.6,
+      "MKKP": 0.9,
+      "counted": 20.55
     },
     "PE-04": {
-      "FIDESZ-KDNP": 36.4,
-      "TISZA": 55.2,
-      "DK": 1.2,
+      "FIDESZ-KDNP": 36.3,
+      "TISZA": 55.3,
+      "DK": 1.3,
       "Mi Hazánk": 6.1,
       "MKKP": 0.9,
-      "counted": 48.78
+      "counted": 63.41
     },
     "PE-05": {
-      "FIDESZ-KDNP": 32.2,
-      "TISZA": 60.5,
-      "DK": 1.4,
-      "Mi Hazánk": 4.9,
+      "FIDESZ-KDNP": 31.5,
+      "TISZA": 61.0,
+      "DK": 1.3,
+      "Mi Hazánk": 5.0,
       "MKKP": 0.9,
-      "counted": 39.44
+      "counted": 45.07
     },
     "PE-06": {
-      "FIDESZ-KDNP": 31.6,
-      "TISZA": 61.4,
+      "FIDESZ-KDNP": 32.1,
+      "TISZA": 60.8,
       "DK": 0.8,
       "Mi Hazánk": 5.4,
       "MKKP": 0.8,
-      "counted": 21.62
+      "counted": 31.08
     },
     "PE-07": {
-      "FIDESZ-KDNP": 40.5,
-      "TISZA": 51.0,
+      "FIDESZ-KDNP": 39.7,
+      "TISZA": 51.8,
       "DK": 1.1,
       "Mi Hazánk": 6.5,
       "MKKP": 0.9,
-      "counted": 41.77
+      "counted": 53.16
     },
     "PE-08": {
-      "FIDESZ-KDNP": 33.3,
+      "FIDESZ-KDNP": 33.1,
       "TISZA": 58.9,
       "DK": 0.9,
-      "Mi Hazánk": 5.8,
-      "MKKP": 0.8,
-      "counted": 58.44
+      "Mi Hazánk": 6.0,
+      "MKKP": 0.9,
+      "counted": 67.53
     },
     "PE-09": {
-      "FIDESZ-KDNP": 37.5,
-      "TISZA": 53.6,
-      "DK": 0.9,
-      "Mi Hazánk": 7.1,
+      "FIDESZ-KDNP": 37.3,
+      "TISZA": 53.4,
+      "DK": 1.0,
+      "Mi Hazánk": 7.5,
       "MKKP": 0.6,
-      "counted": 43.59
+      "counted": 58.97
     },
     "PE-10": {
-      "FIDESZ-KDNP": 31.5,
-      "TISZA": 60.1,
-      "DK": 1.4,
+      "FIDESZ-KDNP": 31.2,
+      "TISZA": 60.4,
+      "DK": 1.3,
       "Mi Hazánk": 5.6,
       "MKKP": 1.0,
-      "counted": 40.0
+      "counted": 42.86
     },
     "PE-11": {
       "FIDESZ-KDNP": 37.7,
       "TISZA": 54.1,
-      "DK": 1.1,
+      "DK": 1.2,
       "Mi Hazánk": 6.1,
-      "MKKP": 1.0,
-      "counted": 38.55
+      "MKKP": 0.9,
+      "counted": 46.99
     },
     "PE-12": {
-      "FIDESZ-KDNP": 41.9,
-      "TISZA": 49.5,
+      "FIDESZ-KDNP": 42.0,
+      "TISZA": 49.3,
       "DK": 0.8,
       "Mi Hazánk": 7.2,
-      "MKKP": 0.7,
-      "counted": 59.26
+      "MKKP": 0.6,
+      "counted": 69.14
     },
     "PE-13": {
-      "FIDESZ-KDNP": 38.8,
-      "TISZA": 48.8,
+      "FIDESZ-KDNP": 39.0,
+      "TISZA": 48.2,
       "DK": 0.7,
-      "Mi Hazánk": 10.7,
+      "Mi Hazánk": 11.1,
       "MKKP": 0.7,
-      "counted": 51.85
+      "counted": 64.2
     },
     "PE-14": {
       "FIDESZ-KDNP": 40.2,
-      "TISZA": 51.0,
-      "DK": 1.3,
+      "TISZA": 51.1,
+      "DK": 1.2,
       "Mi Hazánk": 7.6,
       "MKKP": 0.0,
-      "counted": 69.32
+      "counted": 76.14
     },
     "SO-01": {
-      "FIDESZ-KDNP": 35.0,
-      "TISZA": 55.7,
-      "DK": 1.3,
+      "FIDESZ-KDNP": 34.9,
+      "TISZA": 55.9,
+      "DK": 1.2,
       "Mi Hazánk": 7.2,
-      "MKKP": 0.5,
-      "counted": 73.49
+      "MKKP": 0.6,
+      "counted": 79.52
     },
     "SO-02": {
-      "FIDESZ-KDNP": 43.3,
-      "TISZA": 46.1,
-      "DK": 1.3,
+      "FIDESZ-KDNP": 44.2,
+      "TISZA": 45.6,
+      "DK": 1.2,
       "Mi Hazánk": 4.4,
       "MKKP": 0.0,
-      "counted": 66.67
+      "counted": 71.05
     },
     "SO-03": {
-      "FIDESZ-KDNP": 45.2,
-      "TISZA": 47.1,
-      "DK": 1.0,
-      "Mi Hazánk": 6.0,
+      "FIDESZ-KDNP": 45.1,
+      "TISZA": 47.0,
+      "DK": 1.1,
+      "Mi Hazánk": 6.3,
       "MKKP": 0.0,
-      "counted": 66.39
+      "counted": 73.95
     },
     "SO-04": {
-      "FIDESZ-KDNP": 46.4,
-      "TISZA": 47.1,
+      "FIDESZ-KDNP": 45.6,
+      "TISZA": 47.7,
       "DK": 1.3,
-      "Mi Hazánk": 4.3,
+      "Mi Hazánk": 4.4,
       "MKKP": 0.7,
-      "counted": 54.87
+      "counted": 63.72
     },
     "SZ-01": {
-      "FIDESZ-KDNP": 30.7,
-      "TISZA": 63.6,
+      "FIDESZ-KDNP": 30.8,
+      "TISZA": 63.5,
       "DK": 0.8,
-      "Mi Hazánk": 4.4,
+      "Mi Hazánk": 4.5,
       "MKKP": 0.4,
-      "counted": 67.5
+      "counted": 72.5
     },
     "SZ-02": {
-      "FIDESZ-KDNP": 39.6,
-      "TISZA": 53.8,
+      "FIDESZ-KDNP": 39.7,
+      "TISZA": 53.7,
       "DK": 0.9,
-      "Mi Hazánk": 5.7,
+      "Mi Hazánk": 5.8,
       "MKKP": 0.0,
-      "counted": 46.67
+      "counted": 55.56
     },
     "SZ-03": {
-      "FIDESZ-KDNP": 42.4,
-      "TISZA": 51.1,
-      "DK": 1.0,
-      "Mi Hazánk": 4.9,
+      "FIDESZ-KDNP": 43.8,
+      "TISZA": 50.0,
+      "DK": 0.9,
+      "Mi Hazánk": 4.7,
       "MKKP": 0.0,
-      "counted": 30.3
+      "counted": 41.41
     },
     "SZ-04": {
-      "FIDESZ-KDNP": 53.3,
-      "TISZA": 40.8,
+      "FIDESZ-KDNP": 53.4,
+      "TISZA": 40.7,
       "DK": 0.6,
-      "Mi Hazánk": 4.2,
+      "Mi Hazánk": 4.1,
       "MKKP": 0.0,
-      "counted": 50.85
+      "counted": 62.71
     },
     "SZ-05": {
-      "FIDESZ-KDNP": 51.0,
-      "TISZA": 41.9,
+      "FIDESZ-KDNP": 50.7,
+      "TISZA": 42.1,
       "DK": 0.6,
-      "Mi Hazánk": 6.4,
+      "Mi Hazánk": 6.3,
       "MKKP": 0.0,
-      "counted": 46.88
+      "counted": 55.21
     },
     "SZ-06": {
-      "FIDESZ-KDNP": 47.0,
-      "TISZA": 46.4,
+      "FIDESZ-KDNP": 46.2,
+      "TISZA": 47.2,
       "DK": 0.4,
-      "Mi Hazánk": 5.0,
-      "MKKP": 0.5,
-      "counted": 46.59
+      "Mi Hazánk": 5.1,
+      "MKKP": 0.4,
+      "counted": 55.68
     },
     "TO-01": {
-      "FIDESZ-KDNP": 40.1,
-      "TISZA": 50.9,
+      "FIDESZ-KDNP": 40.8,
+      "TISZA": 50.1,
       "DK": 1.0,
-      "Mi Hazánk": 7.2,
-      "MKKP": 0.7,
-      "counted": 70.73
+      "Mi Hazánk": 7.4,
+      "MKKP": 0.6,
+      "counted": 79.27
     },
     "TO-02": {
-      "FIDESZ-KDNP": 46.6,
-      "TISZA": 44.9,
+      "FIDESZ-KDNP": 46.0,
+      "TISZA": 45.3,
       "DK": 1.0,
-      "Mi Hazánk": 7.3,
+      "Mi Hazánk": 7.4,
       "MKKP": 0.0,
-      "counted": 48.21
+      "counted": 53.57
     },
     "TO-03": {
-      "FIDESZ-KDNP": 45.7,
-      "TISZA": 47.0,
+      "FIDESZ-KDNP": 45.2,
+      "TISZA": 47.4,
       "DK": 1.0,
-      "Mi Hazánk": 6.1,
+      "Mi Hazánk": 6.2,
       "MKKP": 0.0,
-      "counted": 66.27
+      "counted": 69.88
     },
     "VA-01": {
-      "FIDESZ-KDNP": 42.4,
-      "TISZA": 51.3,
+      "FIDESZ-KDNP": 39.9,
+      "TISZA": 54.3,
       "DK": 0.0,
-      "Mi Hazánk": 5.3,
-      "MKKP": 1.0,
-      "counted": 15.29
+      "Mi Hazánk": 4.9,
+      "MKKP": 0.9,
+      "counted": 28.24
     },
     "VA-02": {
-      "FIDESZ-KDNP": 47.3,
-      "TISZA": 44.9,
+      "FIDESZ-KDNP": 47.1,
+      "TISZA": 45.0,
       "DK": 0.8,
       "Mi Hazánk": 5.5,
       "MKKP": 0.0,
-      "counted": 70.73
+      "counted": 77.24
     },
     "VA-03": {
-      "FIDESZ-KDNP": 50.8,
-      "TISZA": 42.0,
+      "FIDESZ-KDNP": 50.7,
+      "TISZA": 42.2,
       "DK": 0.8,
       "Mi Hazánk": 5.9,
       "MKKP": 0.0,
-      "counted": 63.35
+      "counted": 70.81
     },
     "VE-01": {
-      "FIDESZ-KDNP": 35.0,
-      "TISZA": 58.2,
+      "FIDESZ-KDNP": 35.1,
+      "TISZA": 57.9,
       "DK": 0.9,
-      "Mi Hazánk": 5.0,
-      "MKKP": 0.8,
-      "counted": 64.52
+      "Mi Hazánk": 5.1,
+      "MKKP": 0.9,
+      "counted": 68.82
     },
     "VE-02": {
       "FIDESZ-KDNP": 36.1,
@@ -807,232 +807,232 @@
       "DK": 1.0,
       "Mi Hazánk": 5.5,
       "MKKP": 0.8,
-      "counted": 55.1
+      "counted": 64.29
     },
     "VE-03": {
-      "FIDESZ-KDNP": 40.0,
-      "TISZA": 53.6,
-      "DK": 1.1,
-      "Mi Hazánk": 4.5,
+      "FIDESZ-KDNP": 39.8,
+      "TISZA": 53.9,
+      "DK": 1.2,
+      "Mi Hazánk": 4.4,
       "MKKP": 0.0,
-      "counted": 51.72
+      "counted": 59.48
     },
     "VE-04": {
-      "FIDESZ-KDNP": 45.3,
-      "TISZA": 46.5,
-      "DK": 1.5,
+      "FIDESZ-KDNP": 44.6,
+      "TISZA": 47.4,
+      "DK": 1.4,
       "Mi Hazánk": 6.0,
       "MKKP": 0.5,
-      "counted": 50.78
+      "counted": 60.94
     },
     "ZA-01": {
       "FIDESZ-KDNP": 42.5,
       "TISZA": 50.5,
       "DK": 0.8,
       "Mi Hazánk": 4.8,
-      "MKKP": 0.7,
-      "counted": 59.03
+      "MKKP": 0.6,
+      "counted": 64.58
     },
     "ZA-02": {
-      "FIDESZ-KDNP": 45.7,
-      "TISZA": 46.7,
+      "FIDESZ-KDNP": 45.9,
+      "TISZA": 46.5,
       "DK": 0.9,
-      "Mi Hazánk": 5.9,
+      "Mi Hazánk": 5.8,
       "MKKP": 0.6,
-      "counted": 49.66
+      "counted": 57.24
     },
     "ZA-03": {
-      "FIDESZ-KDNP": 37.4,
-      "TISZA": 54.4,
+      "FIDESZ-KDNP": 37.1,
+      "TISZA": 54.8,
       "DK": 1.7,
-      "Mi Hazánk": 6.3,
+      "Mi Hazánk": 6.2,
       "MKKP": 0.0,
-      "counted": 43.8
+      "counted": 50.36
     }
   },
   "countyList": {
     "Budapest": {
-      "FIDESZ-KDNP": 29.9,
-      "TISZA": 61.7,
-      "DK": 1.9,
-      "Mi Hazánk": 5.0,
-      "MKKP": 1.4
+      "FIDESZ-KDNP": 29.7,
+      "TISZA": 62.0,
+      "DK": 1.8,
+      "Mi Hazánk": 4.9,
+      "MKKP": 1.3
     },
     "Baranya": {
-      "FIDESZ-KDNP": 38.6,
-      "TISZA": 50.9,
+      "FIDESZ-KDNP": 38.5,
+      "TISZA": 51.1,
       "DK": 1.1,
-      "Mi Hazánk": 5.2,
+      "Mi Hazánk": 5.3,
       "MKKP": 0.7
     },
     "Bács-Kiskun": {
-      "FIDESZ-KDNP": 40.0,
-      "TISZA": 50.9,
-      "DK": 1.0,
+      "FIDESZ-KDNP": 39.5,
+      "TISZA": 51.4,
+      "DK": 1.1,
       "Mi Hazánk": 7.1,
       "MKKP": 0.7
     },
     "Békés": {
-      "FIDESZ-KDNP": 36.9,
-      "TISZA": 54.2,
-      "DK": 1.2,
-      "Mi Hazánk": 6.4,
+      "FIDESZ-KDNP": 37.8,
+      "TISZA": 53.4,
+      "DK": 1.1,
+      "Mi Hazánk": 6.3,
       "MKKP": 0.6
     },
     "Borsod-Abaúj-Zemplén": {
       "FIDESZ-KDNP": 40.6,
-      "TISZA": 51.1,
-      "DK": 0.8,
-      "Mi Hazánk": 5.9,
+      "TISZA": 51.0,
+      "DK": 0.9,
+      "Mi Hazánk": 6.0,
       "MKKP": 0.5
     },
     "Csongrád-Csanád": {
-      "FIDESZ-KDNP": 32.9,
-      "TISZA": 57.5,
+      "FIDESZ-KDNP": 32.1,
+      "TISZA": 58.6,
       "DK": 1.2,
-      "Mi Hazánk": 7.7,
+      "Mi Hazánk": 7.2,
       "MKKP": 0.8
     },
     "Fejér": {
-      "FIDESZ-KDNP": 43.1,
-      "TISZA": 46.8,
+      "FIDESZ-KDNP": 41.0,
+      "TISZA": 49.3,
       "DK": 1.1,
-      "Mi Hazánk": 6.9,
+      "Mi Hazánk": 6.8,
       "MKKP": 0.8
     },
     "Győr-Moson-Sopron": {
-      "FIDESZ-KDNP": 42.3,
-      "TISZA": 49.3,
+      "FIDESZ-KDNP": 41.8,
+      "TISZA": 49.9,
       "DK": 1.0,
-      "Mi Hazánk": 6.4,
+      "Mi Hazánk": 6.2,
       "MKKP": 0.7
     },
     "Hajdú-Bihar": {
       "FIDESZ-KDNP": 39.3,
-      "TISZA": 52.5,
-      "DK": 1.1,
-      "Mi Hazánk": 5.7,
+      "TISZA": 52.4,
+      "DK": 1.0,
+      "Mi Hazánk": 5.8,
       "MKKP": 0.7
     },
     "Heves": {
-      "FIDESZ-KDNP": 39.5,
-      "TISZA": 51.0,
+      "FIDESZ-KDNP": 38.9,
+      "TISZA": 51.7,
       "DK": 1.2,
-      "Mi Hazánk": 6.7,
+      "Mi Hazánk": 6.8,
       "MKKP": 0.6
     },
     "Jász-Nagykun-Szolnok": {
-      "FIDESZ-KDNP": 43.2,
-      "TISZA": 47.7,
+      "FIDESZ-KDNP": 41.3,
+      "TISZA": 49.5,
       "DK": 1.0,
-      "Mi Hazánk": 6.9,
-      "MKKP": 0.7
+      "Mi Hazánk": 7.1,
+      "MKKP": 0.6
     },
     "Komárom-Esztergom": {
-      "FIDESZ-KDNP": 35.9,
-      "TISZA": 55.3,
+      "FIDESZ-KDNP": 36.1,
+      "TISZA": 55.2,
       "DK": 1.3,
-      "Mi Hazánk": 6.0,
+      "Mi Hazánk": 6.1,
       "MKKP": 0.8
     },
     "Nógrád": {
       "FIDESZ-KDNP": 42.9,
-      "TISZA": 47.1,
-      "DK": 1.1,
-      "Mi Hazánk": 7.6,
+      "TISZA": 46.9,
+      "DK": 1.0,
+      "Mi Hazánk": 7.8,
       "MKKP": 0.5
     },
     "Pest": {
-      "FIDESZ-KDNP": 37.8,
-      "TISZA": 53.1,
+      "FIDESZ-KDNP": 36.9,
+      "TISZA": 54.0,
       "DK": 1.1,
       "Mi Hazánk": 6.5,
       "MKKP": 0.9
     },
     "Somogy": {
-      "FIDESZ-KDNP": 44.0,
-      "TISZA": 47.8,
-      "DK": 1.1,
-      "Mi Hazánk": 5.9,
+      "FIDESZ-KDNP": 43.8,
+      "TISZA": 48.2,
+      "DK": 1.2,
+      "Mi Hazánk": 5.7,
       "MKKP": 0.6
     },
     "Szabolcs-Szatmár-Bereg": {
-      "FIDESZ-KDNP": 44.0,
+      "FIDESZ-KDNP": 43.8,
       "TISZA": 49.0,
       "DK": 0.9,
       "Mi Hazánk": 5.0,
       "MKKP": 0.5
     },
     "Tolna": {
-      "FIDESZ-KDNP": 44.7,
-      "TISZA": 45.6,
-      "DK": 1.1,
-      "Mi Hazánk": 6.8,
-      "MKKP": 0.6
+      "FIDESZ-KDNP": 44.8,
+      "TISZA": 45.5,
+      "DK": 1.0,
+      "Mi Hazánk": 6.7,
+      "MKKP": 0.5
     },
     "Vas": {
-      "FIDESZ-KDNP": 48.9,
-      "TISZA": 42.7,
+      "FIDESZ-KDNP": 48.6,
+      "TISZA": 43.1,
       "DK": 0.9,
-      "Mi Hazánk": 6.5,
+      "Mi Hazánk": 6.4,
       "MKKP": 0.7
     },
     "Veszprém": {
-      "FIDESZ-KDNP": 39.7,
-      "TISZA": 51.1,
-      "DK": 1.3,
-      "Mi Hazánk": 6.3,
+      "FIDESZ-KDNP": 39.0,
+      "TISZA": 52.0,
+      "DK": 1.4,
+      "Mi Hazánk": 6.2,
       "MKKP": 0.8
     },
     "Zala": {
-      "FIDESZ-KDNP": 41.2,
-      "TISZA": 50.4,
-      "DK": 1.4,
-      "Mi Hazánk": 6.2,
-      "MKKP": 0.6
+      "FIDESZ-KDNP": 41.6,
+      "TISZA": 49.9,
+      "DK": 1.3,
+      "Mi Hazánk": 6.3,
+      "MKKP": 0.7
     }
   },
   "nationalVote": {
-    "FIDESZ-KDNP": 39.019,
-    "TISZA": 52.159,
-    "DK": 1.198,
-    "Mi Hazánk": 6.191,
-    "MKKP": 0.765
+    "FIDESZ-KDNP": 38.499,
+    "TISZA": 52.733,
+    "DK": 1.193,
+    "Mi Hazánk": 6.153,
+    "MKKP": 0.775
   },
   "minorityVote": {
-    "Országos Ukrán": 0.008,
-    "OHÖ": 0.025,
+    "Országos Ukrán": 0.006,
+    "OHÖ": 0.021,
     "OSZÖ": 0.02,
     "Magyarországi Romák Országos": 0.293,
-    "Országos Szlovén": 0.004,
+    "Országos Szlovén": 0.008,
     "OÖÖ": 0.001,
-    "MGOÖ": 0.002,
+    "MGOÖ": 0.003,
     "Bolgár Országos Önkormányzat": 0.002,
-    "MROÖ": 0.012,
+    "MROÖ": 0.01,
     "ORÖ": 0.007,
     "OLÖ": 0.002,
-    "MNOÖ": 0.292
+    "MNOÖ": 0.274
   },
   "nationalBreakdown": {
     "capital": {
-      "FIDESZ-KDNP": 29.92,
-      "TISZA": 61.69,
-      "DK": 1.89,
-      "Mi Hazánk": 4.99,
-      "MKKP": 1.35
+      "FIDESZ-KDNP": 29.69,
+      "TISZA": 62.03,
+      "DK": 1.85,
+      "Mi Hazánk": 4.93,
+      "MKKP": 1.34
     },
     "restOfCountry": {
-      "FIDESZ-KDNP": 40.47,
-      "TISZA": 50.64,
+      "FIDESZ-KDNP": 39.91,
+      "TISZA": 51.24,
       "DK": 1.09,
-      "Mi Hazánk": 6.38,
-      "MKKP": 0.67
+      "Mi Hazánk": 6.35,
+      "MKKP": 0.68
     },
     "abroad": {
-      "FIDESZ-KDNP": 91.05,
-      "TISZA": 7.33,
-      "DK": 0.18,
-      "Mi Hazánk": 1.24,
+      "FIDESZ-KDNP": 91.15,
+      "TISZA": 7.24,
+      "DK": 0.17,
+      "Mi Hazánk": 1.22,
       "MKKP": 0.21
     }
   },
@@ -20878,7 +20878,7 @@
       "18:30": 77.8
     }
   },
-  "processingPctDomestic": 22.05,
-  "nviVersion": "2026.04.12.20:53:20",
-  "processingPct": 37.04
+  "processingPctDomestic": 31.03,
+  "nviVersion": "2026.04.12.21:03:52",
+  "processingPct": 45.71
 }
