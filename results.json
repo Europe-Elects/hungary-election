@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-12T14:30:32.163832",
+  "lastUpdated": "2026-04-12T15:07:49.384992",
   "constituencies": {},
   "countyList": {
     "Budapest": {
@@ -923,6 +923,12 @@
         "time": "13:00"
       }
     },
-    "lastReportTime": "13:00"
+    "lastReportTime": "13:00",
+    "nationalHistory": {
+      "07:00": 3.46,
+      "09:00": 16.89,
+      "11:00": 37.98,
+      "13:00": 54.14
+    }
   }
 }
