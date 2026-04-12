@@ -70,6 +70,11 @@ svg#chart {
 @media (prefers-reduced-motion: reduce) {
   @keyframes pulse { 0%, 100% { opacity: 1; } }
 }
+@media (max-width: 480px) {
+  .legend-row { gap: 8px; font-size: 10px; }
+  .legend-row .line-swatch { width: 16px; }
+  .chart-footnote { font-size: 9px; }
+}
 </style>
 </head>
 <body>
