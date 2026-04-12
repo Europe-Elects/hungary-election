@@ -248,7 +248,8 @@ svg#chart {
       Each dot is a constituency. X = Fidesz-KDNP's 2022 share, Y =
       2026 turnout − <strong>time-matched, per-county</strong> 2022
       turnout. Rising turnout in opposition-won districts = opposition
-      mobilising.<span id="budapestNote"></span>
+      mobilising. Pest county constituencies excluded (redrawn in 2024,
+      boundaries not comparable).<span id="budapestNote"></span>
     </div>
   </div>
   <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · 2022 baseline from NVI XLSX</div>
@@ -335,17 +336,23 @@ function adjust2022ForTime(constFinal2022, reportTime, county) {
   return constFinal2022;
 }
 
-// Constituencies that existed in 2022 but were abolished for 2026.
-// Budapest went from 18 OEVKs to 16 in the redistricting.
-// These will never receive 2026 data — exclude from the scatter.
-const ABOLISHED = new Set(['BP-17', 'BP-18']);
+// Constituencies excluded from the scatter because of 2024 redistricting:
+// - BP-17, BP-18: abolished (Budapest 18→16 OEVKs)
+// - All Pest constituencies: redrawn (12→14 OEVKs), boundaries changed
+//   so 2022→2026 comparison is not apples-to-apples.
+const EXCLUDED = new Set([
+  'BP-17', 'BP-18',
+  'PE-01', 'PE-02', 'PE-03', 'PE-04', 'PE-05', 'PE-06',
+  'PE-07', 'PE-08', 'PE-09', 'PE-10', 'PE-11', 'PE-12',
+  'PE-13', 'PE-14',
+]);
 
 function buildPoints() {
   if (!baseline || !lastResults) return [];
   const turnout2026 = (lastResults.turnout && lastResults.turnout.constituencies) || {};
   const points = [];
   for (const [id, base2022] of Object.entries(baseline.constituencies || {})) {
-    if (ABOLISHED.has(id)) continue;  // skip abolished constituencies
+    if (EXCLUDED.has(id)) continue;  // skip abolished + redrawn constituencies
     const r2026 = turnout2026[id];
     const t2026 = r2026 && typeof r2026.pct === 'number' ? r2026.pct : null;
     const t2022final = base2022.turnoutPct;
