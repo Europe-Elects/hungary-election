@@ -388,7 +388,7 @@ function renderChart() {
     const dot = document.createElementNS(ns, 'circle');
     dot.setAttribute('cx', xScale(p.x));
     dot.setAttribute('cy', yScale(p.y));
-    const baseR = isBp ? 4.5 : 2.5;
+    const baseR = isBp ? 3.5 : 1.5;
     dot.setAttribute('r', baseR);
     dot.setAttribute('fill', strongholdColor(p.fideszPct));
     dot.setAttribute('stroke', isBp ? '#fff' : 'none');
@@ -398,7 +398,7 @@ function renderChart() {
     const dimmed = (filterGroup === 'bp' && !isBp) || (filterGroup === 'rest' && isBp);
     dot.setAttribute('opacity', dimmed ? '0.06' : (isBp ? '0.9' : '0.5'));
     dot.addEventListener('mouseenter', (e) => {
-      dot.setAttribute('r', isBp ? 7 : 4.5);
+      dot.setAttribute('r', isBp ? 5.5 : 3.5);
       showTooltip(p, e);
     });
     dot.addEventListener('mousemove', (e) => {
