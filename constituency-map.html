@@ -128,6 +128,7 @@ svg:active { cursor: grabbing; }
   <div class="header">
     <div class="subtitle">106 single-member constituencies (OEVK)</div>
     <div class="last-updated" id="lastUpdated">Last updated: –</div>
+    <span id="countedPill" style="display:none; margin-left:6px; font-size:11px; padding:3px 8px; background:#FEF3C7; color:#92400E; border-radius:4px; font-weight:600;"></span>
   </div>
   <div id="map-container">
     <svg id="map"></svg>
@@ -269,6 +270,16 @@ function buildLegend() {
   lg.innerHTML += `<div class="legend-item"><div class="legend-swatch" style="background:${NO_DATA_COLOR}"></div>No data</div>`;
 }
 
+function updateCountedPill(data) {
+  const pill = document.getElementById('countedPill');
+  if (typeof data.processingPct === 'number' && data.processingPct > 0) {
+    pill.style.display = 'inline-block';
+    pill.textContent = data.processingPct.toFixed(1) + '% counted';
+  } else {
+    pill.style.display = 'none';
+  }
+}
+
 async function loadResults() {
   try {
     const data = await (await fetch('results.json?' + Date.now())).json();
@@ -276,6 +287,7 @@ async function loadResults() {
     el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
     el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
     buildMap(data.constituencies || {});
+    updateCountedPill(data);
   } catch (e) { buildMap({}); }
 }
 
@@ -287,6 +299,7 @@ setInterval(async () => {
     el.classList.toggle('live', Object.keys(data.constituencies || {}).length > 0);
     document.getElementById('map').innerHTML = '';
     buildMap(data.constituencies || {});
+    updateCountedPill(data);
   } catch(e) {}
 }, 30000);
 
