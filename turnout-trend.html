@@ -241,8 +241,9 @@ function renderChart(history2026) {
   }
 
   // Draw a polyline from a {time: pct} dict
-  function drawLine(dataDict, color, width, dash, drawDots, opacity) {
+  function drawLine(dataDict, color, width, dash, drawDots, opacity, dotR) {
     if (typeof opacity === 'undefined') opacity = 1;
+    if (typeof dotR === 'undefined') dotR = 3;
     const sorted = TIME_SLOTS
       .filter(t => typeof dataDict[t] === 'number')
       .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(dataDict[t]), pct: dataDict[t], time: t }));
@@ -267,21 +268,22 @@ function renderChart(history2026) {
         const circle = document.createElementNS(ns, 'circle');
         circle.setAttribute('cx', p.x);
         circle.setAttribute('cy', p.y);
-        circle.setAttribute('r', 4);
+        circle.setAttribute('r', dotR);
         circle.setAttribute('fill', color);
         circle.setAttribute('stroke', '#fff');
-        circle.setAttribute('stroke-width', 1.5);
+        circle.setAttribute('stroke-width', dotR > 3 ? 1.5 : 1);
+        if (opacity < 1) circle.setAttribute('opacity', opacity);
         const title = document.createElementNS(ns, 'title');
         title.textContent = `${p.time}: ${p.pct.toFixed(2)}%`;
         circle.appendChild(title);
         svg.appendChild(circle);
 
-        // Value label on the last dot
-        if (p === sorted[sorted.length - 1]) {
+        // Value label on the LAST 2026 dot only (historical get end-label instead)
+        if (dotR > 3 && p === sorted[sorted.length - 1]) {
           const lbl = document.createElementNS(ns, 'text');
-          lbl.setAttribute('x', p.x + 6);
-          lbl.setAttribute('y', p.y - 6);
-          lbl.setAttribute('font-size', '11');
+          lbl.setAttribute('x', p.x + 8);
+          lbl.setAttribute('y', p.y - 8);
+          lbl.setAttribute('font-size', '12');
           lbl.setAttribute('font-weight', '700');
           lbl.setAttribute('fill', color);
           lbl.textContent = p.pct.toFixed(1) + '%';
@@ -291,33 +293,45 @@ function renderChart(history2026) {
     }
   }
 
-  // Draw historical lines (bottom layer) — with dots at each snapshot
-  for (const [year, cfg] of Object.entries(HISTORICAL).reverse()) {
+  // Draw historical lines (bottom layer) — small dots, staggered end labels
+  const histEntries = Object.entries(HISTORICAL);
+  // Pre-sort labels by their 18:30 value to stagger them vertically
+  const labelOffsets = {};
+  const sorted1830 = histEntries
+    .map(([year, cfg]) => ({ year, val: cfg.data['18:30'] || cfg.data['17:00'] || 0, final: cfg.final }))
+    .sort((a, b) => b.val - a.val);
+  sorted1830.forEach((entry, i) => { labelOffsets[entry.year] = i * 14; });
+
+  for (const [year, cfg] of histEntries.reverse()) {
     const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
     const opacity = visible ? 1 : 0.08;
-    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, true, opacity);
-    // Final turnout label at the end of the line (instead of year name)
+    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, true, opacity, 2.5);
+    // Final turnout label at the end of the line — staggered
     if (visible) {
       const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
       if (lastTime) {
         const lastVal = cfg.data[lastTime];
         const finalVal = cfg.final;
+        const yBase = yScale(lastVal);
+        // Stagger vertically based on sorted position
+        const offset = labelOffsets[year] || 0;
         const lbl = document.createElementNS(ns, 'text');
-        lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 5);
-        lbl.setAttribute('y', yScale(lastVal) + 4);
+        lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 8);
+        lbl.setAttribute('y', yBase - 4 + offset);
         lbl.setAttribute('font-size', '10');
         lbl.setAttribute('font-weight', '600');
         lbl.setAttribute('fill', cfg.color);
+        if (opacity < 1) lbl.setAttribute('opacity', opacity);
         lbl.textContent = finalVal ? `${year}: ${finalVal}%` : `${year}: ${lastVal}%`;
         svg.appendChild(lbl);
       }
     }
   }
 
-  // Draw 2026 line (top layer, with dots)
+  // Draw 2026 line (top layer, with bigger dots)
   const show2026 = isolatedYear === null || isolatedYear === '2026';
   if (show2026 && history2026 && Object.keys(history2026).length > 0) {
-    drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
+    drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true, 1, 5);
 
     // Projection: only shown when 2026 is visible
     if (!show2026) return;
