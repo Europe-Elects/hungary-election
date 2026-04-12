@@ -142,7 +142,7 @@ const X_MIN = 0;   // 06:00
 const X_MAX = timeToMinutes('19:00'); // 780 - 360 = 420 (not used, we go to 19:00)
 
 const PAD_LEFT = 48;
-const PAD_RIGHT = 20;
+const PAD_RIGHT = 90;  // room for end-of-line "2022: 70.2%" labels
 const PAD_TOP = 20;
 const PAD_BOTTOM = 32;
 
@@ -300,7 +300,9 @@ function renderChart(history2026) {
   const sorted1830 = histEntries
     .map(([year, cfg]) => ({ year, val: cfg.data['18:30'] || cfg.data['17:00'] || 0, final: cfg.final }))
     .sort((a, b) => b.val - a.val);
-  sorted1830.forEach((entry, i) => { labelOffsets[entry.year] = i * 14; });
+  // Stagger upward from each line's endpoint so labels don't overlap
+  // Highest value gets offset 0, next gets -14, etc.
+  sorted1830.forEach((entry, i) => { labelOffsets[entry.year] = -i * 13; });
 
   for (const [year, cfg] of histEntries.reverse()) {
     const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
