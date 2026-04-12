@@ -142,7 +142,7 @@ const X_MIN = 0;   // 06:00
 const X_MAX = timeToMinutes('19:00'); // 780 - 360 = 420 (not used, we go to 19:00)
 
 const PAD_LEFT = 48;
-const PAD_RIGHT = 90;  // room for end-of-line "2022: 70.2%" labels
+const PAD_RIGHT = 24;
 const PAD_TOP = 20;
 const PAD_BOTTOM = 32;
 
@@ -166,7 +166,8 @@ function buildLegend() {
     const isThis = isolatedYear === year;
     const isDimmed = isolatedYear !== null && isolatedYear !== year && isolatedYear !== '2026';
     item.className = 'item' + (isThis ? ' active' : isDimmed ? ' dimmed' : '');
-    item.innerHTML = `<div class="line-swatch" style="background:${cfg.color}"></div>${year}`;
+    const finalLabel = cfg.final ? ` (${cfg.final}%)` : '';
+    item.innerHTML = `<div class="line-swatch" style="background:${cfg.color}"></div>${year}${finalLabel}`;
     item.addEventListener('click', () => {
       isolatedYear = (isolatedYear === year) ? null : year;
       updateChart();
@@ -310,26 +311,7 @@ function renderChart(history2026) {
     const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
     const opacity = visible ? 1 : 0.08;
     drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, true, opacity, 2.5);
-    // Final turnout label at the end of the line — staggered
-    if (visible) {
-      const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
-      if (lastTime) {
-        const lastVal = cfg.data[lastTime];
-        const finalVal = cfg.final;
-        const yBase = yScale(lastVal);
-        // Stagger vertically based on sorted position
-        const offset = labelOffsets[year] || 0;
-        const lbl = document.createElementNS(ns, 'text');
-        lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 8);
-        lbl.setAttribute('y', yBase - 4 + offset);
-        lbl.setAttribute('font-size', '10');
-        lbl.setAttribute('font-weight', '600');
-        lbl.setAttribute('fill', cfg.color);
-        if (opacity < 1) lbl.setAttribute('opacity', opacity);
-        lbl.textContent = finalVal ? `${year}: ${finalVal}%` : `${year}: ${lastVal}%`;
-        svg.appendChild(lbl);
-      }
-    }
+    // No end-of-line labels — final % is in the legend row to avoid overlap
   }
 
   // Draw 2026 line (top layer, with bigger dots)
