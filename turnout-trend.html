@@ -44,7 +44,15 @@ body {
   display: flex; flex-wrap: wrap; gap: 14px;
   font-size: 12px; color: #334155; margin-bottom: 6px;
 }
-.legend-row .item { display: flex; align-items: center; gap: 5px; }
+.legend-row .item {
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; user-select: none;
+  padding: 2px 6px; border-radius: 4px; border: 1px solid transparent;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.legend-row .item:hover { background: #F1F5F9; }
+.legend-row .item.active { border-color: #94A3B8; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.legend-row .item.dimmed { opacity: 0.35; }
 .legend-row .line-swatch {
   width: 24px; height: 3px; border-radius: 2px;
 }
@@ -138,13 +146,38 @@ const PAD_RIGHT = 20;
 const PAD_TOP = 20;
 const PAD_BOTTOM = 32;
 
+// Which year is isolated (null = show all)
+let isolatedYear = null;
+
 function buildLegend() {
   const el = document.getElementById('legend');
-  let html = `<div class="item y2026"><div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 (live)</div>`;
+  el.innerHTML = '';
+  // 2026 always visible, clicking it resets to "show all"
+  const item2026 = document.createElement('div');
+  item2026.className = 'item y2026' + (isolatedYear === null ? ' active' : isolatedYear === '2026' ? ' active' : ' dimmed');
+  item2026.dataset.year = '2026';
+  item2026.innerHTML = `<div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 (live)`;
+  item2026.addEventListener('click', () => toggleYear('2026'));
+  el.appendChild(item2026);
+
   for (const [year, cfg] of Object.entries(HISTORICAL)) {
-    html += `<div class="item"><div class="line-swatch" style="background:${cfg.color}"></div>${year}</div>`;
+    const item = document.createElement('div');
+    item.className = 'item' + (isolatedYear === year ? ' active' : isolatedYear !== null && isolatedYear !== year ? ' dimmed' : '');
+    item.dataset.year = year;
+    item.innerHTML = `<div class="line-swatch" style="background:${cfg.color}"></div>${year}`;
+    item.addEventListener('click', () => toggleYear(year));
+    el.appendChild(item);
   }
-  el.innerHTML = html;
+}
+
+function toggleYear(year) {
+  if (isolatedYear === year) {
+    isolatedYear = null; // toggle off → show all
+  } else {
+    isolatedYear = year;
+  }
+  buildLegend();
+  if (lastData) origApply(lastData);
 }
 
 function renderChart(history2026) {
@@ -208,7 +241,8 @@ function renderChart(history2026) {
   }
 
   // Draw a polyline from a {time: pct} dict
-  function drawLine(dataDict, color, width, dash, drawDots) {
+  function drawLine(dataDict, color, width, dash, drawDots, opacity) {
+    if (typeof opacity === 'undefined') opacity = 1;
     const sorted = TIME_SLOTS
       .filter(t => typeof dataDict[t] === 'number')
       .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(dataDict[t]), pct: dataDict[t], time: t }));
@@ -224,6 +258,7 @@ function renderChart(history2026) {
       if (dash) pl.setAttribute('stroke-dasharray', dash);
       pl.setAttribute('stroke-linecap', 'round');
       pl.setAttribute('stroke-linejoin', 'round');
+      if (opacity < 1) pl.setAttribute('opacity', opacity);
       svg.appendChild(pl);
     }
 
@@ -258,24 +293,32 @@ function renderChart(history2026) {
 
   // Draw historical lines (bottom layer)
   for (const [year, cfg] of Object.entries(HISTORICAL).reverse()) {
-    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, false);
+    const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
+    const opacity = visible ? 1 : 0.08;
+    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, false, opacity);
     // Year label at the end of the line
-    const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
-    if (lastTime) {
-      const lbl = document.createElementNS(ns, 'text');
-      lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 5);
-      lbl.setAttribute('y', yScale(cfg.data[lastTime]) + 4);
-      lbl.setAttribute('font-size', '10');
-      lbl.setAttribute('font-weight', '500');
-      lbl.setAttribute('fill', cfg.color);
-      lbl.textContent = year;
-      svg.appendChild(lbl);
+    if (visible) {
+      const lastTime = TIME_SLOTS.filter(t => typeof cfg.data[t] === 'number').pop();
+      if (lastTime) {
+        const lbl = document.createElementNS(ns, 'text');
+        lbl.setAttribute('x', xScale(timeToMinutes(lastTime)) + 5);
+        lbl.setAttribute('y', yScale(cfg.data[lastTime]) + 4);
+        lbl.setAttribute('font-size', '10');
+        lbl.setAttribute('font-weight', '500');
+        lbl.setAttribute('fill', cfg.color);
+        lbl.textContent = year;
+        svg.appendChild(lbl);
+      }
     }
   }
 
   // Draw 2026 line (top layer, with dots)
-  if (history2026 && Object.keys(history2026).length > 0) {
+  const show2026 = isolatedYear === null || isolatedYear === '2026';
+  if (show2026 && history2026 && Object.keys(history2026).length > 0) {
     drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
+
+    // Projection: only shown when 2026 is visible
+    if (!show2026) return;
 
     // Projection: "remaining-voter capture rate" model.
     //
