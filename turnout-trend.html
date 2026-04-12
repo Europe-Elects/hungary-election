@@ -300,9 +300,11 @@ function renderChart(history2026) {
   const sorted1830 = histEntries
     .map(([year, cfg]) => ({ year, val: cfg.data['18:30'] || cfg.data['17:00'] || 0, final: cfg.final }))
     .sort((a, b) => b.val - a.val);
-  // Stagger upward from each line's endpoint so labels don't overlap
-  // Highest value gets offset 0, next gets -14, etc.
-  sorted1830.forEach((entry, i) => { labelOffsets[entry.year] = -i * 13; });
+  // Stagger labels alternating left/right of the endpoint to avoid overlap.
+  // Even indices go right+up, odd go right+down.
+  sorted1830.forEach((entry, i) => {
+    labelOffsets[entry.year] = (i % 2 === 0) ? -6 - i * 5 : 10 + i * 5;
+  });
 
   for (const [year, cfg] of histEntries.reverse()) {
     const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
