@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Municipality Turnout Change</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #1E293B;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.container {
+  max-width: 960px; margin: 0 auto; padding: 16px 16px 16px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+.header { margin-bottom: 8px; }
+.subtitle { font-size: 13px; color: #64748B; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.last-updated::before {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: #64748B;
+}
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.stats-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 8px;
+}
+.stat-card {
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); padding: 8px 12px;
+}
+.stat-card.bp { border-left: 3px solid #2563EB; }
+.stat-card.rest { border-left: 3px solid #64748B; }
+.stat-card.diff { border-left: 3px solid #22C55E; }
+.stat-card.diff.negative { border-left-color: #EF4444; }
+.stat-label { font-size: 9px; font-weight: 600; color: #475569; text-transform: uppercase; }
+.stat-value { font-size: 20px; font-weight: 700; color: #0F172A; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.stat-sub { font-size: 9px; color: #64748B; margin-top: 2px; }
+
+#chart-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  flex: 1 1 auto; min-height: 0;
+  padding: 10px 12px 6px; display: flex; flex-direction: column;
+}
+.chart-legend {
+  display: flex; gap: 14px; font-size: 12px; color: #334155; margin-bottom: 4px;
+}
+.chart-legend .item { display: flex; align-items: center; gap: 5px; }
+.chart-legend .swatch { width: 10px; height: 10px; border-radius: 50%; }
+.chart-legend .note { font-size: 11px; color: #64748B; }
+
+svg#chart { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: block; font-family: inherit; }
+.grid-line { stroke: #F1F5F9; stroke-width: 1; }
+.grid-line.axis { stroke: #CBD5E1; }
+.ref-line { stroke: #94A3B8; stroke-width: 1; stroke-dasharray: 3 3; }
+.axis-label { font-size: 10px; fill: #64748B; font-variant-numeric: tabular-nums; }
+.axis-title { font-size: 11px; fill: #475569; font-weight: 600; }
+.axis-line { stroke: #CBD5E1; stroke-width: 1; }
+
+.chart-footnote { font-size: 10px; color: #64748B; margin-top: 4px; line-height: 1.45; }
+.chart-footnote strong { color: #334155; }
+.footer { margin-top: 8px; font-size: 11px; color: #64748B; text-align: center; }
+
+@media (max-width: 640px) {
+  .stat-card { padding: 6px 8px; }
+  .stat-label { font-size: 7px; }
+  .stat-value { font-size: 14px; }
+  .stat-sub { font-size: 7px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">Municipality turnout change vs 2022 — direct comparison at the same hour</div>
+    <div class="last-updated" id="lastUpdated">Loading…</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card bp">
+      <div class="stat-label">Budapest avg</div>
+      <div class="stat-value" id="statBp">—</div>
+      <div class="stat-sub" id="statBpSub">23 districts</div>
+    </div>
+    <div class="stat-card rest">
+      <div class="stat-label">Rest of country avg</div>
+      <div class="stat-value" id="statRest">—</div>
+      <div class="stat-sub" id="statRestSub">3154 municipalities</div>
+    </div>
+    <div class="stat-card diff" id="diffCard">
+      <div class="stat-label">Budapest vs Rest</div>
+      <div class="stat-value" id="statDiff">—</div>
+      <div class="stat-sub" id="statDiffSub">Budapest mobilisation edge</div>
+    </div>
+  </div>
+  <div id="chart-container">
+    <div class="chart-legend">
+      <div class="item"><div class="swatch" style="background:#2563EB"></div>Budapest</div>
+      <div class="item"><div class="swatch" style="background:#94A3B8"></div>Rest of country</div>
+      <div class="note" id="modeNote"></div>
+    </div>
+    <svg id="chart"></svg>
+    <div class="chart-footnote">
+      Each dot is a municipality. X = 2022 turnout at the <strong>same
+      hour</strong>, Y = 2026 turnout at the latest snapshot. Dots above
+      the diagonal = higher turnout than 2022. No estimation needed —
+      direct comparison at the exact same time of day.
+    </div>
+  </div>
+  <div class="footer">Chart created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service</div>
+</div>
+
+<script>
+const PAD_LEFT = 48;
+const PAD_RIGHT = 16;
+const PAD_TOP = 16;
+const PAD_BOTTOM = 36;
+
+let baseline2022 = null;
+let lastResults = null;
+
+async function loadBaseline() {
+  try {
+    const r = await fetch('2022_municipality_baseline.json?v=' + Date.now());
+    baseline2022 = await r.json();
+  } catch (e) { baseline2022 = null; }
+}
+
+async function loadResults() {
+  try {
+    const r = await fetch('results.json?' + Date.now());
+    lastResults = await r.json();
+  } catch (e) {}
+}
+
+function buildPoints() {
+  if (!baseline2022 || !lastResults) return [];
+  const munis2026 = (lastResults.turnout && lastResults.turnout.municipalities) || {};
+  const points = [];
+  for (const [key, base] of Object.entries(baseline2022)) {
+    const live = munis2026[key];
+    if (!live || typeof live.pct !== 'number' || live.pct <= 0) continue;
+    const snapshotTime = live.time;
+    const base2022AtTime = base[snapshotTime];
+    if (typeof base2022AtTime !== 'number') continue;
+    points.push({
+      key,
+      isBudapest: key.startsWith('01-'),
+      x: base2022AtTime,    // 2022 turnout at same hour
+      y: live.pct,          // 2026 turnout now
+      delta: +(live.pct - base2022AtTime).toFixed(2),
+      vp: live.vp,
+      time: snapshotTime,
+    });
+  }
+  return points;
+}
+
+function updateStats(points) {
+  const bp = points.filter(p => p.isBudapest);
+  const rest = points.filter(p => !p.isBudapest);
+  const avg = arr => arr.length ? arr.reduce((s, p) => s + p.delta, 0) / arr.length : null;
+  const bpAvg = avg(bp);
+  const restAvg = avg(rest);
+
+  document.getElementById('statBp').textContent = bpAvg !== null ? (bpAvg > 0 ? '+' : '') + bpAvg.toFixed(1) + ' pp' : '—';
+  document.getElementById('statBpSub').textContent = `${bp.length} districts with data`;
+  document.getElementById('statRest').textContent = restAvg !== null ? (restAvg > 0 ? '+' : '') + restAvg.toFixed(1) + ' pp' : '—';
+  document.getElementById('statRestSub').textContent = `${rest.length} municipalities with data`;
+
+  if (bpAvg !== null && restAvg !== null) {
+    const diff = bpAvg - restAvg;
+    document.getElementById('statDiff').textContent = (diff > 0 ? '+' : '') + diff.toFixed(1) + ' pp';
+    document.getElementById('diffCard').classList.toggle('negative', diff < -0.5);
+    document.getElementById('statDiffSub').textContent = diff > 0.5
+      ? 'Budapest mobilising more'
+      : diff < -0.5 ? 'Rest of country mobilising more' : 'Balanced';
+  }
+
+  const latest = points.map(p => p.time).filter(Boolean).sort().pop() || '—';
+  document.getElementById('modeNote').textContent = `${points.length} municipalities · snapshot ${latest}`;
+}
+
+function renderChart() {
+  const svg = document.getElementById('chart');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  const rect = svg.getBoundingClientRect();
+  const VB_W = Math.max(300, Math.round(rect.width));
+  const VB_H = Math.max(200, Math.round(rect.height));
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+
+  const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
+  const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
+
+  const points = buildPoints();
+  updateStats(points);
+
+  // Axes: 0-100% on both
+  const axMin = 0, axMax = 100;
+  function xScale(v) { return PAD_LEFT + (v / axMax) * plotW; }
+  function yScale(v) { return PAD_TOP + plotH - (v / axMax) * plotH; }
+
+  // Grid every 20%
+  for (let v = 0; v <= 100; v += 20) {
+    // Horizontal
+    const yy = yScale(v);
+    const hl = document.createElementNS(ns, 'line');
+    hl.setAttribute('x1', PAD_LEFT); hl.setAttribute('x2', PAD_LEFT + plotW);
+    hl.setAttribute('y1', yy); hl.setAttribute('y2', yy);
+    hl.setAttribute('class', v === 0 ? 'grid-line axis' : 'grid-line');
+    svg.appendChild(hl);
+    const yl = document.createElementNS(ns, 'text');
+    yl.setAttribute('x', PAD_LEFT - 6); yl.setAttribute('y', yy + 3);
+    yl.setAttribute('text-anchor', 'end'); yl.setAttribute('class', 'axis-label');
+    yl.textContent = v + '%';
+    svg.appendChild(yl);
+    // Vertical
+    const xx = xScale(v);
+    const vl = document.createElementNS(ns, 'line');
+    vl.setAttribute('x1', xx); vl.setAttribute('x2', xx);
+    vl.setAttribute('y1', PAD_TOP); vl.setAttribute('y2', PAD_TOP + plotH);
+    vl.setAttribute('class', 'grid-line');
+    svg.appendChild(vl);
+    const xl = document.createElementNS(ns, 'text');
+    xl.setAttribute('x', xx); xl.setAttribute('y', PAD_TOP + plotH + 14);
+    xl.setAttribute('text-anchor', 'middle'); xl.setAttribute('class', 'axis-label');
+    xl.textContent = v + '%';
+    svg.appendChild(xl);
+  }
+
+  // Diagonal reference line (y = x → same turnout as 2022)
+  const diagLine = document.createElementNS(ns, 'line');
+  diagLine.setAttribute('x1', xScale(0)); diagLine.setAttribute('y1', yScale(0));
+  diagLine.setAttribute('x2', xScale(100)); diagLine.setAttribute('y2', yScale(100));
+  diagLine.setAttribute('class', 'ref-line');
+  svg.appendChild(diagLine);
+
+  // Axis frame
+  const ab = document.createElementNS(ns, 'line');
+  ab.setAttribute('x1', PAD_LEFT); ab.setAttribute('x2', PAD_LEFT + plotW);
+  ab.setAttribute('y1', PAD_TOP + plotH); ab.setAttribute('y2', PAD_TOP + plotH);
+  ab.setAttribute('class', 'axis-line');
+  svg.appendChild(ab);
+  const al = document.createElementNS(ns, 'line');
+  al.setAttribute('x1', PAD_LEFT); al.setAttribute('x2', PAD_LEFT);
+  al.setAttribute('y1', PAD_TOP); al.setAttribute('y2', PAD_TOP + plotH);
+  al.setAttribute('class', 'axis-line');
+  svg.appendChild(al);
+
+  // Axis titles
+  const xt = document.createElementNS(ns, 'text');
+  xt.setAttribute('x', PAD_LEFT + plotW / 2);
+  xt.setAttribute('y', VB_H - 4);
+  xt.setAttribute('text-anchor', 'middle');
+  xt.setAttribute('class', 'axis-title');
+  xt.textContent = '2022 turnout at same hour (%)';
+  svg.appendChild(xt);
+  const yt = document.createElementNS(ns, 'text');
+  yt.setAttribute('transform', `rotate(-90 12 ${PAD_TOP + plotH / 2})`);
+  yt.setAttribute('x', 12);
+  yt.setAttribute('y', PAD_TOP + plotH / 2);
+  yt.setAttribute('text-anchor', 'middle');
+  yt.setAttribute('class', 'axis-title');
+  yt.textContent = '2026 turnout (%)';
+  svg.appendChild(yt);
+
+  // Draw dots — rest first (grey, transparent), then Budapest (blue, prominent)
+  const restPts = points.filter(p => !p.isBudapest);
+  const bpPts = points.filter(p => p.isBudapest);
+
+  for (const p of restPts) {
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', xScale(p.x));
+    dot.setAttribute('cy', yScale(p.y));
+    dot.setAttribute('r', 2);
+    dot.setAttribute('fill', '#94A3B8');
+    dot.setAttribute('opacity', '0.35');
+    const t = document.createElementNS(ns, 'title');
+    t.textContent = `${p.key}\n2022 at ${p.time}: ${p.x.toFixed(1)}%\n2026 at ${p.time}: ${p.y.toFixed(1)}%\nΔ ${p.delta > 0 ? '+' : ''}${p.delta} pp`;
+    dot.appendChild(t);
+    svg.appendChild(dot);
+  }
+  for (const p of bpPts) {
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', xScale(p.x));
+    dot.setAttribute('cy', yScale(p.y));
+    dot.setAttribute('r', 4.5);
+    dot.setAttribute('fill', '#2563EB');
+    dot.setAttribute('opacity', '0.8');
+    dot.setAttribute('stroke', '#fff');
+    dot.setAttribute('stroke-width', '1');
+    const t = document.createElementNS(ns, 'title');
+    t.textContent = `${p.key}\n2022 at ${p.time}: ${p.x.toFixed(1)}%\n2026 at ${p.time}: ${p.y.toFixed(1)}%\nΔ ${p.delta > 0 ? '+' : ''}${p.delta} pp`;
+    dot.appendChild(t);
+    svg.appendChild(dot);
+  }
+
+  // "Above diagonal" label
+  const diagLabel = document.createElementNS(ns, 'text');
+  diagLabel.setAttribute('x', xScale(15));
+  diagLabel.setAttribute('y', yScale(25));
+  diagLabel.setAttribute('font-size', '10');
+  diagLabel.setAttribute('fill', '#16A34A');
+  diagLabel.setAttribute('font-weight', '600');
+  diagLabel.setAttribute('opacity', '0.6');
+  diagLabel.textContent = '↑ higher than 2022';
+  svg.appendChild(diagLabel);
+}
+
+function applyUpdate() {
+  const el = document.getElementById('lastUpdated');
+  if (lastResults) {
+    el.textContent = 'Last updated: ' + new Date(lastResults.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
+    el.classList.toggle('live', true);
+  }
+  renderChart();
+}
+
+async function init() {
+  await loadBaseline();
+  await loadResults();
+  applyUpdate();
+  setInterval(async () => { await loadResults(); applyUpdate(); }, 30000);
+  let t = null;
+  window.addEventListener('resize', () => { if (t) clearTimeout(t); t = setTimeout(renderChart, 150); });
+}
+init();
+</script>
+</body>
+</html>
