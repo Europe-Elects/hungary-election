@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T02:36:11.726137",
+  "lastUpdated": "2026-04-13T02:46:18.166136",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -159,7 +159,7 @@
       "DK": 1.0,
       "Mi Hazánk": 4.8,
       "MKKP": 0.6,
-      "counted": 99.09
+      "counted": 99.55
     },
     "BK-01": {
       "FIDESZ-KDNP": 40.8,
@@ -266,12 +266,12 @@
       "counted": 99.24
     },
     "BO-04": {
-      "FIDESZ-KDNP": 39.4,
-      "TISZA": 52.5,
+      "FIDESZ-KDNP": 39.2,
+      "TISZA": 52.7,
       "DK": 1.0,
-      "Mi Hazánk": 6.8,
+      "Mi Hazánk": 6.9,
       "MKKP": 0.0,
-      "counted": 98.45
+      "counted": 99.22
     },
     "BO-05": {
       "FIDESZ-KDNP": 45.4,
@@ -378,12 +378,12 @@
       "counted": 98.53
     },
     "GY-02": {
-      "FIDESZ-KDNP": 37.6,
-      "TISZA": 54.2,
+      "FIDESZ-KDNP": 37.7,
+      "TISZA": 54.0,
       "DK": 1.0,
-      "Mi Hazánk": 6.3,
+      "Mi Hazánk": 6.4,
       "MKKP": 0.7,
-      "counted": 97.65
+      "counted": 98.82
     },
     "GY-03": {
       "FIDESZ-KDNP": 48.2,
@@ -730,12 +730,12 @@
       "counted": 98.31
     },
     "SZ-05": {
-      "FIDESZ-KDNP": 51.3,
+      "FIDESZ-KDNP": 51.2,
       "TISZA": 41.4,
       "DK": 0.6,
       "Mi Hazánk": 6.5,
       "MKKP": 0.0,
-      "counted": 96.88
+      "counted": 97.92
     },
     "SZ-06": {
       "FIDESZ-KDNP": 47.0,
@@ -881,7 +881,7 @@
     },
     "Borsod-Abaúj-Zemplén": {
       "FIDESZ-KDNP": 38.4,
-      "TISZA": 52.8,
+      "TISZA": 52.9,
       "DK": 1.0,
       "Mi Hazánk": 6.0,
       "MKKP": 0.5
@@ -902,9 +902,9 @@
     },
     "Győr-Moson-Sopron": {
       "FIDESZ-KDNP": 39.9,
-      "TISZA": 51.8,
+      "TISZA": 51.7,
       "DK": 1.0,
-      "Mi Hazánk": 6.1,
+      "Mi Hazánk": 6.2,
       "MKKP": 0.7
     },
     "Hajdú-Bihar": {
@@ -993,11 +993,11 @@
     }
   },
   "nationalVote": {
-    "FIDESZ-KDNP": 36.965,
-    "TISZA": 54.333,
+    "FIDESZ-KDNP": 36.972,
+    "TISZA": 54.326,
     "DK": 1.187,
-    "Mi Hazánk": 5.964,
-    "MKKP": 0.833
+    "Mi Hazánk": 5.965,
+    "MKKP": 0.832
   },
   "minorityVote": {
     "Országos Ukrán": 0.006,
@@ -1023,16 +1023,16 @@
     },
     "restOfCountry": {
       "FIDESZ-KDNP": 38.62,
-      "TISZA": 52.54,
+      "TISZA": 52.53,
       "DK": 1.08,
       "Mi Hazánk": 6.23,
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 86.55,
-      "TISZA": 11.47,
+      "FIDESZ-KDNP": 86.61,
+      "TISZA": 11.43,
       "DK": 0.23,
-      "Mi Hazánk": 1.46,
+      "Mi Hazánk": 1.45,
       "MKKP": 0.29
     }
   },
@@ -20878,7 +20878,7 @@
       "18:30": 77.8
     }
   },
-  "processingPctDomestic": 98.79,
-  "nviVersion": "2026.04.13.01:33:26",
-  "processingPct": 98.82
+  "processingPctDomestic": 98.84,
+  "nviVersion": "2026.04.13.01:43:08",
+  "processingPct": 98.87
 }
