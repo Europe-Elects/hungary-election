@@ -272,44 +272,68 @@ function renderChart(history2026) {
   if (history2026 && Object.keys(history2026).length > 0) {
     drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true);
 
-    // Projection: extrapolate from the 2022 curve shape.
-    // Take the ratio (2026_latest / 2022_at_same_time) and apply it
-    // to 2022's remaining snapshots. This assumes the 2026 turnout
-    // follows the same intraday shape as 2022 but scaled up.
+    // Projection: extrapolate using a DECLINING ratio model.
+    //
+    // The 2026/2022 ratio at each snapshot typically declines through
+    // the day (morning surge fades, afternoon converges). We fit a
+    // linear trend to the observed ratios and extrapolate forward,
+    // floored at 1.0 (2026 can't fall below 2022's curve). This is
+    // more conservative than a fixed-ratio projection — and matches
+    // the historical pattern where high-turnout elections converge
+    // with the baseline in the late afternoon.
     const ref = HISTORICAL['2022'].data;
-    const availableTimes = TIME_SLOTS.filter(t => typeof history2026[t] === 'number');
-    const latestTime = availableTimes[availableTimes.length - 1];
-    if (latestTime && ref[latestTime] && ref[latestTime] > 0) {
-      const ratio = history2026[latestTime] / ref[latestTime];
+    const availableTimes = TIME_SLOTS.filter(t =>
+      typeof history2026[t] === 'number' && typeof ref[t] === 'number' && ref[t] > 0
+    );
+    if (availableTimes.length >= 2) {
+      // Compute ratio at each available time + linear regression
+      const ratioPoints = availableTimes.map(t => ({
+        x: timeToMinutes(t),
+        ratio: history2026[t] / ref[t],
+      }));
+      const n = ratioPoints.length;
+      const xMean = ratioPoints.reduce((s, p) => s + p.x, 0) / n;
+      const yMean = ratioPoints.reduce((s, p) => s + p.ratio, 0) / n;
+      const num = ratioPoints.reduce((s, p) => s + (p.x - xMean) * (p.ratio - yMean), 0);
+      const den = ratioPoints.reduce((s, p) => s + (p.x - xMean) ** 2, 0);
+      const slope = den !== 0 ? num / den : 0;
+      const intercept = yMean - slope * xMean;
+
+      function projRatio(t) {
+        const m = timeToMinutes(t);
+        return Math.max(1.0, intercept + slope * m);
+      }
+
+      const latestTime = availableTimes[availableTimes.length - 1];
       const futureTimes = TIME_SLOTS.filter(t => timeToMinutes(t) > timeToMinutes(latestTime));
       if (futureTimes.length > 0) {
-        // Build projection points starting from the last real point
         const projData = {};
-        projData[latestTime] = history2026[latestTime]; // connect to the real line
+        projData[latestTime] = history2026[latestTime]; // anchor to last real point
         for (const t of futureTimes) {
           if (typeof ref[t] === 'number') {
-            projData[t] = Math.min(100, +(ref[t] * ratio).toFixed(1));
+            projData[t] = Math.min(100, +(ref[t] * projRatio(t)).toFixed(1));
           }
         }
-        // Also project the "final" estimate at 19:00 using 2022's final
+
+        // Projected final estimate
         const final2022 = HISTORICAL['2022'].final;
-        if (final2022) {
-          const projFinal = Math.min(100, +(final2022 * ratio).toFixed(1));
-          // Draw the projected final as a label at the end
-          const lastProjTime = futureTimes.filter(t => projData[t]).pop();
-          if (lastProjTime) {
-            // Add small annotation for projected final
-            const lx = xScale(timeToMinutes(lastProjTime)) + 6;
-            const ly = yScale(projData[lastProjTime]);
-            const ann = document.createElementNS(ns, 'text');
-            ann.setAttribute('x', lx);
-            ann.setAttribute('y', ly - 6);
-            ann.setAttribute('font-size', '10');
-            ann.setAttribute('font-weight', '700');
-            ann.setAttribute('fill', '#93C5FD');
-            ann.textContent = '~' + projData[lastProjTime].toFixed(0) + '%';
-            svg.appendChild(ann);
-            // Projected final label below
+        const projFinalRatio = Math.max(1.0, intercept + slope * (13 * 60));
+        const projFinal = final2022 ? Math.min(100, +(final2022 * projFinalRatio).toFixed(1)) : null;
+
+        // Draw annotation at end of projection
+        const lastProjTime = futureTimes.filter(t => projData[t]).pop();
+        if (lastProjTime) {
+          const lx = xScale(timeToMinutes(lastProjTime)) + 6;
+          const ly = yScale(projData[lastProjTime]);
+          const ann = document.createElementNS(ns, 'text');
+          ann.setAttribute('x', lx);
+          ann.setAttribute('y', ly - 6);
+          ann.setAttribute('font-size', '10');
+          ann.setAttribute('font-weight', '700');
+          ann.setAttribute('fill', '#93C5FD');
+          ann.textContent = '~' + projData[lastProjTime].toFixed(0) + '%';
+          svg.appendChild(ann);
+          if (projFinal !== null) {
             const ann2 = document.createElementNS(ns, 'text');
             ann2.setAttribute('x', lx);
             ann2.setAttribute('y', ly + 6);
@@ -320,7 +344,7 @@ function renderChart(history2026) {
           }
         }
 
-        // Draw the projection as a dashed lighter blue line
+        // Draw projection as dashed light blue line
         const projSorted = TIME_SLOTS
           .filter(t => typeof projData[t] === 'number')
           .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(projData[t]) }));
