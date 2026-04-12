@@ -685,6 +685,49 @@ function renderChart() {
 
     svg.appendChild(dot);
   }
+
+  // Linear trendline (red) — shows the relationship between
+  // Fidesz 2022 stronghold strength and turnout change.
+  // If the line slopes down: Fidesz areas have lower turnout change
+  // → opposition is mobilising relatively more.
+  if (withDelta.length > 2) {
+    const n = withDelta.length;
+    const xMean = withDelta.reduce((s, p) => s + p.fidesz2022, 0) / n;
+    const yMean = withDelta.reduce((s, p) => s + p.delta, 0) / n;
+    const num = withDelta.reduce((s, p) => s + (p.fidesz2022 - xMean) * (p.delta - yMean), 0);
+    const den = withDelta.reduce((s, p) => s + (p.fidesz2022 - xMean) ** 2, 0);
+    const slope = den !== 0 ? num / den : 0;
+    const intercept = yMean - slope * xMean;
+
+    const x1 = Math.max(xMin, Math.min(...withDelta.map(p => p.fidesz2022)) - 2);
+    const x2 = Math.min(xMax, Math.max(...withDelta.map(p => p.fidesz2022)) + 2);
+    const y1 = intercept + slope * x1;
+    const y2 = intercept + slope * x2;
+
+    const trend = document.createElementNS(ns, 'line');
+    trend.setAttribute('x1', xScale(x1));
+    trend.setAttribute('y1', yScale(Math.max(yMin, Math.min(yMax, y1))));
+    trend.setAttribute('x2', xScale(x2));
+    trend.setAttribute('y2', yScale(Math.max(yMin, Math.min(yMax, y2))));
+    trend.setAttribute('stroke', '#EF4444');
+    trend.setAttribute('stroke-width', '2');
+    trend.setAttribute('stroke-dasharray', '');
+    trend.setAttribute('opacity', '0.7');
+    const title = document.createElementNS(ns, 'title');
+    title.textContent = `Trendline: slope ${slope > 0 ? '+' : ''}${slope.toFixed(3)} pp per 1% Fidesz share`;
+    trend.appendChild(title);
+    svg.appendChild(trend);
+
+    // Small label at the right end
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', xScale(x2) + 4);
+    lbl.setAttribute('y', yScale(Math.max(yMin, Math.min(yMax, y2))) - 4);
+    lbl.setAttribute('font-size', '9');
+    lbl.setAttribute('font-weight', '600');
+    lbl.setAttribute('fill', '#EF4444');
+    lbl.textContent = slope < -0.05 ? '↘ opp. edge' : slope > 0.05 ? '↗ Fidesz edge' : '→ flat';
+    svg.appendChild(lbl);
+  }
 }
 
 function renderDotTooltipHtml(p) {
