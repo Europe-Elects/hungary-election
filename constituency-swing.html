@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Constituency Swing vs 2022</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #0F172A;
+  display: flex; flex-direction: column; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.container {
+  max-width: 1040px; margin: 0 auto; padding: 16px 16px 12px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+.header { margin-bottom: 10px; }
+.subtitle { font-size: 13px; color: #475569; font-weight: 500; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.last-updated::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #94A3B8; }
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#map-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 10px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.03);
+  flex: 1 1 auto; min-height: 0;
+  padding: 8px;
+  display: flex; flex-direction: column;
+}
+svg#map { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: block; }
+.district { fill: #F8FAFC; stroke: #CBD5E1; stroke-width: 0.5; }
+.county-border { fill: none; stroke: #94A3B8; stroke-width: 1; opacity: 0.5; pointer-events: none; }
+.swing-arrow { pointer-events: none; }
+.swing-hover:hover { opacity: 0.75; cursor: help; }
+.arrow-dot { pointer-events: none; }
+
+.legend-row {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  padding: 6px 10px 2px; font-size: 12px; color: #334155;
+}
+.legend-row .item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-row .swatch { width: 20px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend-row .count { color: #64748B; font-weight: 500; font-variant-numeric: tabular-nums; }
+.scale-key {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-left: auto; font-size: 11px; color: #475569;
+}
+.scale-key svg { width: 140px; height: 18px; }
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 12px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 30; min-width: 240px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .1s, transform .1s;
+}
+#tooltip.visible { opacity: 1; transform: translateY(0); }
+#tooltip h4 { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 2px; }
+#tooltip .sub { font-size: 10.5px; color: #64748B; margin-bottom: 6px; }
+#tooltip .row { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; padding: 1px 0; }
+#tooltip .row .lbl { color: #64748B; font-weight: 500; }
+#tooltip .row .v { font-variant-numeric: tabular-nums; font-weight: 600; color: #0F172A; }
+#tooltip .row .pos { color: #1D4ED8; }
+#tooltip .row .neg { color: #334155; }
+#tooltip .divider { height: 1px; background: #F1F5F9; margin: 5px 0; }
+#tooltip .note { font-size: 10px; color: #DC2626; margin-top: 4px; font-style: italic; }
+
+.footer { margin-top: 8px; font-size: 11px; color: #64748B; text-align: center; }
+.chart-footnote { font-size: 10px; color: #64748B; padding: 4px 10px; line-height: 1.45; }
+.chart-footnote strong { color: #334155; }
+
+@media (prefers-reduced-motion: reduce) { @keyframes pulse { 0%, 100% { opacity: 1; } } }
+@media (max-width: 600px) { .legend-row { gap: 8px; font-size: 11px; } .scale-key { margin-left: 0; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">How the vote swung since the last election — list-vote share change per constituency (106 OEVK), 2022 → 2026</div>
+    <div class="last-updated" id="lastUpdated">Loading…</div>
+  </div>
+  <div id="map-container">
+    <div class="legend-row">
+      <span class="item"><span class="swatch" style="background:#3399FF"></span>TISZA gain (vs United for Hungary 2022)<span class="count" id="countBlue"></span></span>
+      <span class="item"><span class="swatch" style="background:#000000"></span>Fidesz-KDNP gain<span class="count" id="countBlack"></span></span>
+      <span class="scale-key">
+        Scale:
+        <svg viewBox="0 0 140 18" aria-hidden="true">
+          <defs>
+            <marker id="scaleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#3399FF"/>
+            </marker>
+          </defs>
+          <line x1="10" y1="9" x2="45" y2="9" stroke="#3399FF" stroke-width="2" marker-end="url(#scaleArrow)"/>
+          <text x="50" y="12" font-size="10" fill="#475569" font-family="Inter">10 pp</text>
+          <line x1="85" y1="9" x2="130" y2="9" stroke="#3399FF" stroke-width="2.5" marker-end="url(#scaleArrow)"/>
+        </svg>
+        <span>20 pp</span>
+      </span>
+    </div>
+    <svg id="map" viewBox="0 0 916 570" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip"></div>
+    <div class="chart-footnote">
+      Each arrow starts at a constituency centroid: horizontal component is the
+      <strong>TISZA 2026 vs United for Hungary 2022</strong> shift, vertical component is the
+      Fidesz-KDNP shift (Fidesz-loss pushes the arrow up). Arrow colour shows which side netted
+      the larger move. Constituencies that were redistricted (BP-17, BP-18 → PE-13, PE-14) are
+      drawn with no arrow since there is no comparable 2022 base.
+    </div>
+  </div>
+  <div class="footer">Map created by Andrei Miclea · Source: Hungarian National Election Office VIP Service</div>
+</div>
+
+<script src="county-data.js"></script>
+<script src="map-data.js"></script>
+<script>
+// ── 2022 baseline per constituency (inlined from 2022_baseline.json, static) ──
+// f = Fidesz-KDNP %, o = United for Hungary % (Egységben Magyarországért coalition)
+const BASELINE_2022_CONST = {
+  "BA-01":{f:41.78,o:44.01},"BA-02":{f:44.41,o:41.17},"BA-03":{f:60.44,o:29.94},"BA-04":{f:61.08,o:28.74},
+  "BE-01":{f:48.27,o:40.05},"BE-02":{f:57.71,o:29.37},"BE-03":{f:55.76,o:33.93},"BE-04":{f:49.82,o:39.67},
+  "BK-01":{f:59.02,o:28.98},"BK-02":{f:53.00,o:34.28},"BK-03":{f:59.70,o:30.23},"BK-04":{f:62.97,o:24.75},
+  "BK-05":{f:60.16,o:28.53},"BK-06":{f:57.26,o:32.71},
+  "BO-01":{f:46.50,o:41.37},"BO-02":{f:43.85,o:42.80},"BO-03":{f:58.93,o:27.08},"BO-04":{f:54.39,o:34.55},
+  "BO-05":{f:60.60,o:29.99},"BO-06":{f:59.00,o:36.94},"BO-07":{f:60.42,o:26.96},
+  "BP-01":{f:42.60,o:48.47},"BP-02":{f:40.73,o:51.94},"BP-03":{f:41.82,o:48.42},"BP-04":{f:40.60,o:51.89},
+  "BP-05":{f:37.79,o:51.39},"BP-06":{f:41.78,o:48.31},"BP-07":{f:30.39,o:60.53},"BP-08":{f:36.54,o:54.09},
+  "BP-09":{f:42.55,o:45.97},"BP-10":{f:41.12,o:48.82},"BP-11":{f:39.08,o:50.82},"BP-12":{f:42.39,o:45.11},
+  "BP-13":{f:44.61,o:45.46},"BP-14":{f:44.66,o:43.98},"BP-15":{f:43.26,o:44.60},"BP-16":{f:42.34,o:46.35},
+  "CS-01":{f:36.37,o:49.51},"CS-02":{f:45.29,o:40.23},"CS-03":{f:54.74,o:31.36},"CS-04":{f:51.77,o:40.20},
+  "FE-01":{f:47.43,o:41.81},"FE-02":{f:56.01,o:30.04},"FE-03":{f:57.34,o:31.90},"FE-04":{f:46.17,o:43.81},
+  "FE-05":{f:64.55,o:24.39},
+  "GY-01":{f:50.44,o:38.29},"GY-02":{f:60.13,o:31.37},"GY-03":{f:71.22,o:21.48},"GY-04":{f:57.35,o:33.26},
+  "GY-05":{f:59.23,o:30.47},
+  "HB-01":{f:48.95,o:39.75},"HB-02":{f:55.61,o:40.12},"HB-03":{f:63.51,o:27.68},"HB-04":{f:61.66,o:23.01},
+  "HB-05":{f:60.61,o:30.39},"HB-06":{f:58.19,o:31.10},
+  "HE-01":{f:52.19,o:36.50},"HE-02":{f:54.91,o:36.41},"HE-03":{f:59.06,o:29.56},
+  "JN-01":{f:46.91,o:39.20},"JN-02":{f:59.81,o:33.74},"JN-03":{f:64.14,o:29.18},"JN-04":{f:51.50,o:37.10},
+  "KE-01":{f:48.18,o:41.16},"KE-02":{f:49.96,o:38.80},"KE-03":{f:55.10,o:33.11},
+  "NO-01":{f:53.85,o:36.15},"NO-02":{f:60.08,o:23.95},
+  "PE-01":{f:45.38,o:43.05},"PE-02":{f:46.77,o:44.92},"PE-03":{f:51.94,o:37.38},"PE-04":{f:55.46,o:33.83},
+  "PE-05":{f:46.30,o:42.04},"PE-06":{f:49.05,o:38.17},"PE-07":{f:49.22,o:36.50},"PE-08":{f:45.55,o:42.65},
+  "PE-09":{f:60.22,o:28.65},"PE-10":{f:59.71,o:28.52},"PE-11":{f:56.81,o:31.71},"PE-12":{f:59.11,o:28.66},
+  "SO-01":{f:47.63,o:34.83},"SO-02":{f:57.86,o:37.16},"SO-03":{f:57.92,o:35.41},"SO-04":{f:59.94,o:35.76},
+  "SZ-01":{f:44.92,o:42.12},"SZ-02":{f:58.13,o:32.65},"SZ-03":{f:65.31,o:26.13},"SZ-04":{f:68.71,o:24.86},
+  "SZ-05":{f:64.79,o:24.58},"SZ-06":{f:65.69,o:26.45},
+  "TO-01":{f:55.51,o:35.00},"TO-02":{f:62.44,o:27.00},"TO-03":{f:62.98,o:27.87},
+  "VA-01":{f:49.95,o:40.23},"VA-02":{f:64.38,o:26.02},"VA-03":{f:66.40,o:26.76},
+  "VE-01":{f:50.48,o:39.24},"VE-02":{f:50.99,o:36.53},"VE-03":{f:50.70,o:44.51},"VE-04":{f:62.70,o:29.09},
+  "ZA-01":{f:56.80,o:30.95},"ZA-02":{f:59.84,o:30.11},"ZA-03":{f:52.98,o:37.45}
+};
+
+// Redistricted constituencies between 2022 and 2026: Budapest lost BP-17, BP-18
+// (partially redrawn), Pest gained PE-13, PE-14. No direct comparable base exists.
+const REDISTRICTED = new Set(['PE-13', 'PE-14']);
+
+// Scale factor: 1 percentage point → this many SVG pixels along each axis.
+// Smaller than the county map because 106 centroids are much more densely packed.
+const PP_SCALE = 0.95;
+
+function renderMap(consts2026) {
+  const svg = document.getElementById('map');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Defs: arrowheads
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5"
+      markerWidth="5" markerHeight="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1E40AF"/>
+    </marker>
+    <marker id="arrowBlack" viewBox="0 0 10 10" refX="8" refY="5"
+      markerWidth="5" markerHeight="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111827"/>
+    </marker>
+  `;
+  svg.appendChild(defs);
+
+  // District polygons (light background)
+  const districtLayer = document.createElementNS(ns, 'g');
+  for (const d of MAP_DATA) {
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', d.d);
+    p.setAttribute('class', 'district');
+    districtLayer.appendChild(p);
+  }
+  svg.appendChild(districtLayer);
+
+  // County borders for orientation (from county-data.js if present; else skip)
+  if (typeof COUNTY_MAP_DATA !== 'undefined') {
+    const cLayer = document.createElementNS(ns, 'g');
+    for (const c of COUNTY_MAP_DATA) {
+      const p = document.createElementNS(ns, 'path');
+      p.setAttribute('d', c.d);
+      p.setAttribute('class', 'county-border');
+      cLayer.appendChild(p);
+    }
+    svg.appendChild(cLayer);
+  }
+
+  // Arrow layer
+  const arrowLayer = document.createElementNS(ns, 'g');
+  svg.appendChild(arrowLayer);
+
+  let blueCount = 0, blackCount = 0, missing = 0;
+
+  for (const d of MAP_DATA) {
+    const id = d.id;
+    const base = BASELINE_2022_CONST[id];
+    const cur = consts2026 && consts2026[id];
+    const wasRedistricted = REDISTRICTED.has(id) || !base;
+
+    if (!cur || typeof cur['FIDESZ-KDNP'] !== 'number' || typeof cur['TISZA'] !== 'number') {
+      missing++;
+      continue;
+    }
+    if (wasRedistricted) {
+      // Draw just a small grey dot to signal the district exists but can't be compared
+      const dot = document.createElementNS(ns, 'circle');
+      dot.setAttribute('cx', d.cx);
+      dot.setAttribute('cy', d.cy);
+      dot.setAttribute('r', 2);
+      dot.setAttribute('fill', '#CBD5E1');
+      dot.setAttribute('stroke', '#fff');
+      dot.setAttribute('stroke-width', '0.5');
+      arrowLayer.appendChild(dot);
+
+      const hit = document.createElementNS(ns, 'circle');
+      hit.setAttribute('cx', d.cx);
+      hit.setAttribute('cy', d.cy);
+      hit.setAttribute('r', 8);
+      hit.setAttribute('fill', 'transparent');
+      hit.setAttribute('class', 'swing-hover');
+      hit.addEventListener('mouseenter', (e) => showRedistrictedTooltip(id, d.county, cur, e));
+      hit.addEventListener('mousemove', positionTooltip);
+      hit.addEventListener('mouseleave', hideTooltip);
+      arrowLayer.appendChild(hit);
+      continue;
+    }
+
+    const fidesz26 = cur['FIDESZ-KDNP'];
+    const tisza26 = cur['TISZA'];
+    const dFid = fidesz26 - base.f;
+    const dOpp = tisza26 - base.o;
+
+    const dx = dOpp * PP_SCALE;
+    const dy = dFid * PP_SCALE; // negative when Fidesz lost ⇒ arrow up
+
+    const oppLead = dOpp - dFid;
+    const blue = oppLead >= 0;
+    if (blue) blueCount++; else blackCount++;
+
+    const color = blue ? '#1E40AF' : '#111827';
+    const marker = blue ? 'url(#arrowBlue)' : 'url(#arrowBlack)';
+    const strokeW = Math.min(2.4, 0.9 + Math.abs(oppLead) * 0.03);
+
+    const x2 = d.cx + dx;
+    const y2 = d.cy + dy;
+
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', d.cx);
+    line.setAttribute('y1', d.cy);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', strokeW);
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('marker-end', marker);
+    line.setAttribute('class', 'swing-arrow');
+    arrowLayer.appendChild(line);
+
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', d.cx);
+    dot.setAttribute('cy', d.cy);
+    dot.setAttribute('r', 1.5);
+    dot.setAttribute('fill', color);
+    dot.setAttribute('class', 'arrow-dot');
+    arrowLayer.appendChild(dot);
+
+    const hit = document.createElementNS(ns, 'circle');
+    hit.setAttribute('cx', (d.cx + x2) / 2);
+    hit.setAttribute('cy', (d.cy + y2) / 2);
+    hit.setAttribute('r', Math.max(8, Math.hypot(dx, dy) / 2 + 3));
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('class', 'swing-hover');
+    hit.addEventListener('mouseenter', (e) => showTooltip(id, d.county, base, cur, dFid, dOpp, e));
+    hit.addEventListener('mousemove', positionTooltip);
+    hit.addEventListener('mouseleave', hideTooltip);
+    arrowLayer.appendChild(hit);
+  }
+
+  document.getElementById('countBlue').textContent = blueCount ? ` · ${blueCount}` : '';
+  document.getElementById('countBlack').textContent = blackCount ? ` · ${blackCount}` : '';
+}
+
+// ── Tooltip ──
+function fmt(v, sign) {
+  if (sign) return (v >= 0 ? '+' : '') + v.toFixed(1);
+  return v.toFixed(1);
+}
+function showTooltip(id, county, base, cur, dFid, dOpp, e) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `
+    <h4>${id}</h4>
+    <div class="sub">${county || ''}</div>
+    <div class="row"><span class="lbl">Fidesz-KDNP 2022</span><span class="v">${fmt(base.f)}%</span></div>
+    <div class="row"><span class="lbl">Fidesz-KDNP 2026</span><span class="v">${fmt(cur['FIDESZ-KDNP'])}%</span></div>
+    <div class="row"><span class="lbl">Shift</span><span class="v ${dFid < 0 ? 'pos' : 'neg'}">${fmt(dFid, true)} pp</span></div>
+    <div class="divider"></div>
+    <div class="row"><span class="lbl">United for Hungary 2022</span><span class="v">${fmt(base.o)}%</span></div>
+    <div class="row"><span class="lbl">TISZA 2026</span><span class="v">${fmt(cur['TISZA'])}%</span></div>
+    <div class="row"><span class="lbl">Shift</span><span class="v ${dOpp > 0 ? 'pos' : 'neg'}">${fmt(dOpp, true)} pp</span></div>
+  `;
+  tt.classList.add('visible');
+  positionTooltip(e);
+}
+function showRedistrictedTooltip(id, county, cur, e) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `
+    <h4>${id}</h4>
+    <div class="sub">${county || ''}</div>
+    <div class="row"><span class="lbl">Fidesz-KDNP 2026</span><span class="v">${fmt(cur['FIDESZ-KDNP'])}%</span></div>
+    <div class="row"><span class="lbl">TISZA 2026</span><span class="v">${fmt(cur['TISZA'])}%</span></div>
+    <div class="note">Redistricted — no directly comparable 2022 result</div>
+  `;
+  tt.classList.add('visible');
+  positionTooltip(e);
+}
+function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
+function positionTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  const container = document.getElementById('map-container');
+  const rect = container.getBoundingClientRect();
+  let left = e.clientX - rect.left + 12;
+  let top = e.clientY - rect.top + 12;
+  const ttW = tt.offsetWidth || 250;
+  const ttH = tt.offsetHeight || 180;
+  if (left + ttW > rect.width - 8) left = e.clientX - rect.left - ttW - 12;
+  if (top + ttH > rect.height - 8) top = e.clientY - rect.top - ttH - 12;
+  tt.style.left = Math.max(4, left) + 'px';
+  tt.style.top = Math.max(4, top) + 'px';
+}
+
+// ── Data loading ──
+async function loadResults() {
+  try {
+    const r = await fetch('results.json?' + Date.now());
+    const d = await r.json();
+    const el = document.getElementById('lastUpdated');
+    el.textContent = 'Last updated: ' + new Date(d.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'medium', timeZone:'Europe/Budapest'});
+    el.classList.toggle('live', !!(d.constituencies));
+    renderMap(d.constituencies || {});
+  } catch (e) {
+    console.error(e);
+    renderMap({});
+  }
+}
+
+loadResults();
+setInterval(loadResults, 30000);
+</script>
+</body>
+</html>
