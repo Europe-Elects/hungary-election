@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Municipality Swing vs 2022</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #0F172A;
+  display: flex; flex-direction: column; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 16px 16px 12px; width: 100%; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.header { margin-bottom: 10px; }
+.subtitle { font-size: 13px; color: #475569; font-weight: 500; }
+.last-updated { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #475569; margin-top: 6px; padding: 3px 8px; background: #F1F5F9; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.last-updated::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #94A3B8; }
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#map-container {
+  position: relative; width: 100%; background: #fff; border-radius: 10px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.03);
+  flex: 1 1 auto; min-height: 0; padding: 8px; display: flex; flex-direction: column;
+}
+svg#map { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; display: block; cursor: grab; }
+svg#map.panning { cursor: grabbing; }
+.muni { fill: #F8FAFC; stroke: #E2E8F0; stroke-width: 0.12; pointer-events: none; }
+.county-border { fill: none; stroke: #0F172A; stroke-width: 0.6; pointer-events: none; opacity: 0.35; }
+.swing-arrow { pointer-events: none; opacity: 0.72; }
+.arrow-dot { pointer-events: none; opacity: 0.5; }
+.swing-hover:hover { opacity: 0.9; cursor: help; }
+
+.zoom-controls { position: absolute; bottom: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5; }
+.zoom-btn {
+  width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 6px;
+  background: #fff; color: #475569; font-size: 16px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1); transition: background .15s, color .15s;
+  line-height: 1; user-select: none;
+}
+.zoom-btn:hover { background: #F1F5F9; color: #0F172A; }
+.zoom-btn.reset { font-size: 11px; font-weight: 500; }
+.zoom-level { font-size: 10px; color: #94A3B8; text-align: center; padding: 2px 0; font-variant-numeric: tabular-nums; user-select: none; }
+
+.legend-row {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  padding: 6px 10px 2px; font-size: 12px; color: #334155;
+}
+.legend-row .item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-row .swatch { width: 20px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend-row .count { color: #64748B; font-weight: 500; font-variant-numeric: tabular-nums; }
+.scale-key { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; font-size: 11px; color: #475569; }
+.scale-key svg { width: 130px; height: 18px; }
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 12px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 30; min-width: 230px;
+  opacity: 0; transform: translateY(4px); transition: opacity .1s, transform .1s;
+}
+#tooltip.visible { opacity: 1; transform: translateY(0); }
+#tooltip h4 { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 6px; }
+#tooltip .row { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; padding: 1px 0; }
+#tooltip .row .lbl { color: #64748B; font-weight: 500; }
+#tooltip .row .v { font-variant-numeric: tabular-nums; font-weight: 600; color: #0F172A; }
+#tooltip .row .pos { color: #1D4ED8; }
+#tooltip .row .neg { color: #334155; }
+#tooltip .divider { height: 1px; background: #F1F5F9; margin: 5px 0; }
+#tooltip .note { font-size: 10px; color: #94A3B8; margin-top: 3px; font-style: italic; }
+
+.footer { margin-top: 8px; font-size: 11px; color: #64748B; text-align: center; }
+.chart-footnote { font-size: 10px; color: #64748B; padding: 4px 10px; line-height: 1.45; }
+.chart-footnote strong { color: #334155; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">How the vote swung since the last election — list-vote share change per municipality, 2022 → 2026</div>
+    <div class="last-updated" id="lastUpdated">Loading…</div>
+  </div>
+  <div id="map-container">
+    <div class="legend-row">
+      <span class="item"><span class="swatch" style="background:#3399FF"></span>TISZA gain<span class="count" id="countBlue"></span></span>
+      <span class="item"><span class="swatch" style="background:#000000"></span>Fidesz-KDNP gain<span class="count" id="countBlack"></span></span>
+      <span class="scale-key">
+        Scale:
+        <svg viewBox="0 0 130 18" aria-hidden="true">
+          <defs>
+            <marker id="scaleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#3399FF"/>
+            </marker>
+          </defs>
+          <line x1="5" y1="9" x2="30" y2="9" stroke="#3399FF" stroke-width="1.2" marker-end="url(#scaleArrow)"/>
+          <text x="36" y="12" font-size="10" fill="#475569" font-family="Inter">10 pp</text>
+          <line x1="72" y1="9" x2="118" y2="9" stroke="#3399FF" stroke-width="1.6" marker-end="url(#scaleArrow)"/>
+        </svg>
+        <span>20 pp</span>
+      </span>
+    </div>
+    <svg id="map"></svg>
+    <div id="tooltip"></div>
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn" title="Zoom in">+</button>
+      <div class="zoom-level" id="zoomLevel">1x</div>
+      <button class="zoom-btn" id="zoomOut" title="Zoom out">&minus;</button>
+      <button class="zoom-btn reset" id="zoomReset" title="Reset view">&#8634;</button>
+    </div>
+    <div class="chart-footnote">
+      3,155 per-municipality arrows (Budapest's 23 kerülets aggregated to one). Horizontal component is the
+      <strong>TISZA 2026 vs United for Hungary 2022</strong> shift; vertical component is the Fidesz-KDNP shift
+      (Fidesz-loss pushes the arrow up). Scroll / pinch to zoom and drag to pan for dense areas.
+    </div>
+  </div>
+  <div class="footer">Map created by Andrei Miclea · Source: Hungarian National Election Office VIP Service · Basemap: Datawrapper</div>
+</div>
+
+<script>
+// Embedded 2022 list-vote baseline per municipality is fetched from
+// 2022_municipality_listvote.json — keeps this file small.
+
+const PP_SCALE = 0.35;            // shrinks arrow lengths so dense areas remain readable
+let topo = null;
+let baseline2022 = null;
+let muni2026 = null;
+let muniNames = null;
+
+async function loadBasemap() {
+  const r = await fetch('hu-municipalities-topo.json?v=1');
+  topo = await r.json();
+}
+async function loadBaseline() {
+  const r = await fetch('2022_municipality_listvote.json?v=1');
+  baseline2022 = await r.json();
+}
+async function loadNames() {
+  try {
+    const r = await fetch('municipality_names.json?v=1');
+    muniNames = await r.json();
+  } catch { muniNames = {}; }
+}
+async function load2026() {
+  try {
+    const r = await fetch('municipality-results.json?v=' + Date.now());
+    const d = await r.json();
+    muni2026 = d.municipalityResults || {};
+    const el = document.getElementById('lastUpdated');
+    if (d.lastUpdated) {
+      el.textContent = 'Last updated: ' + new Date(d.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'medium', timeZone:'Europe/Budapest'});
+      el.classList.toggle('live', !!Object.keys(muni2026).length);
+    }
+  } catch (e) { console.error(e); muni2026 = {}; }
+}
+
+// ── TopoJSON decoding (handles non-quantized basemap) ──
+function topoTransform(t) {
+  if (!t) return { fn: (p) => [p[0], p[1]], quantized: false };
+  const [sx, sy] = t.scale;
+  const [tx, ty] = t.translate;
+  return { fn: (p) => [p[0] * sx + tx, p[1] * sy + ty], quantized: true };
+}
+function decodeArc(arc, tr) {
+  const out = [];
+  if (tr.quantized) {
+    let x = 0, y = 0;
+    for (const p of arc) { x += p[0]; y += p[1]; out.push(tr.fn([x, y])); }
+  } else {
+    for (const p of arc) out.push(tr.fn(p));
+  }
+  return out;
+}
+function arcsToPath(arcIndices, arcs, tr) {
+  const points = [];
+  for (let i = 0; i < arcIndices.length; i++) {
+    const idx = arcIndices[i];
+    let decoded;
+    if (idx < 0) {
+      const fwd = decodeArc(arcs[~idx], tr);
+      decoded = fwd.slice().reverse();
+    } else {
+      decoded = decodeArc(arcs[idx], tr);
+    }
+    if (i > 0) decoded = decoded.slice(1);
+    for (const p of decoded) points.push(p);
+  }
+  return points;
+}
+
+// ── Budapest aggregation (23 kerülets → one) ──
+function aggregateBudapest(dict) {
+  const entries = Object.entries(dict).filter(([k]) => k.startsWith('01-'));
+  if (!entries.length) return null;
+  let tot = 0, sumF = 0, sumO = 0, sumT = 0;
+  for (const [, r] of entries) {
+    if (!r) continue;
+    const w = r.total || r.t || 0;
+    if (!w) continue;
+    const fKey = 'FIDESZ-KDNP' in r ? 'FIDESZ-KDNP' : 'f';
+    const tiszaKey = 'TISZA' in r ? 'TISZA' : 'o';
+    const oKey = 'o';
+    tot += w;
+    if (r[fKey] != null) sumF += r[fKey] * w;
+    if (r[tiszaKey] != null) sumO += r[tiszaKey] * w;
+    if (r[oKey] != null) sumO = (r[oKey] != null && tiszaKey === 'o') ? sumO : sumO;
+  }
+  if (!tot) return null;
+  return { f: sumF / tot, o: sumO / tot, total: tot };
+}
+function aggregateBudapest2022() {
+  return aggregateBudapest(baseline2022);
+}
+function aggregateBudapest2026() {
+  const entries = Object.entries(muni2026).filter(([k]) => k.startsWith('01-'));
+  if (!entries.length) return null;
+  let tot = 0, sumF = 0, sumT = 0;
+  for (const [, r] of entries) {
+    if (!r || !r.total) continue;
+    tot += r.total;
+    if (typeof r['FIDESZ-KDNP'] === 'number') sumF += r['FIDESZ-KDNP'] * r.total;
+    if (typeof r['TISZA'] === 'number') sumT += r['TISZA'] * r.total;
+  }
+  if (!tot) return null;
+  return { fidesz: sumF / tot, tisza: sumT / tot, total: tot };
+}
+
+// ── Rendering ──
+function renderMap() {
+  if (!topo || !baseline2022 || !muni2026) return;
+  const svg = document.getElementById('map');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const transform = topoTransform(topo.transform);
+  const arcs = topo.arcs;
+  const regionGeos = topo.objects.regions.geometries;
+
+  // Compute bbox
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const arc of arcs) {
+    const dec = decodeArc(arc, transform);
+    for (const [x, y] of dec) {
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+  }
+  const targetW = 1000;
+  const spanX = Math.max(1e-9, maxX - minX);
+  const spanY = Math.max(1e-9, maxY - minY);
+  const targetH = Math.max(1, Math.round(targetW * spanY / spanX));
+
+  const firstInit = (zoomState.baseW === 0);
+  zoomState.baseW = targetW;
+  zoomState.baseH = targetH;
+  if (firstInit) {
+    zoomState.vbX = 0; zoomState.vbY = 0;
+    zoomState.vbW = targetW; zoomState.vbH = targetH;
+    zoomState.scale = 1;
+  } else {
+    clampViewBox();
+  }
+  applyViewBox();
+
+  function projX(x) { return ((x - minX) / spanX) * targetW; }
+  function projY(y) { return ((y - minY) / spanY) * targetH; }
+
+  // Arrow defs
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `
+    <marker id="mArrowBlue" viewBox="0 0 10 10" refX="8" refY="5"
+      markerWidth="4.5" markerHeight="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1E40AF"/>
+    </marker>
+    <marker id="mArrowBlack" viewBox="0 0 10 10" refX="8" refY="5"
+      markerWidth="4.5" markerHeight="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111827"/>
+    </marker>
+  `;
+  svg.appendChild(defs);
+
+  // Municipality polygons (light fill)
+  function drawGeom(geom) {
+    const rings = [];
+    const ringArcsFor = (g) => {
+      if (g.type === 'Polygon') return g.arcs;
+      if (g.type === 'MultiPolygon') return [].concat(...g.arcs);
+      return [];
+    };
+    for (const ringArcIndices of ringArcsFor(geom)) {
+      const pts = arcsToPath(ringArcIndices, arcs, transform);
+      const projected = pts.map(p => [projX(p[0]), projY(p[1])]);
+      rings.push(projected);
+    }
+    return rings.map(ring =>
+      'M' + ring.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join('L') + 'Z'
+    ).join(' ');
+  }
+  function geomCentroid(geom) {
+    // Average of all ring points in projected space — good enough for this use.
+    let sx = 0, sy = 0, n = 0;
+    const ringArcsFor = (g) => {
+      if (g.type === 'Polygon') return g.arcs;
+      if (g.type === 'MultiPolygon') return [].concat(...g.arcs);
+      return [];
+    };
+    for (const ri of ringArcsFor(geom)) {
+      const pts = arcsToPath(ri, arcs, transform);
+      for (const [x, y] of pts) { sx += projX(x); sy += projY(y); n++; }
+    }
+    return n ? [sx / n, sy / n] : null;
+  }
+
+  // Index by name
+  const nameToKey = {};
+  if (muniNames) {
+    for (const [k, name] of Object.entries(muniNames)) nameToKey[name] = k;
+  }
+
+  // Budapest aggregates
+  let bpCentroid = null;
+  const bp22 = aggregateBudapest2022();
+  const bp26 = aggregateBudapest2026();
+
+  const polyLayer = document.createElementNS(ns, 'g');
+  const arrowLayer = document.createElementNS(ns, 'g');
+  svg.appendChild(polyLayer);
+
+  let blueCount = 0, blackCount = 0, missing = 0;
+  const arrowPayloads = []; // draw order: thinner/longer last
+
+  for (const geom of regionGeos) {
+    const d = drawGeom(geom);
+    const name = geom.properties && geom.properties.name;
+
+    // Polygon
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'muni');
+    polyLayer.appendChild(path);
+
+    if (!name) continue;
+
+    // Budapest: remember centroid, compute one arrow at the end
+    if (name === 'Budapest') {
+      bpCentroid = geomCentroid(geom);
+      continue;
+    }
+
+    const key = nameToKey[name];
+    if (!key) { missing++; continue; }
+    const base = baseline2022[key];
+    const cur = muni2026[key];
+    if (!base || !cur) { missing++; continue; }
+    if (typeof cur['FIDESZ-KDNP'] !== 'number' || typeof cur['TISZA'] !== 'number') { missing++; continue; }
+
+    const dFid = cur['FIDESZ-KDNP'] - base.f;
+    const dOpp = cur['TISZA'] - base.o;
+    const c = geomCentroid(geom);
+    if (!c) continue;
+
+    arrowPayloads.push({
+      name, key, base, cur, dFid, dOpp, cx: c[0], cy: c[1], total: base.t,
+    });
+  }
+
+  // Budapest aggregate arrow
+  if (bpCentroid && bp22 && bp26) {
+    const dFid = bp26.fidesz - bp22.f;
+    const dOpp = bp26.tisza - bp22.o;
+    arrowPayloads.push({
+      name: 'Budapest', key: '01-*', base: bp22, cur: { 'FIDESZ-KDNP': bp26.fidesz, 'TISZA': bp26.tisza },
+      dFid, dOpp, cx: bpCentroid[0], cy: bpCentroid[1],
+      total: (bp22.total || 0) + (bp26.total || 0), budapest: true,
+    });
+  }
+
+  // Paint arrows — biggest first so smaller ones sit on top (better hit testing)
+  arrowPayloads.sort((a, b) => Math.hypot(b.dOpp, b.dFid) - Math.hypot(a.dOpp, a.dFid));
+
+  svg.appendChild(arrowLayer);
+
+  for (const p of arrowPayloads) {
+    const dx = p.dOpp * PP_SCALE;
+    const dy = p.dFid * PP_SCALE;
+    const oppLead = p.dOpp - p.dFid;
+    const blue = oppLead >= 0;
+    if (blue) blueCount++; else blackCount++;
+
+    const color = blue ? '#1E40AF' : '#111827';
+    const marker = blue ? 'url(#mArrowBlue)' : 'url(#mArrowBlack)';
+    const strokeW = p.budapest ? 2.4 : Math.max(0.35, Math.min(1.3, 0.4 + Math.abs(oppLead) * 0.018));
+
+    const x2 = p.cx + dx;
+    const y2 = p.cy + dy;
+
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', p.cx);
+    line.setAttribute('y1', p.cy);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', strokeW);
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('marker-end', marker);
+    line.setAttribute('class', 'swing-arrow');
+    arrowLayer.appendChild(line);
+
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', p.cx);
+    dot.setAttribute('cy', p.cy);
+    dot.setAttribute('r', p.budapest ? 2.4 : 0.6);
+    dot.setAttribute('fill', color);
+    dot.setAttribute('class', 'arrow-dot');
+    arrowLayer.appendChild(dot);
+
+    // Hover hitbox: rectangle from origin to arrow head
+    const hit = document.createElementNS(ns, 'circle');
+    hit.setAttribute('cx', (p.cx + x2) / 2);
+    hit.setAttribute('cy', (p.cy + y2) / 2);
+    hit.setAttribute('r', Math.max(p.budapest ? 14 : 3, Math.hypot(dx, dy) / 2 + 2));
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('class', 'swing-hover');
+    hit.addEventListener('mouseenter', (e) => showTooltip(p, e));
+    hit.addEventListener('mousemove', positionTooltip);
+    hit.addEventListener('mouseleave', hideTooltip);
+    arrowLayer.appendChild(hit);
+  }
+
+  // County borders (if the basemap exposes them)
+  if (topo.objects.borders) {
+    const cLayer = document.createElementNS(ns, 'g');
+    for (const g of topo.objects.borders.geometries) {
+      const p = document.createElementNS(ns, 'path');
+      p.setAttribute('d', drawGeom(g));
+      p.setAttribute('class', 'county-border');
+      cLayer.appendChild(p);
+    }
+    svg.appendChild(cLayer);
+  }
+
+  document.getElementById('countBlue').textContent = blueCount ? ` · ${blueCount.toLocaleString()}` : '';
+  document.getElementById('countBlack').textContent = blackCount ? ` · ${blackCount.toLocaleString()}` : '';
+}
+
+// ── Tooltip ──
+function fmt(v, sign) { return sign ? (v >= 0 ? '+' : '') + v.toFixed(1) : v.toFixed(1); }
+function showTooltip(p, e) {
+  const tt = document.getElementById('tooltip');
+  const title = p.budapest ? 'Budapest (aggregated)' : p.name;
+  tt.innerHTML = `
+    <h4>${title}</h4>
+    <div class="row"><span class="lbl">Fidesz-KDNP 2022</span><span class="v">${fmt(p.base.f)}%</span></div>
+    <div class="row"><span class="lbl">Fidesz-KDNP 2026</span><span class="v">${fmt(p.cur['FIDESZ-KDNP'])}%</span></div>
+    <div class="row"><span class="lbl">Shift</span><span class="v ${p.dFid < 0 ? 'pos' : 'neg'}">${fmt(p.dFid, true)} pp</span></div>
+    <div class="divider"></div>
+    <div class="row"><span class="lbl">United for Hungary 2022</span><span class="v">${fmt(p.base.o)}%</span></div>
+    <div class="row"><span class="lbl">TISZA 2026</span><span class="v">${fmt(p.cur['TISZA'])}%</span></div>
+    <div class="row"><span class="lbl">Shift</span><span class="v ${p.dOpp > 0 ? 'pos' : 'neg'}">${fmt(p.dOpp, true)} pp</span></div>
+    ${p.budapest ? '<div class="note">23 Budapest districts aggregated</div>' : ''}
+  `;
+  tt.classList.add('visible');
+  positionTooltip(e);
+}
+function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
+function positionTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  const container = document.getElementById('map-container');
+  const rect = container.getBoundingClientRect();
+  let left = e.clientX - rect.left + 12;
+  let top = e.clientY - rect.top + 12;
+  const ttW = tt.offsetWidth || 240;
+  const ttH = tt.offsetHeight || 180;
+  if (left + ttW > rect.width - 8) left = e.clientX - rect.left - ttW - 12;
+  if (top + ttH > rect.height - 8) top = e.clientY - rect.top - ttH - 12;
+  tt.style.left = Math.max(4, left) + 'px';
+  tt.style.top = Math.max(4, top) + 'px';
+}
+
+// ── Zoom / Pan (same pattern as municipality-results.html) ──
+const zoomState = {
+  baseW: 0, baseH: 0, scale: 1, vbX: 0, vbY: 0, vbW: 0, vbH: 0,
+  minScale: 1, maxScale: 16,
+  isPanning: false, startX: 0, startY: 0, startVbX: 0, startVbY: 0, pinchDist: 0,
+};
+function applyViewBox() {
+  const svg = document.getElementById('map');
+  if (!svg || !zoomState.baseW) return;
+  svg.setAttribute('viewBox', `${zoomState.vbX} ${zoomState.vbY} ${zoomState.vbW} ${zoomState.vbH}`);
+  document.getElementById('zoomLevel').textContent = zoomState.scale.toFixed(1) + 'x';
+}
+function clampViewBox() {
+  const maxX = zoomState.baseW - zoomState.vbW;
+  const maxY = zoomState.baseH - zoomState.vbH;
+  zoomState.vbX = Math.max(0, Math.min(Math.max(0, maxX), zoomState.vbX));
+  zoomState.vbY = Math.max(0, Math.min(Math.max(0, maxY), zoomState.vbY));
+}
+function zoomAt(cx, cy, factor) {
+  const ns = Math.max(zoomState.minScale, Math.min(zoomState.maxScale, zoomState.scale * factor));
+  if (ns === zoomState.scale) return;
+  const nW = zoomState.baseW / ns, nH = zoomState.baseH / ns;
+  const r = 1 - nW / zoomState.vbW;
+  zoomState.vbX += (cx - zoomState.vbX) * r;
+  zoomState.vbY += (cy - zoomState.vbY) * r;
+  zoomState.vbW = nW; zoomState.vbH = nH; zoomState.scale = ns;
+  clampViewBox(); applyViewBox();
+}
+function resetZoom() {
+  zoomState.scale = 1;
+  zoomState.vbX = 0; zoomState.vbY = 0;
+  zoomState.vbW = zoomState.baseW; zoomState.vbH = zoomState.baseH;
+  applyViewBox();
+}
+function svgPoint(e) {
+  const svg = document.getElementById('map');
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width;
+  const sy = (e.clientY - rect.top) / rect.height;
+  return { x: zoomState.vbX + sx * zoomState.vbW, y: zoomState.vbY + sy * zoomState.vbH };
+}
+function getTouchDist(ts) { const dx = ts[0].clientX - ts[1].clientX, dy = ts[0].clientY - ts[1].clientY; return Math.hypot(dx, dy); }
+function getTouchCenter(ts) { return { clientX: (ts[0].clientX + ts[1].clientX) / 2, clientY: (ts[0].clientY + ts[1].clientY) / 2 }; }
+function initZoomHandlers() {
+  const mapEl = document.getElementById('map-container');
+  const svg = document.getElementById('map');
+  mapEl.addEventListener('wheel', (e) => { if (!zoomState.baseW) return; e.preventDefault(); const pt = svgPoint(e); zoomAt(pt.x, pt.y, e.deltaY < 0 ? 1.25 : 0.8); }, { passive: false });
+  svg.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || !zoomState.baseW) return;
+    zoomState.isPanning = true;
+    zoomState.startX = e.clientX; zoomState.startY = e.clientY;
+    zoomState.startVbX = zoomState.vbX; zoomState.startVbY = zoomState.vbY;
+    svg.classList.add('panning');
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!zoomState.isPanning) return;
+    const rect = svg.getBoundingClientRect();
+    const dx = (e.clientX - zoomState.startX) / rect.width * zoomState.vbW;
+    const dy = (e.clientY - zoomState.startY) / rect.height * zoomState.vbH;
+    zoomState.vbX = zoomState.startVbX - dx;
+    zoomState.vbY = zoomState.startVbY - dy;
+    clampViewBox(); applyViewBox();
+  });
+  window.addEventListener('mouseup', () => { zoomState.isPanning = false; svg.classList.remove('panning'); });
+  svg.addEventListener('touchstart', (e) => {
+    if (!zoomState.baseW) return;
+    if (e.touches.length === 1) {
+      zoomState.isPanning = true;
+      zoomState.startX = e.touches[0].clientX; zoomState.startY = e.touches[0].clientY;
+      zoomState.startVbX = zoomState.vbX; zoomState.startVbY = zoomState.vbY;
+    } else if (e.touches.length === 2) {
+      zoomState.isPanning = false; zoomState.pinchDist = getTouchDist(e.touches);
+    }
+  }, { passive: true });
+  svg.addEventListener('touchmove', (e) => {
+    if (!zoomState.baseW) return;
+    e.preventDefault();
+    if (e.touches.length === 1 && zoomState.isPanning) {
+      const rect = svg.getBoundingClientRect();
+      const dx = (e.touches[0].clientX - zoomState.startX) / rect.width * zoomState.vbW;
+      const dy = (e.touches[0].clientY - zoomState.startY) / rect.height * zoomState.vbH;
+      zoomState.vbX = zoomState.startVbX - dx; zoomState.vbY = zoomState.startVbY - dy;
+      clampViewBox(); applyViewBox();
+    } else if (e.touches.length === 2) {
+      const nd = getTouchDist(e.touches), c = getTouchCenter(e.touches), pt = svgPoint(c);
+      zoomAt(pt.x, pt.y, nd / zoomState.pinchDist); zoomState.pinchDist = nd;
+    }
+  }, { passive: false });
+  svg.addEventListener('touchend', () => { zoomState.isPanning = false; });
+  document.getElementById('zoomIn').addEventListener('click', () => {
+    if (!zoomState.baseW) return;
+    zoomAt(zoomState.vbX + zoomState.vbW / 2, zoomState.vbY + zoomState.vbH / 2, 1.5);
+  });
+  document.getElementById('zoomOut').addEventListener('click', () => {
+    if (!zoomState.baseW) return;
+    zoomAt(zoomState.vbX + zoomState.vbW / 2, zoomState.vbY + zoomState.vbH / 2, 0.67);
+  });
+  document.getElementById('zoomReset').addEventListener('click', resetZoom);
+}
+
+initZoomHandlers();
+
+(async () => {
+  await Promise.all([loadBasemap(), loadBaseline(), loadNames(), load2026()]);
+  renderMap();
+  setInterval(async () => { await load2026(); renderMap(); }, 30000);
+})();
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderMap, 150);
+});
+</script>
+</body>
+</html>
