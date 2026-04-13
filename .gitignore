@@ -6,3 +6,8 @@ ELECTION_DAY_PLAN.md
 2022_nepszavazas
 2022_parlamenti
 Napk*.xlsx
+
+# Local-only / dev artifacts (laptop-bound; not needed for GH Pages)
+scraper.py
+build_2022_baseline.py
+old-election-data/
