@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T04:12:53.760541",
+  "lastUpdated": "2026-04-13T05:01:10.934313",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -20879,6 +20879,6 @@
     }
   },
   "processingPctDomestic": 98.93,
-  "nviVersion": "2026.04.13.03:10:01",
+  "nviVersion": "2026.04.13.03:59:00",
   "processingPct": 98.93
 }
