@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T17:31:57.107491",
+  "lastUpdated": "2026-04-13T18:01:11.100876",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -1029,10 +1029,10 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.13,
-      "TISZA": 10.88,
-      "DK": 0.21,
-      "Mi Hazánk": 1.49,
+      "FIDESZ-KDNP": 87.25,
+      "TISZA": 10.77,
+      "DK": 0.2,
+      "Mi Hazánk": 1.48,
       "MKKP": 0.3
     }
   },
@@ -22281,6 +22281,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.13.16:28:37",
+  "nviVersion": "2026.04.13.16:58:20",
   "processingPct": 98.22
 }
