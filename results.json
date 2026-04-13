@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T14:22:41.488410",
+  "lastUpdated": "2026-04-13T14:47:51.744260",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -20876,7 +20876,7 @@
       "15:00": 66.01,
       "17:00": 74.23,
       "18:30": 77.8,
-      "19:00": 78.99
+      "19:00": 79.56
     },
     "nationalFinal": {
       "pct": 78.99,
@@ -21515,6 +21515,773 @@
         "pct": 78.79,
         "register": 66276,
         "ballotsCast": 52221
+      }
+    },
+    "nationalFinalInclusive": {
+      "pct": 79.56,
+      "register": 7522951,
+      "ballotsCast": 5985063,
+      "feldar": 99.97,
+      "generated": "2026-04-13T12:58:26+02:00"
+    },
+    "countiesFinalInclusive": {
+      "Budapest": {
+        "pct": 83.1,
+        "register": 1271446,
+        "ballotsCast": 1056573,
+        "feldar": 100.0
+      },
+      "Baranya": {
+        "pct": 77.52,
+        "register": 282839,
+        "ballotsCast": 219250,
+        "feldar": 100.0
+      },
+      "Bács-Kiskun": {
+        "pct": 77.19,
+        "register": 391731,
+        "ballotsCast": 302360,
+        "feldar": 100.0
+      },
+      "Békés": {
+        "pct": 76.64,
+        "register": 256661,
+        "ballotsCast": 196703,
+        "feldar": 100.0
+      },
+      "Borsod-Abaúj-Zemplén": {
+        "pct": 73.73,
+        "register": 476007,
+        "ballotsCast": 350951,
+        "feldar": 99.74
+      },
+      "Csongrád-Csanád": {
+        "pct": 79.55,
+        "register": 310957,
+        "ballotsCast": 247374,
+        "feldar": 100.0
+      },
+      "Fejér": {
+        "pct": 81.11,
+        "register": 333628,
+        "ballotsCast": 270613,
+        "feldar": 100.0
+      },
+      "Győr-Moson-Sopron": {
+        "pct": 83.45,
+        "register": 360235,
+        "ballotsCast": 300602,
+        "feldar": 100.0
+      },
+      "Hajdú-Bihar": {
+        "pct": 76.61,
+        "register": 407381,
+        "ballotsCast": 312104,
+        "feldar": 100.0
+      },
+      "Heves": {
+        "pct": 78.37,
+        "register": 226608,
+        "ballotsCast": 177598,
+        "feldar": 100.0
+      },
+      "Jász-Nagykun-Szolnok": {
+        "pct": 75.76,
+        "register": 280420,
+        "ballotsCast": 212459,
+        "feldar": 100.0
+      },
+      "Komárom-Esztergom": {
+        "pct": 79.54,
+        "register": 237015,
+        "ballotsCast": 188531,
+        "feldar": 100.0
+      },
+      "Nógrád": {
+        "pct": 76.1,
+        "register": 145069,
+        "ballotsCast": 110404,
+        "feldar": 100.0
+      },
+      "Pest": {
+        "pct": 82.55,
+        "register": 1050620,
+        "ballotsCast": 867325,
+        "feldar": 100.0
+      },
+      "Somogy": {
+        "pct": 77.37,
+        "register": 234479,
+        "ballotsCast": 181407,
+        "feldar": 100.0
+      },
+      "Szabolcs-Szatmár-Bereg": {
+        "pct": 74.36,
+        "register": 416208,
+        "ballotsCast": 309489,
+        "feldar": 100.0
+      },
+      "Tolna": {
+        "pct": 77.56,
+        "register": 164963,
+        "ballotsCast": 127939,
+        "feldar": 99.64
+      },
+      "Vas": {
+        "pct": 83.49,
+        "register": 196783,
+        "ballotsCast": 164286,
+        "feldar": 100.0
+      },
+      "Veszprém": {
+        "pct": 81.32,
+        "register": 270016,
+        "ballotsCast": 219578,
+        "feldar": 100.0
+      },
+      "Zala": {
+        "pct": 80.77,
+        "register": 209885,
+        "ballotsCast": 169517,
+        "feldar": 100.0
+      }
+    },
+    "constituenciesFinalInclusive": {
+      "BP-01": {
+        "pct": 82.1,
+        "register": 75687,
+        "ballotsCast": 62139,
+        "feldar": 100.0
+      },
+      "BP-02": {
+        "pct": 75.62,
+        "register": 82213,
+        "ballotsCast": 62168,
+        "feldar": 100.0
+      },
+      "BP-03": {
+        "pct": 87.82,
+        "register": 86511,
+        "ballotsCast": 75970,
+        "feldar": 100.0
+      },
+      "BP-04": {
+        "pct": 86.52,
+        "register": 79124,
+        "ballotsCast": 68457,
+        "feldar": 100.0
+      },
+      "BP-05": {
+        "pct": 80.9,
+        "register": 74555,
+        "ballotsCast": 60317,
+        "feldar": 100.0
+      },
+      "BP-06": {
+        "pct": 82.06,
+        "register": 81019,
+        "ballotsCast": 66482,
+        "feldar": 100.0
+      },
+      "BP-07": {
+        "pct": 81.51,
+        "register": 76012,
+        "ballotsCast": 61955,
+        "feldar": 100.0
+      },
+      "BP-08": {
+        "pct": 81.99,
+        "register": 81209,
+        "ballotsCast": 66580,
+        "feldar": 100.0
+      },
+      "BP-09": {
+        "pct": 80.02,
+        "register": 76984,
+        "ballotsCast": 61602,
+        "feldar": 100.0
+      },
+      "BP-10": {
+        "pct": 85.56,
+        "register": 75359,
+        "ballotsCast": 64479,
+        "feldar": 100.0
+      },
+      "BP-11": {
+        "pct": 85.15,
+        "register": 81203,
+        "ballotsCast": 69145,
+        "feldar": 100.0
+      },
+      "BP-12": {
+        "pct": 83.78,
+        "register": 88620,
+        "ballotsCast": 74244,
+        "feldar": 100.0
+      },
+      "BP-13": {
+        "pct": 83.26,
+        "register": 76596,
+        "ballotsCast": 63773,
+        "feldar": 100.0
+      },
+      "BP-14": {
+        "pct": 85.47,
+        "register": 76566,
+        "ballotsCast": 65444,
+        "feldar": 100.0
+      },
+      "BP-15": {
+        "pct": 85.58,
+        "register": 78662,
+        "ballotsCast": 67322,
+        "feldar": 100.0
+      },
+      "BP-16": {
+        "pct": 81.97,
+        "register": 81126,
+        "ballotsCast": 66496,
+        "feldar": 100.0
+      },
+      "BA-01": {
+        "pct": 80.31,
+        "register": 71086,
+        "ballotsCast": 57091,
+        "feldar": 100.0
+      },
+      "BA-02": {
+        "pct": 78.04,
+        "register": 72141,
+        "ballotsCast": 56297,
+        "feldar": 100.0
+      },
+      "BA-03": {
+        "pct": 76.66,
+        "register": 67171,
+        "ballotsCast": 51494,
+        "feldar": 100.0
+      },
+      "BA-04": {
+        "pct": 75.05,
+        "register": 72441,
+        "ballotsCast": 54368,
+        "feldar": 100.0
+      },
+      "BK-01": {
+        "pct": 78.02,
+        "register": 66064,
+        "ballotsCast": 51543,
+        "feldar": 100.0
+      },
+      "BK-02": {
+        "pct": 80.89,
+        "register": 71290,
+        "ballotsCast": 57663,
+        "feldar": 100.0
+      },
+      "BK-03": {
+        "pct": 78.12,
+        "register": 61667,
+        "ballotsCast": 48177,
+        "feldar": 100.0
+      },
+      "BK-04": {
+        "pct": 76.71,
+        "register": 68723,
+        "ballotsCast": 52718,
+        "feldar": 100.0
+      },
+      "BK-05": {
+        "pct": 73.38,
+        "register": 63744,
+        "ballotsCast": 46775,
+        "feldar": 100.0
+      },
+      "BK-06": {
+        "pct": 75.5,
+        "register": 60243,
+        "ballotsCast": 45484,
+        "feldar": 100.0
+      },
+      "BE-01": {
+        "pct": 80.67,
+        "register": 63696,
+        "ballotsCast": 51383,
+        "feldar": 100.0
+      },
+      "BE-02": {
+        "pct": 76.04,
+        "register": 64167,
+        "ballotsCast": 48795,
+        "feldar": 100.0
+      },
+      "BE-03": {
+        "pct": 76.41,
+        "register": 63208,
+        "ballotsCast": 48299,
+        "feldar": 100.0
+      },
+      "BE-04": {
+        "pct": 73.53,
+        "register": 65590,
+        "ballotsCast": 48226,
+        "feldar": 100.0
+      },
+      "BO-01": {
+        "pct": 78.1,
+        "register": 66386,
+        "ballotsCast": 51845,
+        "feldar": 100.0
+      },
+      "BO-02": {
+        "pct": 76.13,
+        "register": 64271,
+        "ballotsCast": 48929,
+        "feldar": 98.73
+      },
+      "BO-03": {
+        "pct": 66.44,
+        "register": 64817,
+        "ballotsCast": 43063,
+        "feldar": 99.24
+      },
+      "BO-04": {
+        "pct": 71.94,
+        "register": 69347,
+        "ballotsCast": 49885,
+        "feldar": 100.0
+      },
+      "BO-05": {
+        "pct": 71.62,
+        "register": 67324,
+        "ballotsCast": 48215,
+        "feldar": 100.0
+      },
+      "BO-06": {
+        "pct": 75.66,
+        "register": 71349,
+        "ballotsCast": 53980,
+        "feldar": 100.0
+      },
+      "BO-07": {
+        "pct": 75.9,
+        "register": 72513,
+        "ballotsCast": 55034,
+        "feldar": 100.0
+      },
+      "CS-01": {
+        "pct": 79.49,
+        "register": 77724,
+        "ballotsCast": 61780,
+        "feldar": 100.0
+      },
+      "CS-02": {
+        "pct": 80.41,
+        "register": 82490,
+        "ballotsCast": 66333,
+        "feldar": 100.0
+      },
+      "CS-03": {
+        "pct": 78.42,
+        "register": 75941,
+        "ballotsCast": 59552,
+        "feldar": 100.0
+      },
+      "CS-04": {
+        "pct": 79.82,
+        "register": 74802,
+        "ballotsCast": 59709,
+        "feldar": 100.0
+      },
+      "FE-01": {
+        "pct": 84.2,
+        "register": 70280,
+        "ballotsCast": 59173,
+        "feldar": 100.0
+      },
+      "FE-02": {
+        "pct": 82.9,
+        "register": 64489,
+        "ballotsCast": 53461,
+        "feldar": 100.0
+      },
+      "FE-03": {
+        "pct": 83.83,
+        "register": 68929,
+        "ballotsCast": 57783,
+        "feldar": 100.0
+      },
+      "FE-04": {
+        "pct": 78.94,
+        "register": 65806,
+        "ballotsCast": 51949,
+        "feldar": 100.0
+      },
+      "FE-05": {
+        "pct": 75.24,
+        "register": 64124,
+        "ballotsCast": 48247,
+        "feldar": 100.0
+      },
+      "GY-01": {
+        "pct": 82.61,
+        "register": 67788,
+        "ballotsCast": 55998,
+        "feldar": 100.0
+      },
+      "GY-02": {
+        "pct": 82.98,
+        "register": 71643,
+        "ballotsCast": 59448,
+        "feldar": 100.0
+      },
+      "GY-03": {
+        "pct": 83.13,
+        "register": 65877,
+        "ballotsCast": 54761,
+        "feldar": 100.0
+      },
+      "GY-04": {
+        "pct": 85.36,
+        "register": 76425,
+        "ballotsCast": 65233,
+        "feldar": 100.0
+      },
+      "GY-05": {
+        "pct": 83.01,
+        "register": 78502,
+        "ballotsCast": 65162,
+        "feldar": 100.0
+      },
+      "HB-01": {
+        "pct": 82.22,
+        "register": 61669,
+        "ballotsCast": 50702,
+        "feldar": 100.0
+      },
+      "HB-02": {
+        "pct": 80.02,
+        "register": 70729,
+        "ballotsCast": 56596,
+        "feldar": 100.0
+      },
+      "HB-03": {
+        "pct": 74.46,
+        "register": 76036,
+        "ballotsCast": 56614,
+        "feldar": 100.0
+      },
+      "HB-04": {
+        "pct": 72.15,
+        "register": 65695,
+        "ballotsCast": 47398,
+        "feldar": 100.0
+      },
+      "HB-05": {
+        "pct": 75.46,
+        "register": 66640,
+        "ballotsCast": 50285,
+        "feldar": 100.0
+      },
+      "HB-06": {
+        "pct": 75.83,
+        "register": 66612,
+        "ballotsCast": 50509,
+        "feldar": 100.0
+      },
+      "HE-01": {
+        "pct": 80.07,
+        "register": 77035,
+        "ballotsCast": 61679,
+        "feldar": 100.0
+      },
+      "HE-02": {
+        "pct": 78.0,
+        "register": 72601,
+        "ballotsCast": 56626,
+        "feldar": 100.0
+      },
+      "HE-03": {
+        "pct": 77.03,
+        "register": 76972,
+        "ballotsCast": 59293,
+        "feldar": 100.0
+      },
+      "JN-01": {
+        "pct": 79.98,
+        "register": 73054,
+        "ballotsCast": 58431,
+        "feldar": 100.0
+      },
+      "JN-02": {
+        "pct": 76.08,
+        "register": 68189,
+        "ballotsCast": 51875,
+        "feldar": 100.0
+      },
+      "JN-03": {
+        "pct": 72.31,
+        "register": 69803,
+        "ballotsCast": 50472,
+        "feldar": 100.0
+      },
+      "JN-04": {
+        "pct": 74.5,
+        "register": 69374,
+        "ballotsCast": 51681,
+        "feldar": 100.0
+      },
+      "KE-01": {
+        "pct": 79.73,
+        "register": 76694,
+        "ballotsCast": 61148,
+        "feldar": 100.0
+      },
+      "KE-02": {
+        "pct": 79.47,
+        "register": 80113,
+        "ballotsCast": 63667,
+        "feldar": 100.0
+      },
+      "KE-03": {
+        "pct": 79.44,
+        "register": 80208,
+        "ballotsCast": 63716,
+        "feldar": 100.0
+      },
+      "NO-01": {
+        "pct": 75.06,
+        "register": 69769,
+        "ballotsCast": 52368,
+        "feldar": 100.0
+      },
+      "NO-02": {
+        "pct": 77.07,
+        "register": 75300,
+        "ballotsCast": 58036,
+        "feldar": 100.0
+      },
+      "PE-01": {
+        "pct": 84.14,
+        "register": 78987,
+        "ballotsCast": 66460,
+        "feldar": 100.0
+      },
+      "PE-02": {
+        "pct": 86.8,
+        "register": 77787,
+        "ballotsCast": 67517,
+        "feldar": 100.0
+      },
+      "PE-03": {
+        "pct": 86.03,
+        "register": 81365,
+        "ballotsCast": 69998,
+        "feldar": 100.0
+      },
+      "PE-04": {
+        "pct": 85.15,
+        "register": 75908,
+        "ballotsCast": 64634,
+        "feldar": 100.0
+      },
+      "PE-05": {
+        "pct": 86.3,
+        "register": 75676,
+        "ballotsCast": 65312,
+        "feldar": 100.0
+      },
+      "PE-06": {
+        "pct": 86.32,
+        "register": 76701,
+        "ballotsCast": 66205,
+        "feldar": 100.0
+      },
+      "PE-07": {
+        "pct": 80.8,
+        "register": 75638,
+        "ballotsCast": 61119,
+        "feldar": 100.0
+      },
+      "PE-08": {
+        "pct": 82.16,
+        "register": 70407,
+        "ballotsCast": 57845,
+        "feldar": 100.0
+      },
+      "PE-09": {
+        "pct": 80.41,
+        "register": 75617,
+        "ballotsCast": 60801,
+        "feldar": 100.0
+      },
+      "PE-10": {
+        "pct": 82.36,
+        "register": 73882,
+        "ballotsCast": 60850,
+        "feldar": 100.0
+      },
+      "PE-11": {
+        "pct": 83.36,
+        "register": 74355,
+        "ballotsCast": 61979,
+        "feldar": 100.0
+      },
+      "PE-12": {
+        "pct": 75.86,
+        "register": 72633,
+        "ballotsCast": 55096,
+        "feldar": 100.0
+      },
+      "PE-13": {
+        "pct": 78.29,
+        "register": 69462,
+        "ballotsCast": 54383,
+        "feldar": 100.0
+      },
+      "PE-14": {
+        "pct": 76.35,
+        "register": 72202,
+        "ballotsCast": 55126,
+        "feldar": 100.0
+      },
+      "SO-01": {
+        "pct": 79.64,
+        "register": 57492,
+        "ballotsCast": 45784,
+        "feldar": 100.0
+      },
+      "SO-02": {
+        "pct": 73.0,
+        "register": 55373,
+        "ballotsCast": 40422,
+        "feldar": 100.0
+      },
+      "SO-03": {
+        "pct": 77.1,
+        "register": 59378,
+        "ballotsCast": 45783,
+        "feldar": 100.0
+      },
+      "SO-04": {
+        "pct": 79.4,
+        "register": 62236,
+        "ballotsCast": 49418,
+        "feldar": 100.0
+      },
+      "SZ-01": {
+        "pct": 81.05,
+        "register": 69780,
+        "ballotsCast": 56559,
+        "feldar": 100.0
+      },
+      "SZ-02": {
+        "pct": 74.02,
+        "register": 68634,
+        "ballotsCast": 50804,
+        "feldar": 100.0
+      },
+      "SZ-03": {
+        "pct": 73.66,
+        "register": 73039,
+        "ballotsCast": 53801,
+        "feldar": 100.0
+      },
+      "SZ-04": {
+        "pct": 71.03,
+        "register": 67179,
+        "ballotsCast": 47718,
+        "feldar": 100.0
+      },
+      "SZ-05": {
+        "pct": 72.35,
+        "register": 68853,
+        "ballotsCast": 49815,
+        "feldar": 100.0
+      },
+      "SZ-06": {
+        "pct": 73.91,
+        "register": 68723,
+        "ballotsCast": 50792,
+        "feldar": 100.0
+      },
+      "TO-01": {
+        "pct": 78.33,
+        "register": 55678,
+        "ballotsCast": 43614,
+        "feldar": 100.0
+      },
+      "TO-02": {
+        "pct": 76.78,
+        "register": 55010,
+        "ballotsCast": 42236,
+        "feldar": 100.0
+      },
+      "TO-03": {
+        "pct": 77.55,
+        "register": 54275,
+        "ballotsCast": 42089,
+        "feldar": 98.8
+      },
+      "VA-01": {
+        "pct": 84.57,
+        "register": 66521,
+        "ballotsCast": 56254,
+        "feldar": 100.0
+      },
+      "VA-02": {
+        "pct": 83.52,
+        "register": 66082,
+        "ballotsCast": 55191,
+        "feldar": 100.0
+      },
+      "VA-03": {
+        "pct": 82.33,
+        "register": 64180,
+        "ballotsCast": 52841,
+        "feldar": 100.0
+      },
+      "VE-01": {
+        "pct": 83.72,
+        "register": 68325,
+        "ballotsCast": 57200,
+        "feldar": 100.0
+      },
+      "VE-02": {
+        "pct": 82.17,
+        "register": 72430,
+        "ballotsCast": 59514,
+        "feldar": 100.0
+      },
+      "VE-03": {
+        "pct": 80.11,
+        "register": 63950,
+        "ballotsCast": 51233,
+        "feldar": 100.0
+      },
+      "VE-04": {
+        "pct": 79.05,
+        "register": 65311,
+        "ballotsCast": 51631,
+        "feldar": 100.0
+      },
+      "ZA-01": {
+        "pct": 82.97,
+        "register": 70675,
+        "ballotsCast": 58638,
+        "feldar": 100.0
+      },
+      "ZA-02": {
+        "pct": 80.11,
+        "register": 71351,
+        "ballotsCast": 57162,
+        "feldar": 100.0
+      },
+      "ZA-03": {
+        "pct": 79.16,
+        "register": 67859,
+        "ballotsCast": 53717,
+        "feldar": 100.0
       }
     }
   },
