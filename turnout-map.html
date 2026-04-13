@@ -255,11 +255,14 @@ function buildMap(turnoutData) {
   if (currentLayer === 'county') {
     // Prefer the post-close final figures when published; fall back to
     // the 18:30 intraday snapshot otherwise.
+    const inclusive = (turnoutData && turnoutData.countiesFinalInclusive) || {};
     const finalCounties = (turnoutData && turnoutData.countiesFinal) || {};
     const snapshotCounties = (turnoutData && turnoutData.counties) || {};
     const toRecord = (name) => {
+      const inc = inclusive[name];
+      if (inc) return { pct: inc.pct, megj: inc.ballotsCast, vp: inc.register, time: '19:00 (final, incl. mail)', isFinal: true };
       const fin = finalCounties[name];
-      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final)', isFinal: true };
+      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final, domestic)', isFinal: true };
       return snapshotCounties[name] || null;
     };
     const counties = {};
@@ -288,11 +291,14 @@ function buildMap(turnoutData) {
       svg.appendChild(b);
     });
   } else {
+    const inclusive = (turnoutData && turnoutData.constituenciesFinalInclusive) || {};
     const finalConsts = (turnoutData && turnoutData.constituenciesFinal) || {};
     const snapshotConsts = (turnoutData && turnoutData.constituencies) || {};
     const toRecord = (id) => {
+      const inc = inclusive[id];
+      if (inc) return { pct: inc.pct, megj: inc.ballotsCast, vp: inc.register, time: '19:00 (final, incl. mail)', isFinal: true };
       const fin = finalConsts[id];
-      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final)', isFinal: true };
+      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final, domestic)', isFinal: true };
       return snapshotConsts[id] || null;
     };
     const constituencies = {};
@@ -366,16 +372,18 @@ function updateNationalSummary(turnoutData) {
     div.innerHTML = '<span class="label">National turnout:</span> <span class="voters-info">Awaiting first report (7:00)</span>';
     return;
   }
-  // Prefer the post-close final figure when present.
-  const nf = turnoutData.nationalFinal;
+  // Prefer the inclusive (domestic + mail) final — matches NVI's website.
+  // Fall back to the domestic-only final from szeredmf.xml.
+  const nf = turnoutData.nationalFinalInclusive || turnoutData.nationalFinal;
   if (nf && typeof nf.pct === 'number') {
     const castFmt = nf.ballotsCast.toLocaleString('en-GB');
     const regFmt = nf.register.toLocaleString('en-GB');
+    const kind = turnoutData.nationalFinalInclusive ? 'incl. mail-in' : 'domestic only';
     div.innerHTML = `
       <div>
         <div class="label">Final national turnout</div>
         <div class="big-number">${nf.pct.toFixed(2)}%</div>
-        <div class="voters-info">${castFmt} of ${regFmt} voters</div>
+        <div class="voters-info">${castFmt} of ${regFmt} voters · ${kind}</div>
       </div>
       <div class="report-time">Post-close (19:00)</div>
     `;
