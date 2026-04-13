@@ -282,10 +282,8 @@ function updateCountedPill(data) {
     return;
   }
   const avg = values.reduce((s, v) => s + v, 0) / values.length;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
   pill.style.display = 'inline-block';
-  pill.textContent = `${avg.toFixed(1)}% counted avg (range ${min.toFixed(0)}–${max.toFixed(0)}%)`;
+  pill.textContent = `${avg.toFixed(1)}% counted`;
 }
 
 async function loadResults() {
