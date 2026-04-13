@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T05:01:10.934313",
+  "lastUpdated": "2026-04-13T07:01:48.210395",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -993,17 +993,17 @@
     }
   },
   "nationalVote": {
-    "FIDESZ-KDNP": 36.978,
-    "TISZA": 54.321,
+    "FIDESZ-KDNP": 36.976,
+    "TISZA": 54.323,
     "DK": 1.187,
-    "Mi Hazánk": 5.964,
+    "Mi Hazánk": 5.963,
     "MKKP": 0.832
   },
   "minorityVote": {
     "Országos Ukrán": 0.006,
     "OHÖ": 0.022,
     "OSZÖ": 0.016,
-    "Magyarországi Romák Országos": 0.333,
+    "Magyarországi Romák Országos": 0.332,
     "Országos Szlovén": 0.003,
     "OÖÖ": 0.002,
     "MGOÖ": 0.003,
@@ -20878,7 +20878,7 @@
       "18:30": 77.8
     }
   },
-  "processingPctDomestic": 98.93,
-  "nviVersion": "2026.04.13.03:59:00",
-  "processingPct": 98.93
+  "processingPctDomestic": 98.94,
+  "nviVersion": "2026.04.13.05:58:34",
+  "processingPct": 98.94
 }
