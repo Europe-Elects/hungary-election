@@ -134,7 +134,7 @@ svg#map.panning { cursor: grabbing; }
       to shade by that party's vote share. Scroll or pinch to zoom, drag to pan.
     </div>
   </div>
-  <div class="footer">Map created by Andrei Miclea · Source: Hungarian National Election Office VIP Service · <a href="municipality-national-list.csv" download style="color:#475569;text-decoration:underline">Download CSV (3,177 municipalities)</a></div>
+  <div class="footer">Map created by Andrei Miclea · Source: Hungarian National Election Office VIP Service</div>
 </div>
 
 <script>
@@ -153,7 +153,7 @@ let muniNames = null;                // municipality_names.json (for tooltip dis
 let currentView = 'winner';          // 'winner' or a party key
 
 // Aggregate the 23 Budapest kerülets into one result when rendering
-// because the Datawrapper basemap treats Budapest as a single polygon.
+// because the basemap treats Budapest as a single polygon.
 function aggregateBudapest(data) {
   const bp = Object.entries(data).filter(([k]) => k.startsWith('01-'));
   if (!bp.length) return null;
@@ -327,7 +327,7 @@ function renderMap() {
     }
   }
 
-  // The Datawrapper basemap is already map-projected (Mercator-ish) and its
+  // The basemap is already map-projected (Mercator-ish) and its
   // Y axis grows downward in screen orientation — no latitude correction,
   // no vertical flip. Preserve aspect ratio.
   const targetW = 1000;
