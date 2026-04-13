@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T17:06:45.186516",
+  "lastUpdated": "2026-04-13T17:31:57.107491",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -1029,8 +1029,8 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.04,
-      "TISZA": 10.95,
+      "FIDESZ-KDNP": 87.13,
+      "TISZA": 10.88,
       "DK": 0.21,
       "Mi Hazánk": 1.49,
       "MKKP": 0.3
@@ -21517,7 +21517,7 @@
       "register": 7452428,
       "ballotsCast": 5928580,
       "feldar": 98.54,
-      "generated": "2026-04-13T15:58:54+02:00"
+      "generated": "2026-04-13T16:28:37+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -22281,6 +22281,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.13.15:58:54",
+  "nviVersion": "2026.04.13.16:28:37",
   "processingPct": 98.22
 }
