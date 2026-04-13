@@ -123,7 +123,7 @@ const PARTIES = {
 const NO_DATA_COLOR = '#E2E8F0';
 
 let topo = null;                     // TopoJSON
-let muniResults = null;              // results.json municipalityResults
+let muniResults = null;              // loaded from sandboxed municipality-results.json
 let muniNames = null;                // municipality_names.json (for tooltip display names)
 let currentView = 'winner';          // 'winner' or a party key
 
@@ -451,29 +451,50 @@ async function loadNames() {
   } catch (e) { muniNames = null; }
 }
 async function loadResults() {
+  // Sandbox source: municipality-results.json (isolated from results.json).
+  let muniPayload = null;
   try {
-    const r = await fetch('results.json?' + Date.now());
-    const d = await r.json();
-    muniResults = d.municipalityResults || {};
-    bpAggregate = aggregateBudapest(muniResults);
-    buildNameIndex();
+    const r = await fetch('municipality-results.json?v=' + Date.now());
+    muniPayload = await r.json();
+  } catch (e) { console.error('muni fetch', e); }
 
-    // Pill: use the domestic processing pct
-    const el = document.getElementById('lastUpdated');
-    el.textContent = 'Last updated: ' + new Date(d.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
-    const anyData = Object.keys(muniResults).length > 0;
-    el.classList.toggle('live', anyData);
-    const pill = document.getElementById('countedPill');
-    const pct = (typeof d.processingPctDomestic === 'number' && d.processingPctDomestic > 0)
-      ? d.processingPctDomestic : d.processingPct;
-    if (typeof pct === 'number' && pct > 0) {
-      pill.style.display = 'inline-block';
-      pill.textContent = pct.toFixed(1) + '% counted (domestic)';
-    } else {
-      pill.style.display = 'none';
-    }
-    renderMap();
-  } catch (e) { console.error(e); }
+  muniResults = (muniPayload && muniPayload.municipalityResults) || {};
+  bpAggregate = aggregateBudapest(muniResults);
+  buildNameIndex();
+
+  const el = document.getElementById('lastUpdated');
+  if (muniPayload && muniPayload.lastUpdated) {
+    el.textContent = 'Last updated: ' + new Date(muniPayload.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
+  }
+  const anyData = Object.keys(muniResults).length > 0;
+  el.classList.toggle('live', anyData);
+
+  // Rehearsal banner (only appears when the sandbox payload flags rehearsal data)
+  const pill = document.getElementById('countedPill');
+  if (muniPayload && muniPayload.isRehearsal) {
+    pill.style.display = 'inline-block';
+    pill.style.background = '#FEE2E2';
+    pill.style.color = '#991B1B';
+    pill.textContent = '⚠ rehearsal data';
+  } else {
+    // Optional: pull domestic processing % from results.json (read-only)
+    try {
+      const rr = await fetch('results.json?v=' + Date.now());
+      const d = await rr.json();
+      const pct = (typeof d.processingPctDomestic === 'number' && d.processingPctDomestic > 0)
+        ? d.processingPctDomestic : d.processingPct;
+      if (typeof pct === 'number' && pct > 0) {
+        pill.style.display = 'inline-block';
+        pill.style.background = '#FEF3C7';
+        pill.style.color = '#92400E';
+        pill.textContent = pct.toFixed(1) + '% counted (domestic)';
+      } else {
+        pill.style.display = 'none';
+      }
+    } catch (e) { pill.style.display = 'none'; }
+  }
+
+  renderMap();
 }
 
 buildLegend();
