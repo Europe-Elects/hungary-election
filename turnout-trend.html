@@ -679,7 +679,13 @@ function applyResults(data) {
   const el = document.getElementById('lastUpdated');
   el.textContent = 'Last updated: ' + new Date(data.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
   const turnout = data.turnout || {};
-  const history = turnout.nationalHistory || {};
+  const historyRaw = turnout.nationalHistory || {};
+  // Drop 2026's 18:30 intraday snapshot once the post-close 19:00 final is
+  // published — the two were visually overlapping at the right edge and
+  // 19:00 is the authoritative end-of-day figure.
+  const history = {};
+  for (const [k, v] of Object.entries(historyRaw)) history[k] = v;
+  if (typeof history['19:00'] === 'number') delete history['18:30'];
   el.classList.toggle('live', Object.keys(history).length > 0);
   renderChart(history);
 }
