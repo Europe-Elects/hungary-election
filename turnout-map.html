@@ -253,7 +253,17 @@ function buildMap(turnoutData) {
   svg.innerHTML = '';
 
   if (currentLayer === 'county') {
-    const counties = (turnoutData && turnoutData.counties) || {};
+    // Prefer the post-close final figures when published; fall back to
+    // the 18:30 intraday snapshot otherwise.
+    const finalCounties = (turnoutData && turnoutData.countiesFinal) || {};
+    const snapshotCounties = (turnoutData && turnoutData.counties) || {};
+    const toRecord = (name) => {
+      const fin = finalCounties[name];
+      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final)', isFinal: true };
+      return snapshotCounties[name] || null;
+    };
+    const counties = {};
+    COUNTY_MAP_DATA.forEach(c => { counties[c.id] = toRecord(c.id); });
     COUNTY_MAP_DATA.forEach(c => {
       const record = counties[c.id];
       const pct = record ? record.pct : null;
@@ -344,8 +354,23 @@ function hideTooltip() { document.getElementById('tooltip').style.display = 'non
 
 function updateNationalSummary(turnoutData) {
   const div = document.getElementById('nationalSummary');
-  if (!turnoutData || !turnoutData.national) {
+  if (!turnoutData || (!turnoutData.national && !turnoutData.nationalFinal)) {
     div.innerHTML = '<span class="label">National turnout:</span> <span class="voters-info">Awaiting first report (7:00)</span>';
+    return;
+  }
+  // Prefer the post-close final figure when present.
+  const nf = turnoutData.nationalFinal;
+  if (nf && typeof nf.pct === 'number') {
+    const castFmt = nf.ballotsCast.toLocaleString('en-GB');
+    const regFmt = nf.register.toLocaleString('en-GB');
+    div.innerHTML = `
+      <div>
+        <div class="label">Final national turnout</div>
+        <div class="big-number">${nf.pct.toFixed(2)}%</div>
+        <div class="voters-info">${castFmt} of ${regFmt} voters</div>
+      </div>
+      <div class="report-time">Post-close (19:00)</div>
+    `;
     return;
   }
   const nat = turnoutData.national;
@@ -408,8 +433,8 @@ setInterval(async () => {
 function updateSubtitle() {
   const sub = document.getElementById('subtitle');
   sub.textContent = currentLayer === 'county'
-    ? 'Live voter turnout by county (20), updated every ~2 hours'
-    : 'Live voter turnout by constituency (OEVK, 106), updated every ~2 hours';
+    ? 'Voter turnout by county (20) — intraday snapshots every ~2 hours, plus post-close final'
+    : 'Voter turnout by constituency (OEVK, 106) and counties — intraday snapshots every ~2 hours, plus post-close final';
 }
 
 function setLayer(layer) {

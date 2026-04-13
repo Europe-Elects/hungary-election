@@ -437,17 +437,27 @@ function renderChart(history2026) {
       svg.appendChild(circle);
     }
 
-    // Value labels on every 2026 dot (above the line, collision-aware)
+    // Value labels on every 2026 dot (above the line, collision-aware).
+    // If the last point is at 19:00 (post-close final) anchor that label to
+    // the LEFT of the dot so it doesn't collide with the historical
+    // end-of-line badges which sit to the right of the same x.
+    const lastIdx = sorted2026.length - 1;
     for (let i = 0; i < sorted2026.length; i++) {
       const p = sorted2026[i];
-      const isLast = i === sorted2026.length - 1;
+      const isLast = i === lastIdx;
+      const isFinal = isLast && p.time === '19:00';
       const lbl = document.createElementNS(ns, 'text');
-      lbl.setAttribute('x', p.x);
-      lbl.setAttribute('y', p.y - 10);
-      lbl.setAttribute('text-anchor', 'middle');
+      if (isFinal) {
+        lbl.setAttribute('x', p.x - 7);
+        lbl.setAttribute('y', p.y - 2);
+        lbl.setAttribute('text-anchor', 'end');
+      } else {
+        lbl.setAttribute('x', p.x);
+        lbl.setAttribute('y', p.y - 10);
+        lbl.setAttribute('text-anchor', 'middle');
+      }
       lbl.setAttribute('class', 'dot-label');
       lbl.setAttribute('fill', YEAR_2026.color);
-      // subtle white outline for legibility
       lbl.setAttribute('paint-order', 'stroke');
       lbl.setAttribute('stroke', '#fff');
       lbl.setAttribute('stroke-width', '3');
@@ -457,9 +467,10 @@ function renderChart(history2026) {
       svg.appendChild(lbl);
     }
 
-    // "NOW" marker at the last 2026 data point
-    if (sorted2026.length > 0) {
-      const last = sorted2026[sorted2026.length - 1];
+    // "NOW" marker at the last 2026 data point — but only while the count
+    // is still in progress (not at the post-close 19:00 final).
+    const last = sorted2026[lastIdx];
+    if (last && last.time !== '19:00') {
       const nowLine = document.createElementNS(ns, 'line');
       nowLine.setAttribute('x1', last.x);
       nowLine.setAttribute('x2', last.x);
