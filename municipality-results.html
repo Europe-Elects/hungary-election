@@ -218,17 +218,23 @@ function hexToRgb(hex) {
 // Minimal inline topojson-feature decoder (no external lib).
 // https://github.com/topojson/topojson-specification
 function topoTransform(t) {
-  if (!t) return (p) => p;
+  if (!t) return { fn: (p) => [p[0], p[1]], quantized: false };
   const [sx, sy] = t.scale;
   const [tx, ty] = t.translate;
-  return (p) => [p[0] * sx + tx, p[1] * sy + ty];
+  return { fn: (p) => [p[0] * sx + tx, p[1] * sy + ty], quantized: true };
 }
-function decodeArc(arc, transform) {
+function decodeArc(arc, transformObj) {
+  // When quantized: arcs are delta-encoded, needs running sum.
+  // When not quantized: arcs are already absolute coordinates.
   const out = [];
-  let x = 0, y = 0;
-  for (const p of arc) {
-    x += p[0]; y += p[1];
-    out.push(transform([x, y]));
+  if (transformObj.quantized) {
+    let x = 0, y = 0;
+    for (const p of arc) {
+      x += p[0]; y += p[1];
+      out.push(transformObj.fn([x, y]));
+    }
+  } else {
+    for (const p of arc) out.push(transformObj.fn(p));
   }
   return out;
 }
@@ -283,58 +289,29 @@ function renderMap() {
   const transform = topoTransform(topo.transform);
   const arcs = topo.arcs;
 
-  // Compute bbox from all region geometries
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  // Compute bbox by decoding every arc (respecting quantization flag).
   const regionGeos = topo.objects.regions.geometries;
-  const regionPaths = [];
-  for (const geom of regionGeos) {
-    const d = geometryToPathString(geom, arcs, transform);
-    regionPaths.push({ geom, d });
-    // Roughly scan for bbox from the arcs referenced
-    function scanArc(a) {
-      let x = 0, y = 0;
-      for (const p of a) {
-        x += p[0]; y += p[1];
-        const [tx, ty] = transform([x, y]);
-        if (tx < minX) minX = tx; if (ty < minY) minY = ty;
-        if (tx > maxX) maxX = tx; if (ty > maxY) maxY = ty;
-      }
-    }
-    const gatherArcs = (arr) => {
-      for (const item of arr) {
-        if (Array.isArray(item) && typeof item[0] === 'number') {
-          const idx = item[0] < 0 ? ~item[0] : item[0];
-          // Actually `item` here is a single index integer wrapped in arrays.
-          // The actual structure: Polygon.arcs = [[idx, idx, ...], ...]
-          // We're overthinking; just scan every arc referenced.
-        }
-      }
-    };
-  }
-  // Simpler bbox: iterate all arcs
-  minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   for (const arc of arcs) {
-    let x = 0, y = 0;
-    for (const p of arc) {
-      x += p[0]; y += p[1];
-      const [tx, ty] = transform([x, y]);
-      if (tx < minX) minX = tx;
-      if (ty < minY) minY = ty;
-      if (tx > maxX) maxX = tx;
-      if (ty > maxY) maxY = ty;
+    const decoded = decodeArc(arc, transform);
+    for (const [x, y] of decoded) {
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
     }
   }
 
-  // Hungary is wider than tall. Use a simple "equirectangular" flip —
-  // SVG y-axis grows downward, but geo y (lat) grows upward, so we flip.
-  // Fit into a fixed viewBox aspect (e.g. 1000 × 580 ≈ Hungary's 3:1.7 ratio)
+  // The Datawrapper basemap is already map-projected (Mercator-ish) and its
+  // Y axis grows downward in screen orientation — no latitude correction,
+  // no vertical flip. Preserve aspect ratio.
   const targetW = 1000;
-  const cosLat = Math.cos(((minY + maxY) / 2) * Math.PI / 180);
-  const geoAspect = (maxX - minX) * cosLat / (maxY - minY);
-  const targetH = Math.round(targetW / geoAspect);
+  const spanX = Math.max(1e-9, maxX - minX);
+  const spanY = Math.max(1e-9, maxY - minY);
+  const targetH = Math.max(1, Math.round(targetW * spanY / spanX));
   svg.setAttribute('viewBox', `0 0 ${targetW} ${targetH}`);
-  function projX(x) { return ((x - minX) / (maxX - minX)) * targetW; }
-  function projY(y) { return targetH - ((y - minY) / (maxY - minY)) * targetH; }
+  function projX(x) { return ((x - minX) / spanX) * targetW; }
+  function projY(y) { return ((y - minY) / spanY) * targetH; }
 
   // Re-render each polygon with flipped Y
   function drawGeom(geom) {
