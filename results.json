@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T18:01:11.100876",
+  "lastUpdated": "2026-04-13T18:31:26.591602",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -1029,8 +1029,8 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.25,
-      "TISZA": 10.77,
+      "FIDESZ-KDNP": 87.39,
+      "TISZA": 10.63,
       "DK": 0.2,
       "Mi Hazánk": 1.48,
       "MKKP": 0.3
@@ -21514,10 +21514,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7452428,
-      "ballotsCast": 5928580,
-      "feldar": 98.54,
-      "generated": "2026-04-13T16:28:37+02:00"
+      "register": 7453620,
+      "ballotsCast": 5929599,
+      "feldar": 98.55,
+      "generated": "2026-04-13T16:58:20+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21617,10 +21617,10 @@
         "feldar": 100.0
       },
       "Tolna": {
-        "pct": 77.56,
-        "register": 164963,
-        "ballotsCast": 127939,
-        "feldar": 99.64
+        "pct": 77.61,
+        "register": 166155,
+        "ballotsCast": 128958,
+        "feldar": 100.0
       },
       "Vas": {
         "pct": 83.49,
@@ -22213,10 +22213,10 @@
         "feldar": 100.0
       },
       "TO-03": {
-        "pct": 77.55,
-        "register": 54275,
-        "ballotsCast": 42089,
-        "feldar": 98.8
+        "pct": 77.72,
+        "register": 55467,
+        "ballotsCast": 43108,
+        "feldar": 100.0
       },
       "VA-01": {
         "pct": 84.57,
@@ -22281,6 +22281,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.13.16:58:20",
+  "nviVersion": "2026.04.13.17:27:58",
   "processingPct": 98.22
 }
