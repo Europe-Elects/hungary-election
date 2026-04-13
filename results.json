@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T14:01:33.317751",
+  "lastUpdated": "2026-04-13T14:04:02.215682",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -20867,7 +20867,7 @@
         "time": "18:30"
       }
     },
-    "lastReportTime": "18:30",
+    "lastReportTime": "19:00",
     "nationalHistory": {
       "07:00": 3.46,
       "09:00": 16.89,
@@ -20875,7 +20875,115 @@
       "13:00": 54.14,
       "15:00": 66.01,
       "17:00": 74.23,
-      "18:30": 77.8
+      "18:30": 77.8,
+      "19:00": 78.99
+    },
+    "nationalFinal": {
+      "pct": 78.99,
+      "register": 7236993,
+      "ballotsCast": 5716721
+    },
+    "countiesFinal": {
+      "Budapest": {
+        "pct": 82.02,
+        "register": 1171652,
+        "ballotsCast": 960946
+      },
+      "Baranya": {
+        "pct": 76.97,
+        "register": 272992,
+        "ballotsCast": 210123
+      },
+      "Bács-Kiskun": {
+        "pct": 76.86,
+        "register": 382747,
+        "ballotsCast": 294179
+      },
+      "Békés": {
+        "pct": 76.36,
+        "register": 251943,
+        "ballotsCast": 192389
+      },
+      "Borsod-Abaúj-Zemplén": {
+        "pct": 73.41,
+        "register": 469774,
+        "ballotsCast": 344871
+      },
+      "Csongrád-Csanád": {
+        "pct": 79.06,
+        "register": 301367,
+        "ballotsCast": 238251
+      },
+      "Fejér": {
+        "pct": 80.73,
+        "register": 323318,
+        "ballotsCast": 261012
+      },
+      "Győr-Moson-Sopron": {
+        "pct": 82.98,
+        "register": 343904,
+        "ballotsCast": 285367
+      },
+      "Hajdú-Bihar": {
+        "pct": 76.2,
+        "register": 396278,
+        "ballotsCast": 301950
+      },
+      "Heves": {
+        "pct": 77.97,
+        "register": 220473,
+        "ballotsCast": 171905
+      },
+      "Jász-Nagykun-Szolnok": {
+        "pct": 75.48,
+        "register": 273561,
+        "ballotsCast": 206474
+      },
+      "Komárom-Esztergom": {
+        "pct": 79.1,
+        "register": 229698,
+        "ballotsCast": 181692
+      },
+      "Nógrád": {
+        "pct": 75.77,
+        "register": 141930,
+        "ballotsCast": 107536
+      },
+      "Pest": {
+        "pct": 82.08,
+        "register": 1007919,
+        "ballotsCast": 827336
+      },
+      "Somogy": {
+        "pct": 76.83,
+        "register": 226494,
+        "ballotsCast": 174014
+      },
+      "Szabolcs-Szatmár-Bereg": {
+        "pct": 74.01,
+        "register": 405879,
+        "ballotsCast": 300396
+      },
+      "Tolna": {
+        "pct": 77.35,
+        "register": 162808,
+        "ballotsCast": 125929
+      },
+      "Vas": {
+        "pct": 83.14,
+        "register": 191560,
+        "ballotsCast": 159267
+      },
+      "Veszprém": {
+        "pct": 80.84,
+        "register": 259160,
+        "ballotsCast": 209505
+      },
+      "Zala": {
+        "pct": 80.37,
+        "register": 203536,
+        "ballotsCast": 163579
+      }
     }
   },
   "processingPctDomestic": 98.94,
