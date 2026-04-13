@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T03:06:30.690577",
+  "lastUpdated": "2026-04-13T04:12:53.760541",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -727,15 +727,15 @@
       "DK": 0.5,
       "Mi Hazánk": 4.2,
       "MKKP": 0.0,
-      "counted": 98.31
+      "counted": 99.15
     },
     "SZ-05": {
-      "FIDESZ-KDNP": 51.2,
+      "FIDESZ-KDNP": 51.3,
       "TISZA": 41.4,
       "DK": 0.6,
       "Mi Hazánk": 6.5,
       "MKKP": 0.0,
-      "counted": 97.92
+      "counted": 98.96
     },
     "SZ-06": {
       "FIDESZ-KDNP": 47.0,
@@ -957,8 +957,8 @@
       "MKKP": 0.6
     },
     "Szabolcs-Szatmár-Bereg": {
-      "FIDESZ-KDNP": 44.7,
-      "TISZA": 48.3,
+      "FIDESZ-KDNP": 44.8,
+      "TISZA": 48.2,
       "DK": 0.8,
       "Mi Hazánk": 4.9,
       "MKKP": 0.4
@@ -993,8 +993,8 @@
     }
   },
   "nationalVote": {
-    "FIDESZ-KDNP": 36.973,
-    "TISZA": 54.326,
+    "FIDESZ-KDNP": 36.978,
+    "TISZA": 54.321,
     "DK": 1.187,
     "Mi Hazánk": 5.964,
     "MKKP": 0.832
@@ -1003,7 +1003,7 @@
     "Országos Ukrán": 0.006,
     "OHÖ": 0.022,
     "OSZÖ": 0.016,
-    "Magyarországi Romák Országos": 0.332,
+    "Magyarországi Romák Országos": 0.333,
     "Országos Szlovén": 0.003,
     "OÖÖ": 0.002,
     "MGOÖ": 0.003,
@@ -1015,8 +1015,8 @@
   },
   "nationalBreakdown": {
     "capital": {
-      "FIDESZ-KDNP": 28.8,
-      "TISZA": 63.19,
+      "FIDESZ-KDNP": 28.79,
+      "TISZA": 63.2,
       "DK": 1.74,
       "Mi Hazánk": 4.66,
       "MKKP": 1.43
@@ -1029,8 +1029,8 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 86.95,
-      "TISZA": 11.12,
+      "FIDESZ-KDNP": 87.08,
+      "TISZA": 10.99,
       "DK": 0.22,
       "Mi Hazánk": 1.43,
       "MKKP": 0.29
@@ -20878,7 +20878,7 @@
       "18:30": 77.8
     }
   },
-  "processingPctDomestic": 98.86,
-  "nviVersion": "2026.04.13.02:03:26",
-  "processingPct": 98.89
+  "processingPctDomestic": 98.93,
+  "nviVersion": "2026.04.13.03:10:01",
+  "processingPct": 98.93
 }
