@@ -34,6 +34,15 @@ svg#map.panning { cursor: grabbing; }
 .county-border { fill: none; stroke: #0F172A; stroke-width: 0.6; pointer-events: none; opacity: 0.35; }
 .swing-arrow { pointer-events: none; opacity: 0.75; }
 .arrow-dot { pointer-events: none; opacity: 0.85; }
+/* When a side is isolated, the other side fades and tooltips stop hitting it */
+.svg-filter-blue .side-black,
+.svg-filter-blue .side-black.swing-arrow,
+.svg-filter-blue .side-black.arrow-dot { opacity: 0.05; }
+.svg-filter-black .side-blue,
+.svg-filter-black .side-blue.swing-arrow,
+.svg-filter-black .side-blue.arrow-dot { opacity: 0.05; }
+.svg-filter-blue .swing-hover.side-black,
+.svg-filter-black .swing-hover.side-blue { pointer-events: none; }
 .swing-hover:hover { opacity: 0.9; cursor: help; }
 
 .zoom-controls { position: absolute; bottom: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5; }
@@ -52,7 +61,16 @@ svg#map.panning { cursor: grabbing; }
   display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
   padding: 6px 10px 2px; font-size: 12px; color: #334155;
 }
-.legend-row .item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-row .item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px;
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  cursor: pointer; user-select: none;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.legend-row .item:hover { background: #F1F5F9; border-color: #CBD5E1; }
+.legend-row .item.active { background: #fff; border-color: #64748B; box-shadow: 0 1px 2px rgba(15,23,42,.06); font-weight: 600; }
+.legend-row .item.dimmed { opacity: 0.35; }
 .legend-row .swatch { width: 20px; height: 3px; border-radius: 2px; display: inline-block; }
 .legend-row .count { color: #64748B; font-weight: 500; font-variant-numeric: tabular-nums; }
 .scale-key { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; font-size: 11px; color: #475569; }
@@ -88,8 +106,8 @@ svg#map.panning { cursor: grabbing; }
   </div>
   <div id="map-container">
     <div class="legend-row">
-      <span class="item"><span class="swatch" style="background:#3399FF"></span>TISZA gain<span class="count" id="countBlue"></span></span>
-      <span class="item"><span class="swatch" style="background:#000000"></span>Fidesz-KDNP gain<span class="count" id="countBlack"></span></span>
+      <span class="item" id="legendBlue" data-side="blue" title="Click to isolate TISZA gains"><span class="swatch" style="background:#3399FF"></span>TISZA gain<span class="count" id="countBlue"></span></span>
+      <span class="item" id="legendBlack" data-side="black" title="Click to isolate Fidesz-KDNP gains"><span class="swatch" style="background:#000000"></span>Fidesz-KDNP gain<span class="count" id="countBlack"></span></span>
       <span class="scale-key">
         Scale:
         <svg viewBox="0 0 130 18" aria-hidden="true">
@@ -412,6 +430,7 @@ function renderMap() {
     const x2 = p.cx + dx;
     const y2 = p.cy + dy;
 
+    const sideCls = blue ? 'side-blue' : 'side-black';
     if (rawLen > 0) {
       const line = document.createElementNS(ns, 'line');
       line.setAttribute('x1', p.cx);
@@ -422,7 +441,7 @@ function renderMap() {
       line.setAttribute('stroke-width', strokeW);
       line.setAttribute('stroke-linecap', 'round');
       line.setAttribute('marker-end', marker);
-      line.setAttribute('class', 'swing-arrow');
+      line.setAttribute('class', `swing-arrow ${sideCls}`);
       arrowLayer.appendChild(line);
     }
 
@@ -431,7 +450,7 @@ function renderMap() {
     dot.setAttribute('cy', p.cy);
     dot.setAttribute('r', p.budapest ? 2.6 : MIN_DOT_R);
     dot.setAttribute('fill', color);
-    dot.setAttribute('class', 'arrow-dot');
+    dot.setAttribute('class', `arrow-dot ${sideCls}`);
     arrowLayer.appendChild(dot);
 
     // Hover hitbox: rectangle from origin to arrow head
@@ -440,7 +459,7 @@ function renderMap() {
     hit.setAttribute('cy', (p.cy + y2) / 2);
     hit.setAttribute('r', Math.max(p.budapest ? 14 : 3, Math.hypot(dx, dy) / 2 + 2));
     hit.setAttribute('fill', 'transparent');
-    hit.setAttribute('class', 'swing-hover');
+    hit.setAttribute('class', `swing-hover ${sideCls}`);
     hit.addEventListener('mouseenter', (e) => showTooltip(p, e));
     hit.addEventListener('mousemove', positionTooltip);
     hit.addEventListener('mouseleave', hideTooltip);
@@ -461,6 +480,9 @@ function renderMap() {
 
   document.getElementById('countBlue').textContent = blueCount ? ` · ${blueCount.toLocaleString()}` : '';
   document.getElementById('countBlack').textContent = blackCount ? ` · ${blackCount.toLocaleString()}` : '';
+
+  // Re-apply any active legend filter after SVG rebuild.
+  if (typeof applyLegendFilter === 'function') applyLegendFilter();
 }
 
 // ── Tooltip ──
@@ -598,6 +620,25 @@ function initZoomHandlers() {
 }
 
 initZoomHandlers();
+
+// ── Legend filter: click a pill to isolate one side; click again to reset ──
+let isolatedSide = null; // 'blue' | 'black' | null
+function applyLegendFilter() {
+  const svg = document.getElementById('map');
+  svg.classList.remove('svg-filter-blue', 'svg-filter-black');
+  if (isolatedSide === 'blue') svg.classList.add('svg-filter-blue');
+  if (isolatedSide === 'black') svg.classList.add('svg-filter-black');
+  document.getElementById('legendBlue').classList.toggle('active', isolatedSide === 'blue');
+  document.getElementById('legendBlue').classList.toggle('dimmed', isolatedSide === 'black');
+  document.getElementById('legendBlack').classList.toggle('active', isolatedSide === 'black');
+  document.getElementById('legendBlack').classList.toggle('dimmed', isolatedSide === 'blue');
+}
+function toggleSide(side) {
+  isolatedSide = (isolatedSide === side) ? null : side;
+  applyLegendFilter();
+}
+document.getElementById('legendBlue').addEventListener('click', () => toggleSide('blue'));
+document.getElementById('legendBlack').addEventListener('click', () => toggleSide('black'));
 
 (async () => {
   await Promise.all([loadBasemap(), loadBaseline(), loadNames(), load2026()]);
