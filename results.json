@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T18:31:26.591602",
+  "lastUpdated": "2026-04-13T19:01:41.516603",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -1029,8 +1029,8 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.39,
-      "TISZA": 10.63,
+      "FIDESZ-KDNP": 87.4,
+      "TISZA": 10.62,
       "DK": 0.2,
       "Mi Hazánk": 1.48,
       "MKKP": 0.3
@@ -21514,10 +21514,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7453620,
-      "ballotsCast": 5929599,
-      "feldar": 98.55,
-      "generated": "2026-04-13T16:58:20+02:00"
+      "register": 7457219,
+      "ballotsCast": 5932311,
+      "feldar": 98.57,
+      "generated": "2026-04-13T17:27:58+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21545,10 +21545,10 @@
         "feldar": 100.0
       },
       "Borsod-Abaúj-Zemplén": {
-        "pct": 73.73,
-        "register": 476007,
-        "ballotsCast": 350951,
-        "feldar": 99.74
+        "pct": 73.74,
+        "register": 479606,
+        "ballotsCast": 353663,
+        "feldar": 100.0
       },
       "Csongrád-Csanád": {
         "pct": 79.55,
@@ -21829,16 +21829,16 @@
         "feldar": 100.0
       },
       "BO-02": {
-        "pct": 76.13,
-        "register": 64271,
-        "ballotsCast": 48929,
-        "feldar": 98.73
+        "pct": 76.4,
+        "register": 67064,
+        "ballotsCast": 51234,
+        "feldar": 100.0
       },
       "BO-03": {
-        "pct": 66.44,
-        "register": 64817,
-        "ballotsCast": 43063,
-        "feldar": 99.24
+        "pct": 66.24,
+        "register": 65623,
+        "ballotsCast": 43470,
+        "feldar": 100.0
       },
       "BO-04": {
         "pct": 71.94,
@@ -22281,6 +22281,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.13.17:27:58",
+  "nviVersion": "2026.04.13.17:58:04",
   "processingPct": 98.22
 }
