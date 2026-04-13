@@ -288,7 +288,15 @@ function buildMap(turnoutData) {
       svg.appendChild(b);
     });
   } else {
-    const constituencies = (turnoutData && turnoutData.constituencies) || {};
+    const finalConsts = (turnoutData && turnoutData.constituenciesFinal) || {};
+    const snapshotConsts = (turnoutData && turnoutData.constituencies) || {};
+    const toRecord = (id) => {
+      const fin = finalConsts[id];
+      if (fin) return { pct: fin.pct, megj: fin.ballotsCast, vp: fin.register, time: '19:00 (final)', isFinal: true };
+      return snapshotConsts[id] || null;
+    };
+    const constituencies = {};
+    MAP_DATA.forEach(d => { constituencies[d.id] = toRecord(d.id); });
     MAP_DATA.forEach(d => {
       const record = constituencies[d.id];
       const pct = record ? record.pct : null;
@@ -405,8 +413,10 @@ function applyTurnoutData(data) {
   const turnout = data.turnout || {};
   lastTurnoutData = turnout;
   const layerHasData = currentLayer === 'county'
-    ? turnout.counties && Object.keys(turnout.counties).length > 0
-    : turnout.constituencies && Object.keys(turnout.constituencies).length > 0;
+    ? (turnout.counties && Object.keys(turnout.counties).length > 0) ||
+      (turnout.countiesFinal && Object.keys(turnout.countiesFinal).length > 0)
+    : (turnout.constituencies && Object.keys(turnout.constituencies).length > 0) ||
+      (turnout.constituenciesFinal && Object.keys(turnout.constituenciesFinal).length > 0);
   el.classList.toggle('live', !!layerHasData);
   buildMap(turnout);
   updateNationalSummary(turnout);
