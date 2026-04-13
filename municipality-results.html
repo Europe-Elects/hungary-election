@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hungary 2026 – Municipality Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F8FAFC; color: #1E293B;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.container {
+  max-width: 1100px; margin: 0 auto; padding: 14px 14px; width: 100%;
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+.header { margin-bottom: 8px; }
+.subtitle { font-size: 13px; color: #64748B; }
+.last-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #475569; margin-top: 6px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.last-updated::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #64748B; }
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+#countedPill { margin-left: 6px; font-size: 11px; padding: 3px 8px; background: #FEF3C7; color: #92400E; border-radius: 4px; font-weight: 600; display: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+#map-container {
+  position: relative; width: 100%;
+  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  flex: 1 1 auto; min-height: 0;
+  padding: 6px;
+  display: flex; flex-direction: column;
+}
+svg#map {
+  width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
+  display: block; cursor: crosshair;
+}
+.muni { stroke: #fff; stroke-width: 0.15; transition: opacity .15s, stroke-width .1s; }
+.muni:hover { stroke: #0F172A; stroke-width: 1.2; }
+.county-border { fill: none; stroke: #0F172A; stroke-width: 0.6; pointer-events: none; opacity: 0.45; }
+
+.legend {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 6px 10px 2px;
+  font-size: 12px; color: #334155;
+}
+.legend .item {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: 6px; border: 1px solid transparent;
+  cursor: pointer; user-select: none;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.legend .item:hover { background: #F1F5F9; border-color: #E2E8F0; }
+.legend .item.active { background: #fff; border-color: #64748B; box-shadow: 0 1px 3px rgba(0,0,0,.08); font-weight: 600; color: #0F172A; }
+.legend .swatch { width: 11px; height: 11px; border-radius: 2px; }
+.legend-hint { font-size: 11px; color: #64748B; padding: 2px 12px 4px; }
+
+#tooltip {
+  position: absolute; pointer-events: none;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 12px; box-shadow: 0 6px 18px rgba(15,23,42,.15);
+  font-size: 12px; z-index: 30; min-width: 210px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .1s, transform .1s;
+}
+#tooltip.visible { opacity: 1; transform: translateY(0); }
+#tooltip h4 { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 6px; }
+#tooltip .row { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; padding: 1px 0; }
+#tooltip .row .lbl { color: #64748B; font-weight: 500; }
+#tooltip .row .v { font-variant-numeric: tabular-nums; font-weight: 600; color: #0F172A; }
+#tooltip .row.winner { font-weight: 700; }
+#tooltip .row.winner .v { color: inherit; }
+#tooltip .na { color: #94A3B8; font-style: italic; font-size: 11px; padding: 4px 0; }
+
+.footer { margin-top: 6px; font-size: 10px; color: #64748B; text-align: center; }
+.chart-footnote { font-size: 10px; color: #64748B; padding: 4px 10px; line-height: 1.4; }
+.chart-footnote strong { color: #334155; }
+
+@media (prefers-reduced-motion: reduce) {
+  .muni { transition: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="subtitle">National list results — every municipality (party list vote share)</div>
+    <div>
+      <span class="last-updated" id="lastUpdated">Loading…</span>
+      <span id="countedPill"></span>
+    </div>
+  </div>
+  <div id="map-container">
+    <div class="legend" id="legend"></div>
+    <div class="legend-hint" id="legendHint">Click a party to recolour municipalities by that party's share</div>
+    <svg id="map"></svg>
+    <div id="tooltip"></div>
+    <div class="chart-footnote">
+      Hungary has 3,177 municipalities. Budapest is shown as a single
+      polygon (its 23 districts aggregated). Click a party in the legend
+      to shade by that party's vote share.
+    </div>
+  </div>
+  <div class="footer">Map created by Andrei Miclea and the EuropeElects team · Source: Hungarian National Election Office VIP Service · Basemap: Datawrapper</div>
+</div>
+
+<script>
+const PARTIES = {
+  'FIDESZ-KDNP': { color: '#000000', name: 'FIDESZ-KDNP (PfE)' },
+  'TISZA':       { color: '#3399FF', name: 'TISZA (EPP)' },
+  'DK':          { color: '#FF0000', name: 'DK (S&D)' },
+  'Mi Hazánk':   { color: '#70463A', name: 'Mi Hazánk (ESN)' },
+  'MKKP':        { color: '#009900', name: 'MKKP (→Greens/EFA)' },
+};
+const NO_DATA_COLOR = '#E2E8F0';
+
+let topo = null;                     // TopoJSON
+let muniResults = null;              // results.json municipalityResults
+let muniNames = null;                // municipality_names.json (for tooltip display names)
+let currentView = 'winner';          // 'winner' or a party key
+
+// Aggregate the 23 Budapest kerülets into one result when rendering
+// because the Datawrapper basemap treats Budapest as a single polygon.
+function aggregateBudapest(data) {
+  const bp = Object.entries(data).filter(([k]) => k.startsWith('01-'));
+  if (!bp.length) return null;
+  const totals = {};
+  for (const p of Object.keys(PARTIES)) totals[p] = 0;
+  let totalVotes = 0;
+  for (const [, r] of bp) {
+    if (!r || !r.total) continue;
+    totalVotes += r.total;
+    for (const p of Object.keys(PARTIES)) {
+      // Un-percentage back to raw votes then re-aggregate
+      if (typeof r[p] === 'number') totals[p] += r[p] * r.total / 100;
+    }
+  }
+  if (totalVotes === 0) return null;
+  const agg = { total: Math.round(totalVotes) };
+  for (const p of Object.keys(PARTIES)) agg[p] = +(totals[p] / totalVotes * 100).toFixed(2);
+  return agg;
+}
+
+// Lookup result for a given municipality name
+// Budapest aggregation handled specially.
+let bpAggregate = null;
+function resultForName(name) {
+  if (!muniResults) return null;
+  if (name === 'Budapest') return bpAggregate;
+  // Names in topojson use 'name' property; names in NVI use the same label
+  // but we need reverse-lookup from name → key (maz-taz). Build that map once.
+  return nameToResult[name] || null;
+}
+
+// Build a name → result map, matching topojson names to NVI names
+let nameToResult = {};
+function buildNameIndex() {
+  nameToResult = {};
+  if (!muniResults || !muniNames) return;
+  for (const [key, result] of Object.entries(muniResults)) {
+    const name = muniNames[key];
+    if (name && !name.startsWith('Budapest')) {
+      nameToResult[name] = result;
+    }
+  }
+}
+
+function getWinner(r) {
+  if (!r) return null;
+  let max = 0, winner = null;
+  for (const p of Object.keys(PARTIES)) {
+    if (typeof r[p] === 'number' && r[p] > max) { max = r[p]; winner = p; }
+  }
+  return winner ? { party: winner, pct: max } : null;
+}
+
+function fillForMunicipality(r) {
+  if (!r) return NO_DATA_COLOR;
+  if (currentView === 'winner') {
+    const w = getWinner(r);
+    return w ? PARTIES[w.party].color : NO_DATA_COLOR;
+  }
+  // Party drill-down: shade by that party's pct, white → party color
+  const pct = r[currentView];
+  if (typeof pct !== 'number' || pct <= 0) return NO_DATA_COLOR;
+  // Use a meaningful max based on party's typical range
+  const max = Math.max(10, partyMax(currentView) * 1.05);
+  const t = Math.max(0, Math.min(1, pct / max));
+  const base = hexToRgb(PARTIES[currentView].color);
+  const r255 = Math.round(255 + (base.r - 255) * t);
+  const g255 = Math.round(255 + (base.g - 255) * t);
+  const b255 = Math.round(255 + (base.b - 255) * t);
+  return `rgb(${r255},${g255},${b255})`;
+}
+function partyMax(party) {
+  if (!muniResults) return 50;
+  let mx = 0;
+  for (const r of Object.values(muniResults)) {
+    if (typeof r[party] === 'number' && r[party] > mx) mx = r[party];
+  }
+  if (bpAggregate && typeof bpAggregate[party] === 'number' && bpAggregate[party] > mx) mx = bpAggregate[party];
+  return mx;
+}
+function hexToRgb(hex) {
+  const h = hex.replace('#', '');
+  return { r: parseInt(h.slice(0,2),16), g: parseInt(h.slice(2,4),16), b: parseInt(h.slice(4,6),16) };
+}
+
+// ── TopoJSON rendering ──
+// Minimal inline topojson-feature decoder (no external lib).
+// https://github.com/topojson/topojson-specification
+function topoTransform(t) {
+  if (!t) return (p) => p;
+  const [sx, sy] = t.scale;
+  const [tx, ty] = t.translate;
+  return (p) => [p[0] * sx + tx, p[1] * sy + ty];
+}
+function decodeArc(arc, transform) {
+  const out = [];
+  let x = 0, y = 0;
+  for (const p of arc) {
+    x += p[0]; y += p[1];
+    out.push(transform([x, y]));
+  }
+  return out;
+}
+function arcsToPath(arcIndices, arcs, transform) {
+  // arcIndices is e.g. [0,1,2] or [~4,~3] (negative-flipped)
+  const points = [];
+  for (let i = 0; i < arcIndices.length; i++) {
+    const idx = arcIndices[i];
+    let arc = idx < 0 ? arcs[~idx].slice().reverse() : arcs[idx];
+    // Decode to absolute coords relative to this arc's start
+    let decoded;
+    if (idx < 0) {
+      const fwd = decodeArc(arcs[~idx], transform);
+      decoded = fwd.slice().reverse();
+    } else {
+      decoded = decodeArc(arcs[idx], transform);
+    }
+    if (i > 0) decoded = decoded.slice(1);  // skip duplicate start point
+    for (const p of decoded) points.push(p);
+  }
+  return points;
+}
+function geometryToPathString(geom, arcs, transform) {
+  // Returns SVG path string
+  const rings = [];
+  if (geom.type === 'Polygon') {
+    for (const ring of geom.arcs) {
+      rings.push(arcsToPath(ring, arcs, transform));
+    }
+  } else if (geom.type === 'MultiPolygon') {
+    for (const poly of geom.arcs) {
+      for (const ring of poly) {
+        rings.push(arcsToPath(ring, arcs, transform));
+      }
+    }
+  } else {
+    return '';
+  }
+  // Build SVG path — each ring starts with M, all lines are L, close with Z
+  return rings.map(ring => 'M' + ring.map(p => p[0].toFixed(3) + ',' + p[1].toFixed(3)).join('L') + 'Z').join(' ');
+}
+
+// ── Map rendering ──
+function renderMap() {
+  if (!topo) return;
+  const svg = document.getElementById('map');
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+
+  // The topojson has raw transform (scale/translate) mapping to roughly lon/lat.
+  // We need to compute the bbox of all projected points and fit them.
+  const transform = topoTransform(topo.transform);
+  const arcs = topo.arcs;
+
+  // Compute bbox from all region geometries
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const regionGeos = topo.objects.regions.geometries;
+  const regionPaths = [];
+  for (const geom of regionGeos) {
+    const d = geometryToPathString(geom, arcs, transform);
+    regionPaths.push({ geom, d });
+    // Roughly scan for bbox from the arcs referenced
+    function scanArc(a) {
+      let x = 0, y = 0;
+      for (const p of a) {
+        x += p[0]; y += p[1];
+        const [tx, ty] = transform([x, y]);
+        if (tx < minX) minX = tx; if (ty < minY) minY = ty;
+        if (tx > maxX) maxX = tx; if (ty > maxY) maxY = ty;
+      }
+    }
+    const gatherArcs = (arr) => {
+      for (const item of arr) {
+        if (Array.isArray(item) && typeof item[0] === 'number') {
+          const idx = item[0] < 0 ? ~item[0] : item[0];
+          // Actually `item` here is a single index integer wrapped in arrays.
+          // The actual structure: Polygon.arcs = [[idx, idx, ...], ...]
+          // We're overthinking; just scan every arc referenced.
+        }
+      }
+    };
+  }
+  // Simpler bbox: iterate all arcs
+  minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
+  for (const arc of arcs) {
+    let x = 0, y = 0;
+    for (const p of arc) {
+      x += p[0]; y += p[1];
+      const [tx, ty] = transform([x, y]);
+      if (tx < minX) minX = tx;
+      if (ty < minY) minY = ty;
+      if (tx > maxX) maxX = tx;
+      if (ty > maxY) maxY = ty;
+    }
+  }
+
+  // Hungary is wider than tall. Use a simple "equirectangular" flip —
+  // SVG y-axis grows downward, but geo y (lat) grows upward, so we flip.
+  // Fit into a fixed viewBox aspect (e.g. 1000 × 580 ≈ Hungary's 3:1.7 ratio)
+  const targetW = 1000;
+  const cosLat = Math.cos(((minY + maxY) / 2) * Math.PI / 180);
+  const geoAspect = (maxX - minX) * cosLat / (maxY - minY);
+  const targetH = Math.round(targetW / geoAspect);
+  svg.setAttribute('viewBox', `0 0 ${targetW} ${targetH}`);
+  function projX(x) { return ((x - minX) / (maxX - minX)) * targetW; }
+  function projY(y) { return targetH - ((y - minY) / (maxY - minY)) * targetH; }
+
+  // Re-render each polygon with flipped Y
+  function drawGeom(geom) {
+    const rings = [];
+    const ringArcsFor = (g) => {
+      if (g.type === 'Polygon') return g.arcs;
+      if (g.type === 'MultiPolygon') return [].concat(...g.arcs);
+      return [];
+    };
+    for (const ringArcIndices of ringArcsFor(geom)) {
+      const pts = arcsToPath(ringArcIndices, arcs, transform);
+      const projected = pts.map(p => [projX(p[0]), projY(p[1])]);
+      rings.push(projected);
+    }
+    return rings.map(ring =>
+      'M' + ring.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join('L') + 'Z'
+    ).join(' ');
+  }
+
+  // Draw each municipality
+  for (let i = 0; i < regionGeos.length; i++) {
+    const geom = regionGeos[i];
+    const name = geom.properties.name;
+    const result = resultForName(name);
+    const fill = fillForMunicipality(result);
+    const pathStr = drawGeom(geom);
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', pathStr);
+    path.setAttribute('fill', fill);
+    path.setAttribute('class', 'muni');
+    path.dataset.name = name;
+    path.addEventListener('mouseenter', (e) => showTooltip(name, result, e));
+    path.addEventListener('mousemove', (e) => positionTooltip(e));
+    path.addEventListener('mouseleave', hideTooltip);
+    svg.appendChild(path);
+  }
+
+  // Draw county borders on top for context
+  const countyGeos = topo.objects.borders.geometries;
+  for (const g of countyGeos) {
+    const pathStr = drawGeom(g);
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', pathStr);
+    p.setAttribute('class', 'county-border');
+    svg.appendChild(p);
+  }
+}
+
+// ── Tooltip ──
+function showTooltip(name, r, e) {
+  const tt = document.getElementById('tooltip');
+  if (!r) {
+    tt.innerHTML = `<h4>${name}</h4><div class="na">No list-vote results yet</div>`;
+  } else {
+    const sorted = Object.entries(r)
+      .filter(([k]) => PARTIES[k])
+      .sort((a, b) => b[1] - a[1]);
+    let html = `<h4>${name}</h4>`;
+    for (const [party, pct] of sorted) {
+      const col = PARTIES[party].color;
+      const isWinner = party === sorted[0][0];
+      html += `<div class="row${isWinner ? ' winner' : ''}"${isWinner ? ` style="color:${col}"` : ''}><span class="lbl">${party}</span><span class="v">${pct.toFixed(1)}%</span></div>`;
+    }
+    if (typeof r.total === 'number') {
+      html += `<div class="row" style="margin-top:4px;border-top:1px solid #F1F5F9;padding-top:3px"><span class="lbl">Valid votes</span><span class="v">${r.total.toLocaleString('en-GB')}</span></div>`;
+    }
+    tt.innerHTML = html;
+  }
+  tt.classList.add('visible');
+  positionTooltip(e);
+}
+function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
+function positionTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  const container = document.getElementById('map-container');
+  const rect = container.getBoundingClientRect();
+  let left = e.clientX - rect.left + 12;
+  let top = e.clientY - rect.top + 12;
+  const ttRect = tt.getBoundingClientRect();
+  if (left + ttRect.width > rect.width - 6) left = e.clientX - rect.left - ttRect.width - 12;
+  if (top + ttRect.height > rect.height - 6) top = e.clientY - rect.top - ttRect.height - 12;
+  tt.style.left = Math.max(6, left) + 'px';
+  tt.style.top = Math.max(6, top) + 'px';
+}
+
+// ── Legend ──
+function buildLegend() {
+  const lg = document.getElementById('legend');
+  lg.innerHTML = '';
+  lg.setAttribute('role', 'group');
+  for (const [key, p] of Object.entries(PARTIES)) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'item' + (currentView === key ? ' active' : '');
+    item.dataset.party = key;
+    item.setAttribute('aria-pressed', currentView === key ? 'true' : 'false');
+    item.innerHTML = `<div class="swatch" style="background:${p.color}"></div>${p.name}`;
+    item.addEventListener('click', () => {
+      currentView = currentView === key ? 'winner' : key;
+      updateLegend();
+      updateHint();
+      renderMap();
+    });
+    lg.appendChild(item);
+  }
+  const nd = document.createElement('div');
+  nd.className = 'item';
+  nd.innerHTML = `<div class="swatch" style="background:${NO_DATA_COLOR}"></div>No data`;
+  lg.appendChild(nd);
+}
+function updateLegend() {
+  document.querySelectorAll('.legend .item[data-party]').forEach(el => {
+    const active = el.dataset.party === currentView;
+    el.classList.toggle('active', active);
+    el.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+function updateHint() {
+  const el = document.getElementById('legendHint');
+  if (currentView === 'winner') {
+    el.textContent = "Click a party to recolour municipalities by that party's share";
+  } else {
+    const p = PARTIES[currentView];
+    el.textContent = `Showing ${p.name} vote share — click again to return to winner view`;
+  }
+}
+
+// ── Data loading ──
+async function loadBasemap() {
+  const r = await fetch('hu-municipalities-topo.json?v=' + Date.now());
+  topo = await r.json();
+}
+async function loadNames() {
+  try {
+    const r = await fetch('municipality_names.json?v=' + Date.now());
+    muniNames = await r.json();
+  } catch (e) { muniNames = null; }
+}
+async function loadResults() {
+  try {
+    const r = await fetch('results.json?' + Date.now());
+    const d = await r.json();
+    muniResults = d.municipalityResults || {};
+    bpAggregate = aggregateBudapest(muniResults);
+    buildNameIndex();
+
+    // Pill: use the domestic processing pct
+    const el = document.getElementById('lastUpdated');
+    el.textContent = 'Last updated: ' + new Date(d.lastUpdated).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'medium',timeZone:'Europe/Budapest'});
+    const anyData = Object.keys(muniResults).length > 0;
+    el.classList.toggle('live', anyData);
+    const pill = document.getElementById('countedPill');
+    const pct = (typeof d.processingPctDomestic === 'number' && d.processingPctDomestic > 0)
+      ? d.processingPctDomestic : d.processingPct;
+    if (typeof pct === 'number' && pct > 0) {
+      pill.style.display = 'inline-block';
+      pill.textContent = pct.toFixed(1) + '% counted (domestic)';
+    } else {
+      pill.style.display = 'none';
+    }
+    renderMap();
+  } catch (e) { console.error(e); }
+}
+
+buildLegend();
+updateHint();
+
+(async () => {
+  await loadBasemap();
+  await loadNames();
+  await loadResults();
+  setInterval(loadResults, 30000);
+})();
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderMap, 150);
+});
+</script>
+</body>
+</html>

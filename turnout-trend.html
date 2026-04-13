@@ -5,71 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hungary 2026 – Turnout Trend</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #F8FAFC; color: #1E293B;
+  background: #F8FAFC; color: #0F172A;
   display: flex; flex-direction: column; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 .container {
-  max-width: 960px; margin: 0 auto; padding: 16px 16px 16px; width: 100%;
+  max-width: 960px; margin: 0 auto; padding: 16px 16px 12px; width: 100%;
   flex: 1; display: flex; flex-direction: column; min-height: 0;
 }
-.header { margin-bottom: 10px; }
-.subtitle { font-size: 13px; color: #64748B; }
+.header { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.title-block { min-width: 0; }
+.subtitle { font-size: 13px; color: #475569; font-weight: 500; letter-spacing: -0.01em; }
 .last-updated {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11px; color: #475569; margin-top: 6px;
-  padding: 3px 8px; background: #F1F5F9; border-radius: 4px;
+  padding: 3px 8px; background: #F1F5F9; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
 }
 .last-updated::before {
   content: ''; display: inline-block; width: 6px; height: 6px;
-  border-radius: 50%; background: #64748B;
+  border-radius: 50%; background: #94A3B8;
 }
-.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; }
+.last-updated.live::before { background: #22C55E; animation: pulse 2s infinite; box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 #chart-container {
   position: relative; width: 100%;
-  background: #fff; border-radius: 8px; border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  background: #fff; border-radius: 10px; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.03);
   flex: 1 1 auto; min-height: 0;
   padding: 14px 14px 8px;
   display: flex; flex-direction: column;
 }
 .legend-row {
-  display: flex; flex-wrap: wrap; gap: 14px;
-  font-size: 12px; color: #334155; margin-bottom: 6px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  font-size: 12px; color: #334155; margin-bottom: 8px;
 }
 .legend-row .item {
-  display: flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 7px;
   cursor: pointer; user-select: none;
-  padding: 2px 6px; border-radius: 4px; border: 1px solid transparent;
-  transition: background .12s, border-color .12s, opacity .12s;
+  padding: 4px 10px; border-radius: 999px;
+  background: #F8FAFC; border: 1px solid #E2E8F0;
+  transition: background .15s, border-color .15s, opacity .15s, transform .15s;
+  font-variant-numeric: tabular-nums;
 }
-.legend-row .item:hover { background: #F1F5F9; }
-.legend-row .item.active { border-color: #94A3B8; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.legend-row .item:hover { background: #F1F5F9; border-color: #CBD5E1; }
+.legend-row .item.active { background: #fff; border-color: #94A3B8; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
 .legend-row .item.dimmed { opacity: 0.35; }
 .legend-row .line-swatch {
-  width: 24px; height: 3px; border-radius: 2px;
+  width: 18px; height: 3px; border-radius: 2px;
 }
-.legend-row .item.y2026 { font-weight: 700; }
+.legend-row .final {
+  color: #64748B; font-weight: 500; font-size: 11px;
+}
+.legend-row .item.y2026 { font-weight: 700; background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF; }
+.legend-row .item.y2026:hover { background: #DBEAFE; }
 .legend-row .item.y2026 .line-swatch { height: 4px; }
 
+.chart-wrap { position: relative; flex: 1 1 auto; min-height: 0; }
 svg#chart {
-  width: 100%; height: 100%; flex: 1 1 auto; min-height: 0;
+  width: 100%; height: 100%;
   display: block; font-family: inherit;
 }
 .grid-line { stroke: #F1F5F9; stroke-width: 1; }
 .grid-line.axis { stroke: #CBD5E1; }
-.axis-label { font-size: 10px; fill: #64748B; font-variant-numeric: tabular-nums; }
-.axis-title { font-size: 11px; fill: #475569; font-weight: 600; }
+.axis-label { font-size: 10.5px; fill: #64748B; font-variant-numeric: tabular-nums; font-weight: 500; }
+.axis-major { font-size: 11px; fill: #334155; font-weight: 600; font-variant-numeric: tabular-nums; }
+.end-badge { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.end-badge-final { font-size: 9.5px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dot-label { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.now-marker-label {
+  font-size: 9.5px; font-weight: 700; fill: #2563EB;
+  letter-spacing: 0.02em; text-transform: uppercase;
+}
+
+#tooltip {
+  position: absolute; pointer-events: none; z-index: 5;
+  background: rgba(15,23,42,0.96); color: #F8FAFC;
+  padding: 8px 10px; border-radius: 6px; font-size: 11.5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  font-variant-numeric: tabular-nums;
+  min-width: 120px;
+  opacity: 0; transition: opacity .12s;
+  transform: translate(-50%, -100%);
+}
+#tooltip.visible { opacity: 1; }
+#tooltip .tt-time { font-weight: 700; margin-bottom: 4px; font-size: 12px; }
+#tooltip .tt-row { display: flex; justify-content: space-between; gap: 10px; line-height: 1.4; }
+#tooltip .tt-row .tt-year { display: flex; align-items: center; gap: 5px; color: #CBD5E1; }
+#tooltip .tt-row .tt-year::before { content: ''; width: 8px; height: 2px; border-radius: 1px; background: currentColor; }
+#tooltip .tt-row.y2026 .tt-year { color: #60A5FA; font-weight: 700; }
+#tooltip .tt-row.y2026 { color: #fff; font-weight: 700; }
 
 .chart-footnote {
-  font-size: 10px; color: #64748B; margin-top: 4px; line-height: 1.45;
+  font-size: 10px; color: #64748B; margin-top: 6px; line-height: 1.45;
 }
 .chart-footnote strong { color: #334155; }
 .footer {
@@ -78,22 +113,29 @@ svg#chart {
 @media (prefers-reduced-motion: reduce) {
   @keyframes pulse { 0%, 100% { opacity: 1; } }
 }
-@media (max-width: 480px) {
-  .legend-row { gap: 8px; font-size: 10px; }
-  .legend-row .line-swatch { width: 16px; }
-  .chart-footnote { font-size: 9px; }
+@media (max-width: 600px) {
+  .legend-row { gap: 6px; font-size: 11px; }
+  .legend-row .item { padding: 3px 8px; }
+  .legend-row .line-swatch { width: 14px; }
+  .chart-footnote { font-size: 9.5px; }
+  .end-badge, .end-badge-final { display: none; }
 }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <div class="subtitle">Turnout progression through election day — 2026 vs previous elections</div>
-    <div class="last-updated" id="lastUpdated">Last updated: –</div>
+    <div class="title-block">
+      <div class="subtitle">Turnout progression through election day — 2026 vs previous elections</div>
+      <div class="last-updated" id="lastUpdated">Last updated: –</div>
+    </div>
   </div>
   <div id="chart-container">
     <div class="legend-row" id="legend"></div>
-    <svg id="chart"></svg>
+    <div class="chart-wrap">
+      <svg id="chart"></svg>
+      <div id="tooltip"></div>
+    </div>
     <div class="chart-footnote">
       Intraday at-the-polls turnout (without mail-in ballots). <strong>2026</strong>
       updates live every ~2 hours. Historical data from valasztas.hu.
@@ -104,60 +146,56 @@ svg#chart {
 
 <script>
 // Historical election turnout at each NVI snapshot time.
-// Source: valasztas.hu, preserved by Europe Elects.
 const HISTORICAL = {
   '2022': {
-    color: '#E11D48', width: 2, dash: '',
+    color: '#DC2626', width: 1.75, dash: '',
     data: {'07:00':1.82,'09:00':10.31,'11:00':25.77,'13:00':40.01,'15:00':52.75,'17:00':62.92,'18:30':67.80,'19:00':70.21},
     final: 70.21,
   },
   '2018': {
-    color: '#F59E0B', width: 2, dash: '',
+    color: '#D97706', width: 1.75, dash: '',
     data: {'07:00':2.24,'09:00':13.17,'11:00':29.93,'13:00':42.32,'15:00':53.64,'17:00':63.21,'18:30':68.13,'19:00':70.22},
     final: 70.22,
   },
   '2014': {
-    color: '#10B981', width: 2, dash: '6 3',
+    color: '#059669', width: 1.75, dash: '5 3',
     data: {'07:00':1.64,'09:00':9.50,'11:00':23.23,'13:00':34.33,'15:00':45.02,'17:00':56.77,'18:30':61.73,'19:00':61.84},
     final: 61.84,
   },
   '2010': {
-    color: '#8B5CF6', width: 2, dash: '6 3',
+    color: '#7C3AED', width: 1.75, dash: '5 3',
     data: {'07:00':1.61,'09:00':10.23,'11:00':24.78,'13:00':35.88,'15:00':46.78,'17:00':59.28,'18:30':64.36,'19:00':64.38},
     final: 64.38,
   },
 };
 
-const YEAR_2026 = {
-  color: '#2563EB', width: 3.5, dash: '',
-};
+const YEAR_2026 = { color: '#2563EB', width: 3.25, dash: '' };
 
-// X-axis: time slots as minutes from 06:00
-const TIME_SLOTS = ['07:00','09:00','11:00','13:00','15:00','17:00','19:00'];
+// All data times (used for line drawing + tooltips)
+const ALL_TIMES = ['07:00','09:00','11:00','13:00','15:00','17:00','18:30','19:00'];
+// Times that get a labelled tick on the x-axis (to avoid crowding)
+const AXIS_TIMES = ['07:00','09:00','11:00','13:00','15:00','17:00','19:00'];
 function timeToMinutes(t) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m - 360; // minutes after 06:00
 }
-const X_MIN = 0;   // 06:00
-const X_MAX = timeToMinutes('19:00'); // 780 - 360 = 420 (not used, we go to 19:00)
 
-const PAD_LEFT = 48;
-const PAD_RIGHT = 24;
-const PAD_TOP = 20;
-const PAD_BOTTOM = 32;
+const PAD_LEFT = 44;
+const PAD_RIGHT = 92; // room for end-of-line badges
+const PAD_TOP = 18;
+const PAD_BOTTOM = 30;
 
-// Which year is isolated (null = show all)
 let isolatedYear = null;
+let lastData = null;
 
 function buildLegend() {
   const el = document.getElementById('legend');
   el.innerHTML = '';
 
-  // 2026 item — always shown, clicking resets to "show all"
   const item2026 = document.createElement('div');
   const is2026Active = isolatedYear === null || isolatedYear === '2026';
   item2026.className = 'item y2026' + (is2026Active ? '' : ' dimmed');
-  item2026.innerHTML = `<div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 (live)`;
+  item2026.innerHTML = `<div class="line-swatch" style="background:${YEAR_2026.color}"></div>2026 <span class="final" style="color:#3B82F6">live</span>`;
   item2026.addEventListener('click', () => { isolatedYear = null; updateChart(); });
   el.appendChild(item2026);
 
@@ -166,7 +204,7 @@ function buildLegend() {
     const isThis = isolatedYear === year;
     const isDimmed = isolatedYear !== null && isolatedYear !== year && isolatedYear !== '2026';
     item.className = 'item' + (isThis ? ' active' : isDimmed ? ' dimmed' : '');
-    const finalLabel = cfg.final ? ` (${cfg.final}%)` : '';
+    const finalLabel = cfg.final ? ` <span class="final">${cfg.final.toFixed(1)}%</span>` : '';
     item.innerHTML = `<div class="line-swatch" style="background:${cfg.color}"></div>${year}${finalLabel}`;
     item.addEventListener('click', () => {
       isolatedYear = (isolatedYear === year) ? null : year;
@@ -181,6 +219,9 @@ function updateChart() {
   if (lastData) origApply(lastData);
 }
 
+// Store geometry for tooltip lookups
+let chartGeom = null;
+
 function renderChart(history2026) {
   const svg = document.getElementById('chart');
   svg.innerHTML = '';
@@ -194,13 +235,26 @@ function renderChart(history2026) {
   const plotW = VB_W - PAD_LEFT - PAD_RIGHT;
   const plotH = VB_H - PAD_TOP - PAD_BOTTOM;
 
-  // X range: 06:00 to 19:00 (0 to 780 minutes)
-  const xMin = 0, xMax = 13 * 60; // 780 min
-  // Y range: 0% to 80% (covers all historical + room for 2026)
-  const yMin = 0, yMax = 80;
+  const xMax = 13 * 60; // 780 min (06:00 -> 19:00)
+  const yMax = 80;
 
   function xScale(min) { return PAD_LEFT + (min / xMax) * plotW; }
   function yScale(pct) { return PAD_TOP + plotH - (pct / yMax) * plotH; }
+
+  chartGeom = { xScale, yScale, plotW, plotH, VB_W, VB_H, yMax };
+
+  // Gradient defs for 2026 area fill
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `
+    <linearGradient id="grad2026" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+  `;
+  svg.appendChild(defs);
 
   // Y gridlines every 20%
   for (let y = 0; y <= yMax; y += 20) {
@@ -213,7 +267,7 @@ function renderChart(history2026) {
     line.setAttribute('class', y === 0 ? 'grid-line axis' : 'grid-line');
     svg.appendChild(line);
     const lbl = document.createElementNS(ns, 'text');
-    lbl.setAttribute('x', PAD_LEFT - 6);
+    lbl.setAttribute('x', PAD_LEFT - 7);
     lbl.setAttribute('y', yy + 3);
     lbl.setAttribute('text-anchor', 'end');
     lbl.setAttribute('class', 'axis-label');
@@ -221,8 +275,8 @@ function renderChart(history2026) {
     svg.appendChild(lbl);
   }
 
-  // X gridlines + labels at each snapshot time
-  for (const t of TIME_SLOTS) {
+  // X gridlines + labels at each major snapshot time
+  for (const t of AXIS_TIMES) {
     const m = timeToMinutes(t);
     const xx = xScale(m);
     const line = document.createElementNS(ns, 'line');
@@ -234,21 +288,19 @@ function renderChart(history2026) {
     svg.appendChild(line);
     const lbl = document.createElementNS(ns, 'text');
     lbl.setAttribute('x', xx);
-    lbl.setAttribute('y', PAD_TOP + plotH + 14);
+    lbl.setAttribute('y', PAD_TOP + plotH + 15);
     lbl.setAttribute('text-anchor', 'middle');
     lbl.setAttribute('class', 'axis-label');
     lbl.textContent = t;
     svg.appendChild(lbl);
   }
 
-  // Draw a polyline from a {time: pct} dict
-  function drawLine(dataDict, color, width, dash, drawDots, opacity, dotR) {
-    if (typeof opacity === 'undefined') opacity = 1;
-    if (typeof dotR === 'undefined') dotR = 3;
-    const sorted = TIME_SLOTS
+  // Helper: polyline + dots from {time: pct}
+  function drawLine(dataDict, color, width, dash, opacity, dotR) {
+    const sorted = ALL_TIMES
       .filter(t => typeof dataDict[t] === 'number')
       .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(dataDict[t]), pct: dataDict[t], time: t }));
-    if (sorted.length < 1) return;
+    if (sorted.length < 1) return sorted;
 
     if (sorted.length > 1) {
       const points = sorted.map(p => `${p.x},${p.y}`).join(' ');
@@ -264,95 +316,187 @@ function renderChart(history2026) {
       svg.appendChild(pl);
     }
 
-    if (drawDots) {
-      for (const p of sorted) {
-        const circle = document.createElementNS(ns, 'circle');
-        circle.setAttribute('cx', p.x);
-        circle.setAttribute('cy', p.y);
-        circle.setAttribute('r', dotR);
-        circle.setAttribute('fill', color);
-        circle.setAttribute('stroke', '#fff');
-        circle.setAttribute('stroke-width', dotR > 3 ? 1.5 : 1);
-        if (opacity < 1) circle.setAttribute('opacity', opacity);
-        const title = document.createElementNS(ns, 'title');
-        title.textContent = `${p.time}: ${p.pct.toFixed(2)}%`;
-        circle.appendChild(title);
-        svg.appendChild(circle);
+    for (const p of sorted) {
+      const circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('cx', p.x);
+      circle.setAttribute('cy', p.y);
+      circle.setAttribute('r', dotR);
+      circle.setAttribute('fill', color);
+      circle.setAttribute('stroke', '#fff');
+      circle.setAttribute('stroke-width', dotR > 3 ? 1.5 : 1);
+      if (opacity < 1) circle.setAttribute('opacity', opacity);
+      svg.appendChild(circle);
+    }
+    return sorted;
+  }
 
-        // Value label on the LAST 2026 dot only (historical get end-label instead)
-        if (dotR > 3 && p === sorted[sorted.length - 1]) {
-          const lbl = document.createElementNS(ns, 'text');
-          lbl.setAttribute('x', p.x + 8);
-          lbl.setAttribute('y', p.y - 8);
-          lbl.setAttribute('font-size', '12');
-          lbl.setAttribute('font-weight', '700');
-          lbl.setAttribute('fill', color);
-          lbl.textContent = p.pct.toFixed(1) + '%';
-          svg.appendChild(lbl);
-        }
-      }
+  // Historical: draw all except isolated case
+  const histEntries = Object.entries(HISTORICAL);
+  const histLabels = []; // {year, color, y, final}
+
+  for (const [year, cfg] of histEntries) {
+    const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
+    const opacity = visible ? 0.85 : 0.08;
+    const sorted = drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, opacity, 2.25);
+    if (visible && sorted.length > 0) {
+      const last = sorted[sorted.length - 1];
+      histLabels.push({ year, color: cfg.color, x: last.x, y: last.y, final: cfg.final });
     }
   }
 
-  // Draw historical lines (bottom layer) — small dots, staggered end labels
-  const histEntries = Object.entries(HISTORICAL);
-  // Pre-sort labels by their 18:30 value to stagger them vertically
-  const labelOffsets = {};
-  const sorted1830 = histEntries
-    .map(([year, cfg]) => ({ year, val: cfg.data['18:30'] || cfg.data['17:00'] || 0, final: cfg.final }))
-    .sort((a, b) => b.val - a.val);
-  // Stagger labels alternating left/right of the endpoint to avoid overlap.
-  // Even indices go right+up, odd go right+down.
-  sorted1830.forEach((entry, i) => {
-    labelOffsets[entry.year] = (i % 2 === 0) ? -6 - i * 5 : 10 + i * 5;
-  });
+  // End-of-line year badges (staggered vertically to avoid collisions)
+  if (histLabels.length > 0) {
+    histLabels.sort((a, b) => a.y - b.y);
+    const minGap = 16;
+    for (let i = 1; i < histLabels.length; i++) {
+      if (histLabels[i].y - histLabels[i-1].y < minGap) {
+        histLabels[i].y = histLabels[i-1].y + minGap;
+      }
+    }
+    const maxY = PAD_TOP + plotH - 4;
+    for (let i = histLabels.length - 1; i >= 0; i--) {
+      if (histLabels[i].y > maxY) histLabels[i].y = maxY - (histLabels.length - 1 - i) * minGap;
+    }
 
-  for (const [year, cfg] of histEntries.reverse()) {
-    const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
-    const opacity = visible ? 1 : 0.08;
-    drawLine(cfg.data, cfg.color, cfg.width, cfg.dash, true, opacity, 2.5);
-    // No end-of-line labels — final % is in the legend row to avoid overlap
+    for (const lbl of histLabels) {
+      // connector line from endpoint to label
+      const g = document.createElementNS(ns, 'g');
+      const conn = document.createElementNS(ns, 'line');
+      conn.setAttribute('x1', lbl.x + 4);
+      conn.setAttribute('x2', lbl.x + 14);
+      conn.setAttribute('y1', lbl.y);
+      conn.setAttribute('y2', lbl.y);
+      conn.setAttribute('stroke', lbl.color);
+      conn.setAttribute('stroke-width', 1);
+      conn.setAttribute('opacity', 0.5);
+      g.appendChild(conn);
+
+      const yearText = document.createElementNS(ns, 'text');
+      yearText.setAttribute('x', lbl.x + 16);
+      yearText.setAttribute('y', lbl.y - 1);
+      yearText.setAttribute('class', 'end-badge');
+      yearText.setAttribute('fill', lbl.color);
+      yearText.textContent = lbl.year;
+      g.appendChild(yearText);
+
+      if (lbl.final) {
+        const finalText = document.createElementNS(ns, 'text');
+        finalText.setAttribute('x', lbl.x + 16);
+        finalText.setAttribute('y', lbl.y + 10);
+        finalText.setAttribute('class', 'end-badge-final');
+        finalText.setAttribute('fill', lbl.color);
+        finalText.setAttribute('opacity', 0.8);
+        finalText.textContent = lbl.final.toFixed(1) + '%';
+        g.appendChild(finalText);
+      }
+      svg.appendChild(g);
+    }
   }
 
-  // Draw 2026 line (top layer, with bigger dots)
+  // 2026 line
   const show2026 = isolatedYear === null || isolatedYear === '2026';
   if (show2026 && history2026 && Object.keys(history2026).length > 0) {
-    drawLine(history2026, YEAR_2026.color, YEAR_2026.width, '', true, 1, 5);
+    const sorted2026 = ALL_TIMES
+      .filter(t => typeof history2026[t] === 'number')
+      .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(history2026[t]), pct: history2026[t], time: t }));
 
-    // Projection: only shown when 2026 is visible
-    if (!show2026) return;
+    // Area fill under the line
+    if (sorted2026.length > 1) {
+      const baseY = yScale(0);
+      const areaPts = [`${sorted2026[0].x},${baseY}`]
+        .concat(sorted2026.map(p => `${p.x},${p.y}`))
+        .concat([`${sorted2026[sorted2026.length-1].x},${baseY}`])
+        .join(' ');
+      const area = document.createElementNS(ns, 'polygon');
+      area.setAttribute('points', areaPts);
+      area.setAttribute('fill', 'url(#grad2026)');
+      svg.appendChild(area);
+    }
+
+    // Line
+    if (sorted2026.length > 1) {
+      const pl = document.createElementNS(ns, 'polyline');
+      pl.setAttribute('points', sorted2026.map(p => `${p.x},${p.y}`).join(' '));
+      pl.setAttribute('fill', 'none');
+      pl.setAttribute('stroke', YEAR_2026.color);
+      pl.setAttribute('stroke-width', YEAR_2026.width);
+      pl.setAttribute('stroke-linecap', 'round');
+      pl.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(pl);
+    }
+
+    // Dots
+    for (const p of sorted2026) {
+      const circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('cx', p.x);
+      circle.setAttribute('cy', p.y);
+      circle.setAttribute('r', 4.5);
+      circle.setAttribute('fill', '#fff');
+      circle.setAttribute('stroke', YEAR_2026.color);
+      circle.setAttribute('stroke-width', 2.25);
+      svg.appendChild(circle);
+    }
+
+    // Value labels on every 2026 dot (above the line, collision-aware)
+    for (let i = 0; i < sorted2026.length; i++) {
+      const p = sorted2026[i];
+      const isLast = i === sorted2026.length - 1;
+      const lbl = document.createElementNS(ns, 'text');
+      lbl.setAttribute('x', p.x);
+      lbl.setAttribute('y', p.y - 10);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('class', 'dot-label');
+      lbl.setAttribute('fill', YEAR_2026.color);
+      // subtle white outline for legibility
+      lbl.setAttribute('paint-order', 'stroke');
+      lbl.setAttribute('stroke', '#fff');
+      lbl.setAttribute('stroke-width', '3');
+      lbl.setAttribute('stroke-linejoin', 'round');
+      lbl.textContent = p.pct.toFixed(1) + '%';
+      if (isLast) lbl.setAttribute('font-size', '12.5');
+      svg.appendChild(lbl);
+    }
+
+    // "NOW" marker at the last 2026 data point
+    if (sorted2026.length > 0) {
+      const last = sorted2026[sorted2026.length - 1];
+      const nowLine = document.createElementNS(ns, 'line');
+      nowLine.setAttribute('x1', last.x);
+      nowLine.setAttribute('x2', last.x);
+      nowLine.setAttribute('y1', PAD_TOP);
+      nowLine.setAttribute('y2', PAD_TOP + plotH);
+      nowLine.setAttribute('stroke', YEAR_2026.color);
+      nowLine.setAttribute('stroke-width', 1);
+      nowLine.setAttribute('stroke-dasharray', '2 3');
+      nowLine.setAttribute('opacity', 0.35);
+      svg.appendChild(nowLine);
+
+      const nowLbl = document.createElementNS(ns, 'text');
+      nowLbl.setAttribute('x', last.x);
+      nowLbl.setAttribute('y', PAD_TOP - 4);
+      nowLbl.setAttribute('text-anchor', 'middle');
+      nowLbl.setAttribute('class', 'now-marker-label');
+      nowLbl.textContent = 'now';
+      svg.appendChild(nowLbl);
+    }
 
     // Projection: "remaining-voter capture rate" model.
-    //
-    // Instead of extrapolating ratios (which mathematically compress
-    // toward 1.0 and give unrealistically low projections), we ask:
-    // "In past elections, what fraction of voters who HADN'T voted by
-    // this hour ended up voting by the end?" Then apply that same
-    // fraction to 2026's remaining pool.
-    //
-    // This naturally accounts for the ceiling effect — if 54% have
-    // already voted, only 46% remain, so even a high capture rate
-    // can't push past ~77%.
-    //
-    // We average the capture rates from 2022 and 2018 (the two
-    // elections with known finals) for a robust estimate.
     const refElections = [
       { data: HISTORICAL['2022'].data, final: HISTORICAL['2022'].final },
       { data: HISTORICAL['2018'].data, final: HISTORICAL['2018'].final },
     ].filter(e => e.final);
 
-    const availableTimes = TIME_SLOTS.filter(t => typeof history2026[t] === 'number');
+    const availableTimes = ALL_TIMES.filter(t => typeof history2026[t] === 'number');
     const latestTime = availableTimes[availableTimes.length - 1];
 
     if (latestTime && refElections.length > 0) {
       const now2026 = history2026[latestTime];
-      const futureTimes = TIME_SLOTS.filter(t => timeToMinutes(t) > timeToMinutes(latestTime));
+      const futureTimes = ALL_TIMES.filter(t => timeToMinutes(t) > timeToMinutes(latestTime));
 
       if (futureTimes.length > 0) {
         const projData = {};
-        projData[latestTime] = now2026; // anchor to last real point
+        projData[latestTime] = now2026;
 
-        // For each future time, average across reference elections
         for (const t of futureTimes) {
           let projSum = 0, projCount = 0;
           for (const ref of refElections) {
@@ -361,11 +505,8 @@ function renderChart(history2026) {
             const refFinal = ref.final;
             if (typeof refNow !== 'number' || typeof refAtT !== 'number' ||
                 !refFinal || refFinal <= refNow) continue;
-            // What fraction of the 13:00→final journey had ref completed by T?
             const frac = (refAtT - refNow) / (refFinal - refNow);
-            // Capture rate: what fraction of remaining voters showed up
             const captureRate = (refFinal - refNow) / (100 - refNow);
-            // 2026's projected afternoon gain × the fraction completed by T
             const afternoonGain = (100 - now2026) * captureRate;
             projSum += now2026 + afternoonGain * frac;
             projCount++;
@@ -375,7 +516,6 @@ function renderChart(history2026) {
           }
         }
 
-        // Projected final: average capture rate across reference elections
         let finalSum = 0, finalCount = 0;
         for (const ref of refElections) {
           const refNow = ref.data[latestTime];
@@ -386,49 +526,142 @@ function renderChart(history2026) {
         }
         const projFinal = finalCount > 0 ? Math.min(100, +(finalSum / finalCount).toFixed(1)) : null;
 
-        // Draw annotation at end of projection
-        const lastProjTime = futureTimes.filter(t => projData[t]).pop();
-        if (lastProjTime) {
-          const lx = xScale(timeToMinutes(lastProjTime)) + 6;
-          const ly = yScale(projData[lastProjTime]);
-          const ann = document.createElementNS(ns, 'text');
-          ann.setAttribute('x', lx);
-          ann.setAttribute('y', ly - 8);
-          ann.setAttribute('font-size', '10');
-          ann.setAttribute('font-weight', '700');
-          ann.setAttribute('fill', '#93C5FD');
-          ann.textContent = '~' + projData[lastProjTime].toFixed(0) + '%';
-          svg.appendChild(ann);
-          if (projFinal !== null) {
-            const ann2 = document.createElementNS(ns, 'text');
-            ann2.setAttribute('x', lx);
-            ann2.setAttribute('y', ly + 4);
-            ann2.setAttribute('font-size', '9');
-            ann2.setAttribute('fill', '#93C5FD');
-            ann2.textContent = 'proj. final ~' + projFinal.toFixed(0) + '%';
-            svg.appendChild(ann2);
-          }
-        }
-
-        // Draw projection as dashed light blue line
-        const projSorted = TIME_SLOTS
+        const projSorted = ALL_TIMES
           .filter(t => typeof projData[t] === 'number')
           .map(t => ({ x: xScale(timeToMinutes(t)), y: yScale(projData[t]) }));
+
         if (projSorted.length > 1) {
-          const points = projSorted.map(p => `${p.x},${p.y}`).join(' ');
           const pl = document.createElementNS(ns, 'polyline');
-          pl.setAttribute('points', points);
+          pl.setAttribute('points', projSorted.map(p => `${p.x},${p.y}`).join(' '));
           pl.setAttribute('fill', 'none');
           pl.setAttribute('stroke', '#93C5FD');
-          pl.setAttribute('stroke-width', 2.5);
-          pl.setAttribute('stroke-dasharray', '6 4');
+          pl.setAttribute('stroke-width', 2.25);
+          pl.setAttribute('stroke-dasharray', '5 4');
           pl.setAttribute('stroke-linecap', 'round');
           pl.setAttribute('stroke-linejoin', 'round');
           svg.appendChild(pl);
         }
+
+        const lastProj = projSorted[projSorted.length - 1];
+        if (lastProj && projFinal !== null) {
+          const annGroup = document.createElementNS(ns, 'g');
+
+          const annBg = document.createElementNS(ns, 'rect');
+          const txt = 'proj. ~' + projFinal.toFixed(0) + '%';
+          const bgW = txt.length * 5.5 + 10;
+          annBg.setAttribute('x', lastProj.x - bgW - 4);
+          annBg.setAttribute('y', lastProj.y - 22);
+          annBg.setAttribute('width', bgW);
+          annBg.setAttribute('height', 16);
+          annBg.setAttribute('rx', 8);
+          annBg.setAttribute('fill', '#DBEAFE');
+          annBg.setAttribute('stroke', '#93C5FD');
+          annBg.setAttribute('stroke-width', '1');
+          annGroup.appendChild(annBg);
+
+          const ann = document.createElementNS(ns, 'text');
+          ann.setAttribute('x', lastProj.x - bgW/2 - 4);
+          ann.setAttribute('y', lastProj.y - 11);
+          ann.setAttribute('text-anchor', 'middle');
+          ann.setAttribute('font-size', '10');
+          ann.setAttribute('font-weight', '700');
+          ann.setAttribute('fill', '#1D4ED8');
+          ann.textContent = txt;
+          annGroup.appendChild(ann);
+
+          svg.appendChild(annGroup);
+        }
       }
     }
   }
+
+  // Invisible hover overlay for crosshair/tooltip
+  const hoverLayer = document.createElementNS(ns, 'rect');
+  hoverLayer.setAttribute('x', PAD_LEFT);
+  hoverLayer.setAttribute('y', PAD_TOP);
+  hoverLayer.setAttribute('width', plotW);
+  hoverLayer.setAttribute('height', plotH);
+  hoverLayer.setAttribute('fill', 'transparent');
+  hoverLayer.setAttribute('id', 'hoverLayer');
+  svg.appendChild(hoverLayer);
+
+  // Crosshair group (shown on hover)
+  const crosshair = document.createElementNS(ns, 'line');
+  crosshair.setAttribute('id', 'crosshair');
+  crosshair.setAttribute('y1', PAD_TOP);
+  crosshair.setAttribute('y2', PAD_TOP + plotH);
+  crosshair.setAttribute('stroke', '#64748B');
+  crosshair.setAttribute('stroke-width', 1);
+  crosshair.setAttribute('stroke-dasharray', '3 3');
+  crosshair.setAttribute('opacity', 0);
+  svg.appendChild(crosshair);
+
+  attachHover(svg, history2026);
+}
+
+function attachHover(svg, history2026) {
+  const tooltip = document.getElementById('tooltip');
+  const crosshair = document.getElementById('crosshair');
+  const hoverLayer = document.getElementById('hoverLayer');
+  const wrap = svg.parentElement;
+  if (!hoverLayer || !chartGeom) return;
+
+  function nearestTime(minutes) {
+    let best = ALL_TIMES[0], bestDist = Infinity;
+    for (const t of ALL_TIMES) {
+      const d = Math.abs(timeToMinutes(t) - minutes);
+      if (d < bestDist) { bestDist = d; best = t; }
+    }
+    return best;
+  }
+
+  function onMove(evt) {
+    const rect = svg.getBoundingClientRect();
+    const ratioX = (evt.clientX - rect.left) / rect.width;
+    const svgX = ratioX * chartGeom.VB_W;
+    if (svgX < PAD_LEFT || svgX > PAD_LEFT + chartGeom.plotW) {
+      onLeave();
+      return;
+    }
+    const minutes = (svgX - PAD_LEFT) / chartGeom.plotW * (13 * 60);
+    const t = nearestTime(minutes);
+    const tx = chartGeom.xScale(timeToMinutes(t));
+
+    crosshair.setAttribute('x1', tx);
+    crosshair.setAttribute('x2', tx);
+    crosshair.setAttribute('opacity', 0.55);
+
+    let rowsHtml = `<div class="tt-time">${t}</div>`;
+    const show2026 = isolatedYear === null || isolatedYear === '2026';
+    if (show2026 && history2026 && typeof history2026[t] === 'number') {
+      rowsHtml += `<div class="tt-row y2026"><span class="tt-year">2026</span><span>${history2026[t].toFixed(2)}%</span></div>`;
+    }
+    for (const [year, cfg] of Object.entries(HISTORICAL)) {
+      const visible = isolatedYear === null || isolatedYear === year || isolatedYear === '2026';
+      if (!visible) continue;
+      if (typeof cfg.data[t] !== 'number') continue;
+      rowsHtml += `<div class="tt-row" style="color:${cfg.color}"><span class="tt-year">${year}</span><span>${cfg.data[t].toFixed(2)}%</span></div>`;
+    }
+    tooltip.innerHTML = rowsHtml;
+    tooltip.classList.add('visible');
+    // Position tooltip: convert SVG x back to client pixel
+    const tooltipX = (tx / chartGeom.VB_W) * rect.width;
+    const tooltipY = Math.max(12, evt.clientY - rect.top - 12);
+    tooltip.style.left = tooltipX + 'px';
+    tooltip.style.top = tooltipY + 'px';
+  }
+
+  function onLeave() {
+    crosshair.setAttribute('opacity', 0);
+    tooltip.classList.remove('visible');
+  }
+
+  hoverLayer.addEventListener('mousemove', onMove);
+  hoverLayer.addEventListener('mouseleave', onLeave);
+  hoverLayer.addEventListener('touchmove', (e) => {
+    if (e.touches[0]) onMove(e.touches[0]);
+  }, { passive: true });
+  hoverLayer.addEventListener('touchend', onLeave);
 }
 
 function applyResults(data) {
@@ -457,7 +690,6 @@ setInterval(async () => {
 }, 30000);
 
 let resizeTimer = null;
-let lastData = null;
 const origApply = applyResults;
 applyResults = function(data) { lastData = data; origApply(data); };
 window.addEventListener('resize', () => {
