@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T11:31:22.812872",
+  "lastUpdated": "2026-04-14T12:01:36.918372",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -21522,7 +21522,7 @@
       "register": 7460866,
       "ballotsCast": 5935231,
       "feldar": 98.64,
-      "generated": "2026-04-14T10:28:53+02:00"
+      "generated": "2026-04-14T10:58:55+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.10:28:53",
+  "nviVersion": "2026.04.14.10:58:55",
   "processingPct": 98.25
 }
