@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T20:31:22.179585",
+  "lastUpdated": "2026-04-14T21:01:35.869391",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -839,7 +839,7 @@
       "DK": 0.8,
       "Mi Hazánk": 5.9,
       "MKKP": 0.6,
-      "counted": 36.81
+      "counted": 39.58
     },
     "ZA-03": {
       "FIDESZ-KDNP": 38.1,
@@ -1029,7 +1029,7 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.69,
+      "FIDESZ-KDNP": 87.7,
       "TISZA": 10.31,
       "DK": 0.19,
       "Mi Hazánk": 1.49,
@@ -21508,8 +21508,8 @@
       },
       "ZA-02": {
         "pct": 78.2,
-        "register": 24107,
-        "ballotsCast": 18851
+        "register": 24175,
+        "ballotsCast": 18905
       },
       "ZA-03": {
         "pct": 78.79,
@@ -21519,10 +21519,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7480060,
-      "ballotsCast": 5950192,
-      "feldar": 99.09,
-      "generated": "2026-04-14T18:59:06+02:00"
+      "register": 7481845,
+      "ballotsCast": 5951664,
+      "feldar": 99.13,
+      "generated": "2026-04-14T19:58:27+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21640,10 +21640,10 @@
         "feldar": 100.0
       },
       "Zala": {
-        "pct": 80.71,
-        "register": 162203,
-        "ballotsCast": 130915,
-        "feldar": 78.69
+        "pct": 80.73,
+        "register": 163988,
+        "ballotsCast": 132387,
+        "feldar": 79.63
       }
     },
     "constituenciesFinalInclusive": {
@@ -22272,10 +22272,10 @@
         "feldar": 100.0
       },
       "ZA-02": {
-        "pct": 78.41,
-        "register": 23669,
-        "ballotsCast": 18560,
-        "feldar": 37.24
+        "pct": 78.7,
+        "register": 25454,
+        "ballotsCast": 20032,
+        "feldar": 40.0
       },
       "ZA-03": {
         "pct": 79.16,
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.19:28:26",
+  "nviVersion": "2026.04.14.19:58:27",
   "processingPct": 98.5
 }
