@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T11:01:08.625242",
+  "lastUpdated": "2026-04-14T11:31:22.812872",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -834,12 +834,12 @@
       "counted": 100.0
     },
     "ZA-02": {
-      "FIDESZ-KDNP": 50.5,
-      "TISZA": 41.7,
-      "DK": 0.8,
-      "Mi Hazánk": 6.4,
+      "FIDESZ-KDNP": 50.7,
+      "TISZA": 41.6,
+      "DK": 0.9,
+      "Mi Hazánk": 6.1,
       "MKKP": 0.6,
-      "counted": 4.17
+      "counted": 4.86
     },
     "ZA-03": {
       "FIDESZ-KDNP": 38.1,
@@ -21507,9 +21507,9 @@
         "ballotsCast": 57028
       },
       "ZA-02": {
-        "pct": 80.24,
-        "register": 3314,
-        "ballotsCast": 2659
+        "pct": 79.78,
+        "register": 3590,
+        "ballotsCast": 2864
       },
       "ZA-03": {
         "pct": 78.79,
@@ -21519,10 +21519,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7460586,
-      "ballotsCast": 5935023,
-      "feldar": 98.63,
-      "generated": "2026-04-14T09:58:40+02:00"
+      "register": 7460866,
+      "ballotsCast": 5935231,
+      "feldar": 98.64,
+      "generated": "2026-04-14T10:28:53+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21640,10 +21640,10 @@
         "feldar": 100.0
       },
       "Zala": {
-        "pct": 81.09,
-        "register": 142729,
-        "ballotsCast": 115746,
-        "feldar": 67.68
+        "pct": 81.08,
+        "register": 143009,
+        "ballotsCast": 115954,
+        "feldar": 67.92
       }
     },
     "constituenciesFinalInclusive": {
@@ -22272,10 +22272,10 @@
         "feldar": 100.0
       },
       "ZA-02": {
-        "pct": 80.83,
-        "register": 4195,
-        "ballotsCast": 3391,
-        "feldar": 4.83
+        "pct": 80.42,
+        "register": 4475,
+        "ballotsCast": 3599,
+        "feldar": 5.52
       },
       "ZA-03": {
         "pct": 79.16,
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.09:58:40",
+  "nviVersion": "2026.04.14.10:28:53",
   "processingPct": 98.25
 }
