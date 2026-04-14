@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T15:01:58.725199",
+  "lastUpdated": "2026-04-14T15:31:12.756045",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -834,10 +834,10 @@
       "counted": 100.0
     },
     "ZA-02": {
-      "FIDESZ-KDNP": 50.9,
-      "TISZA": 41.6,
-      "DK": 0.9,
-      "Mi Hazánk": 5.9,
+      "FIDESZ-KDNP": 50.8,
+      "TISZA": 41.9,
+      "DK": 0.8,
+      "Mi Hazánk": 5.7,
       "MKKP": 0.6,
       "counted": 9.03
     },
@@ -21507,9 +21507,9 @@
         "ballotsCast": 57028
       },
       "ZA-02": {
-        "pct": 76.78,
-        "register": 6314,
-        "ballotsCast": 4848
+        "pct": 76.89,
+        "register": 7269,
+        "ballotsCast": 5589
       },
       "ZA-03": {
         "pct": 78.79,
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.13:59:06",
-  "processingPct": 98.28
+  "nviVersion": "2026.04.14.14:28:04",
+  "processingPct": 98.29
 }
