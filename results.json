@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T18:31:29.541487",
+  "lastUpdated": "2026-04-14T19:01:42.039570",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -834,12 +834,12 @@
       "counted": 100.0
     },
     "ZA-02": {
-      "FIDESZ-KDNP": 49.1,
-      "TISZA": 43.5,
+      "FIDESZ-KDNP": 49.4,
+      "TISZA": 43.2,
       "DK": 0.8,
-      "Mi Hazánk": 5.7,
+      "Mi Hazánk": 5.8,
       "MKKP": 0.6,
-      "counted": 31.25
+      "counted": 34.03
     },
     "ZA-03": {
       "FIDESZ-KDNP": 38.1,
@@ -1029,11 +1029,11 @@
       "MKKP": 0.71
     },
     "abroad": {
-      "FIDESZ-KDNP": 87.4,
-      "TISZA": 10.61,
+      "FIDESZ-KDNP": 87.45,
+      "TISZA": 10.55,
       "DK": 0.2,
-      "Mi Hazánk": 1.48,
-      "MKKP": 0.3
+      "Mi Hazánk": 1.49,
+      "MKKP": 0.31
     }
   },
   "turnout": {
@@ -21507,9 +21507,9 @@
         "ballotsCast": 57028
       },
       "ZA-02": {
-        "pct": 77.76,
-        "register": 19881,
-        "ballotsCast": 15459
+        "pct": 77.8,
+        "register": 21108,
+        "ballotsCast": 16423
       },
       "ZA-03": {
         "pct": 78.79,
@@ -21519,10 +21519,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7477417,
-      "ballotsCast": 5948086,
-      "feldar": 99.01,
-      "generated": "2026-04-14T17:28:49+02:00"
+      "register": 7478658,
+      "ballotsCast": 5949064,
+      "feldar": 99.05,
+      "generated": "2026-04-14T17:58:30+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21640,10 +21640,10 @@
         "feldar": 100.0
       },
       "Zala": {
-        "pct": 80.73,
-        "register": 159560,
-        "ballotsCast": 128809,
-        "feldar": 76.81
+        "pct": 80.71,
+        "register": 160801,
+        "ballotsCast": 129787,
+        "feldar": 77.75
       }
     },
     "constituenciesFinalInclusive": {
@@ -22272,10 +22272,10 @@
         "feldar": 100.0
       },
       "ZA-02": {
-        "pct": 78.26,
-        "register": 21026,
-        "ballotsCast": 16454,
-        "feldar": 31.72
+        "pct": 78.29,
+        "register": 22267,
+        "ballotsCast": 17432,
+        "feldar": 34.48
       },
       "ZA-03": {
         "pct": 79.16,
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.17:28:49",
-  "processingPct": 98.44
+  "nviVersion": "2026.04.14.17:58:30",
+  "processingPct": 98.46
 }
