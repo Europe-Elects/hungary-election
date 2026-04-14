@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-14T18:01:16.777433",
+  "lastUpdated": "2026-04-14T18:31:29.541487",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 31.1,
@@ -835,11 +835,11 @@
     },
     "ZA-02": {
       "FIDESZ-KDNP": 49.1,
-      "TISZA": 43.6,
+      "TISZA": 43.5,
       "DK": 0.8,
       "Mi Hazánk": 5.7,
       "MKKP": 0.6,
-      "counted": 29.86
+      "counted": 31.25
     },
     "ZA-03": {
       "FIDESZ-KDNP": 38.1,
@@ -1030,7 +1030,7 @@
     },
     "abroad": {
       "FIDESZ-KDNP": 87.4,
-      "TISZA": 10.62,
+      "TISZA": 10.61,
       "DK": 0.2,
       "Mi Hazánk": 1.48,
       "MKKP": 0.3
@@ -21507,9 +21507,9 @@
         "ballotsCast": 57028
       },
       "ZA-02": {
-        "pct": 77.74,
-        "register": 19790,
-        "ballotsCast": 15384
+        "pct": 77.76,
+        "register": 19881,
+        "ballotsCast": 15459
       },
       "ZA-03": {
         "pct": 78.79,
@@ -21519,10 +21519,10 @@
     },
     "nationalFinalInclusive": {
       "pct": 79.55,
-      "register": 7476956,
-      "ballotsCast": 5947730,
-      "feldar": 98.99,
-      "generated": "2026-04-14T16:28:34+02:00"
+      "register": 7477417,
+      "ballotsCast": 5948086,
+      "feldar": 99.01,
+      "generated": "2026-04-14T17:28:49+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -21640,10 +21640,10 @@
         "feldar": 100.0
       },
       "Zala": {
-        "pct": 80.74,
-        "register": 159099,
-        "ballotsCast": 128453,
-        "feldar": 76.35
+        "pct": 80.73,
+        "register": 159560,
+        "ballotsCast": 128809,
+        "feldar": 76.81
       }
     },
     "constituenciesFinalInclusive": {
@@ -22272,10 +22272,10 @@
         "feldar": 100.0
       },
       "ZA-02": {
-        "pct": 78.28,
-        "register": 20565,
-        "ballotsCast": 16098,
-        "feldar": 30.34
+        "pct": 78.26,
+        "register": 21026,
+        "ballotsCast": 16454,
+        "feldar": 31.72
       },
       "ZA-03": {
         "pct": 79.16,
@@ -22286,6 +22286,6 @@
     }
   },
   "processingPctDomestic": 98.94,
-  "nviVersion": "2026.04.14.16:58:49",
+  "nviVersion": "2026.04.14.17:28:49",
   "processingPct": 98.44
 }
