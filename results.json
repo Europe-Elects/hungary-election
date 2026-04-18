@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-18T15:30:00.000000",
+  "lastUpdated": "2026-04-18T22:00:00.000000",
   "constituencies": {
     "BP-01": {
       "FIDESZ-KDNP": 30.7,
@@ -852,10 +852,10 @@
   },
   "countyList": {
     "Budapest": {
-      "TISZA": 63.66,
-      "FIDESZ-KDNP": 28.43,
-      "Mi Hazánk": 4.61,
-      "DK": 1.7,
+      "TISZA": 63.76,
+      "FIDESZ-KDNP": 28.36,
+      "Mi Hazánk": 4.59,
+      "DK": 1.69,
       "MKKP": 1.42
     },
     "Baranya": {
@@ -894,9 +894,9 @@
       "MKKP": 0.9
     },
     "Fejér": {
-      "TISZA": 53.56,
-      "FIDESZ-KDNP": 37.53,
-      "Mi Hazánk": 6.26,
+      "TISZA": 53.72,
+      "FIDESZ-KDNP": 37.4,
+      "Mi Hazánk": 6.23,
       "DK": 1.19,
       "MKKP": 0.96
     },
@@ -915,11 +915,11 @@
       "MKKP": 0.67
     },
     "Heves": {
-      "TISZA": 52.39,
-      "FIDESZ-KDNP": 38.42,
-      "Mi Hazánk": 6.86,
-      "DK": 1.05,
-      "MKKP": 0.56
+      "TISZA": 52.87,
+      "FIDESZ-KDNP": 38.02,
+      "Mi Hazánk": 6.81,
+      "DK": 1.04,
+      "MKKP": 0.57
     },
     "Jász-Nagykun-Szolnok": {
       "TISZA": 52.63,
@@ -950,11 +950,11 @@
       "MKKP": 0.91
     },
     "Somogy": {
-      "TISZA": 51.01,
-      "FIDESZ-KDNP": 40.84,
-      "Mi Hazánk": 5.68,
+      "TISZA": 51.38,
+      "FIDESZ-KDNP": 40.5,
+      "Mi Hazánk": 5.66,
       "DK": 1.23,
-      "MKKP": 0.61
+      "MKKP": 0.62
     },
     "Szabolcs-Szatmár-Bereg": {
       "TISZA": 49.78,
@@ -993,10 +993,10 @@
     }
   },
   "nationalVote": {
-    "TISZA": 53.12,
-    "FIDESZ-KDNP": 38.66,
-    "Mi Hazánk": 5.64,
-    "DK": 1.11,
+    "TISZA": 53.18,
+    "FIDESZ-KDNP": 38.61,
+    "Mi Hazánk": 5.63,
+    "DK": 1.1,
     "MKKP": 0.82
   },
   "minorityVote": {
@@ -1015,23 +1015,23 @@
   },
   "nationalBreakdown": {
     "capital": {
-      "TISZA": 63.8,
-      "FIDESZ-KDNP": 28.5,
+      "TISZA": 63.9,
+      "FIDESZ-KDNP": 28.4,
       "Mi Hazánk": 4.6,
       "DK": 1.7,
       "MKKP": 1.4
     },
     "restOfCountry": {
-      "TISZA": 54.0,
+      "TISZA": 54.1,
       "FIDESZ-KDNP": 38.0,
       "Mi Hazánk": 6.2,
       "DK": 1.1,
       "MKKP": 0.7
     },
     "abroad": {
-      "FIDESZ-KDNP": 84.0,
-      "TISZA": 13.9,
-      "Mi Hazánk": 1.6,
+      "FIDESZ-KDNP": 84.2,
+      "TISZA": 13.8,
+      "Mi Hazánk": 1.4,
       "MKKP": 0.4,
       "DK": 0.2
     }
@@ -21522,7 +21522,7 @@
       "register": 7527742,
       "ballotsCast": 5988778,
       "feldar": 100.0,
-      "generated": "2026-04-18T14:28:11+02:00"
+      "generated": "2026-04-18T21:58:13+02:00"
     },
     "countiesFinalInclusive": {
       "Budapest": {
@@ -22285,14 +22285,14 @@
       }
     }
   },
-  "processingPctDomestic": 99.93,
+  "processingPctDomestic": 100.0,
   "nviVersion": "2026.04.16.10:29:05",
   "processingPct": 100.0,
   "nationalVoteDomestic": {
-    "TISZA": 55.7,
-    "FIDESZ-KDNP": 36.38,
-    "Mi Hazánk": 5.91,
-    "DK": 1.17,
+    "TISZA": 55.76,
+    "FIDESZ-KDNP": 36.33,
+    "Mi Hazánk": 5.9,
+    "DK": 1.16,
     "MKKP": 0.85
   }
 }
