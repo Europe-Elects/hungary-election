@@ -379,7 +379,7 @@ function applyResults(data) {
     : data.processingPct;
   if (typeof pct === 'number' && pct > 0) {
     pill.style.display = 'inline-block';
-    pill.textContent = pct.toFixed(1) + '% counted (domestic)';
+    pill.textContent = pct.toFixed(1) + '% counted';
   } else {
     pill.style.display = 'none';
   }
